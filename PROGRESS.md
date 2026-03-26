@@ -5,9 +5,9 @@
 ---
 
 ## Current Status
-**Active Phase:** Phase 2 — Auth System
-**Last Completed Task:** Phase 1 — Backend Foundation
-**Next Task:** Phase 2, Step 1 — POST /auth/register endpoint
+**Active Phase:** Phase 3 — Core API Endpoints
+**Last Completed Task:** Phase 2 — Auth System
+**Next Task:** Phase 3, Step 1 — GET /deliveries endpoint
 
 ---
 
@@ -36,11 +36,11 @@
 - [x] Backend runs: `uvicorn main:app --reload`
 
 ### Phase 2 — Auth System
-- [ ] `POST /auth/register` endpoint
-- [ ] `POST /auth/login` endpoint (returns httpOnly cookie)
-- [ ] JWT middleware / dependency (get_current_user)
-- [ ] Role-based dependency (require_admin, require_dispatcher)
-- [ ] Auth tests passing (`pytest tests/test_auth.py`)
+- [x] `POST /auth/register` endpoint
+- [x] `POST /auth/login` endpoint (returns httpOnly cookie)
+- [x] JWT middleware / dependency (get_current_user)
+- [x] Role-based dependency (require_admin, require_dispatcher)
+- [x] Auth tests passing (`pytest tests/test_auth.py`)
 
 ### Phase 3 — Core API Endpoints
 - [ ] `GET /deliveries`
@@ -141,6 +141,7 @@
 |---|---|---|---|
 | 1 | 2026-03-26 | Completed Phase 0: Project Setup, created folder structure, .gitignore, README.md | Phase 1 Step 1 |
 | 2 | 2026-03-26 | Completed Phase 1: Backend Foundation — venv, requirements.txt, config.py, database.py, all models, schemas, Alembic migration, main.py, uvicorn verified | Phase 2 Step 1 |
+| 3 | 2026-03-26 | Completed Phase 2: Auth System — register, login (httpOnly cookie), logout, /me, get_current_user, require_admin, require_dispatcher. All 7 pytest tests passing. | Phase 3 Step 1 |
 
 ---
 
@@ -154,5 +155,7 @@ None yet.
 <!-- Update this section at end of every session -->
 - Backend is fully set up and running on port 8000.
 - Neon DB is connected; all 7 tables are live (run `alembic current` to verify).
-- Next: Phase 2 — Auth System. Create `POST /auth/register`, `POST /auth/login` (httpOnly cookie), and `get_current_user` dependency in `routers/auth.py`.
+- Auth system complete: register, login, logout, /me, JWT cookie auth, role-based deps.
+- All 7 auth tests pass (`pytest tests/test_auth.py -v`).
+- Next: Phase 3 — Core API Endpoints (deliveries, riders, analytics).
 - Reminder: NEVER commit `backend/.env` — it is in `.gitignore`.

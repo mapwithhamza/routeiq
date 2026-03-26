@@ -24,11 +24,16 @@ async def health_check():
 
 
 # ---------------------------------------------------------------------------
-# Routers (wired in Phase 2 onwards)
+# Routers
 # ---------------------------------------------------------------------------
-# from routers import auth, deliveries, riders, routes, analytics
-# app.include_router(auth.router, prefix="/auth", tags=["auth"])
+from routers import auth as auth_router
+
+app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
+
+# Additional routers wired in later phases:
+# from routers import deliveries, riders, routes, analytics
 # app.include_router(deliveries.router, prefix="/deliveries", tags=["deliveries"])
 # app.include_router(riders.router, prefix="/riders", tags=["riders"])
 # app.include_router(routes.router, prefix="/routes", tags=["routes"])
 # app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
+
