@@ -5,9 +5,9 @@
 ---
 
 ## Current Status
-**Active Phase:** Phase 3 — Core API Endpoints
-**Last Completed Task:** Phase 2 — Auth System
-**Next Task:** Phase 3, Step 1 — GET /deliveries endpoint
+**Active Phase:** Phase 4 — DSA Engine
+**Last Completed Task:** Phase 3 — Core API Endpoints
+**Next Task:** Phase 4, Step 1 — dsa/graph.py Graph builder
 
 ---
 
@@ -43,17 +43,17 @@
 - [x] Auth tests passing (`pytest tests/test_auth.py`)
 
 ### Phase 3 — Core API Endpoints
-- [ ] `GET /deliveries`
-- [ ] `POST /deliveries`
-- [ ] `PUT /deliveries/{id}`
-- [ ] `DELETE /deliveries/{id}`
-- [ ] `GET /riders`
-- [ ] `POST /riders`
-- [ ] `PUT /riders/{id}`
-- [ ] `GET /analytics/summary`
-- [ ] `GET /analytics/algorithms`
-- [ ] Delivery tests passing
-- [ ] Rider tests passing
+- [x] `GET /deliveries`
+- [x] `POST /deliveries`
+- [x] `PUT /deliveries/{id}`
+- [x] `DELETE /deliveries/{id}`
+- [x] `GET /riders`
+- [x] `POST /riders`
+- [x] `PUT /riders/{id}`
+- [x] `GET /analytics/summary`
+- [x] `GET /analytics/algorithms`
+- [x] Delivery tests passing (7/7)
+- [x] Rider tests passing (7/7)
 
 ### Phase 4 — DSA Engine
 - [ ] `dsa/graph.py` — Graph builder from GeoJSON/mock data
@@ -142,6 +142,7 @@
 | 1 | 2026-03-26 | Completed Phase 0: Project Setup, created folder structure, .gitignore, README.md | Phase 1 Step 1 |
 | 2 | 2026-03-26 | Completed Phase 1: Backend Foundation — venv, requirements.txt, config.py, database.py, all models, schemas, Alembic migration, main.py, uvicorn verified | Phase 2 Step 1 |
 | 3 | 2026-03-26 | Completed Phase 2: Auth System — register, login (httpOnly cookie), logout, /me, get_current_user, require_admin, require_dispatcher. All 7 pytest tests passing. | Phase 3 Step 1 |
+| 4 | 2026-03-26 | Completed Phase 3: Core API Endpoints — deliveries CRUD, riders CRUD, analytics summary & algorithms. All 14 tests passing (7 deliveries + 7 riders). | Phase 4 Step 1 |
 
 ---
 
@@ -155,7 +156,7 @@ None yet.
 <!-- Update this section at end of every session -->
 - Backend is fully set up and running on port 8000.
 - Neon DB is connected; all 7 tables are live (run `alembic current` to verify).
-- Auth system complete: register, login, logout, /me, JWT cookie auth, role-based deps.
-- All 7 auth tests pass (`pytest tests/test_auth.py -v`).
-- Next: Phase 3 — Core API Endpoints (deliveries, riders, analytics).
+- Auth system complete + all Phase 3 endpoints complete.
+- All tests pass: 7 auth + 7 deliveries + 7 riders = 21 total.
+- Next: Phase 4 — DSA Engine (graph.py, bfs, dfs, dijkstra, astar, greedy_nn, tsp_dp, merge_sort, benchmark).
 - Reminder: NEVER commit `backend/.env` — it is in `.gitignore`.
