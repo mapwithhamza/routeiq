@@ -5,9 +5,9 @@
 ---
 
 ## Current Status
-**Active Phase:** Phase 6 — Auth UI
-**Last Completed Task:** Phase 5 — Frontend Foundation (Vite dev server confirmed running cleanly at localhost:5173)
-**Next Task:** Phase 6, Step 1 — Login page + protected route wrapper
+**Active Phase:** Phase 7 — Dashboard & Core Pages
+**Last Completed Task:** Phase 6 — Auth UI (Login, Register, ProtectedRoute, useAuth hook, role-based redirect)
+**Next Task:** Phase 7, Step 1 — Dashboard page (4 summary cards + ECharts chart)
 
 ---
 
@@ -83,13 +83,13 @@
 - [x] React Router v6 configured with all 6 routes
 - [x] `.env` created (VITE_API_URL)
 
-### Phase 6 — Auth UI
-- [ ] Login page (`/pages/Login.tsx`)
-- [ ] Register page (or modal)
-- [ ] Protected route wrapper component
-- [ ] Role-based redirect after login
-- [ ] Auth state managed (TanStack Query or context)
-- [ ] Sonner toast on login error / success
+### Phase 6 — Auth UI ✅
+- [x] Login page (`/pages/Login.tsx`)
+- [x] Register page (`/pages/Register.tsx`)
+- [x] Protected route wrapper (`/components/ProtectedRoute.tsx`)
+- [x] Role-based redirect after login (admin/dispatcher → /dashboard)
+- [x] Auth state managed via TanStack Query (`/hooks/useAuth.ts`)
+- [x] Sonner toast on login error / success
 
 ### Phase 7 — Dashboard & Core Pages
 - [ ] Dashboard Home (`/pages/Dashboard.tsx`) — 4 summary cards + ECharts chart
@@ -145,6 +145,7 @@
 | 4 | 2026-03-26 | Completed Phase 3: Core API Endpoints — deliveries CRUD, riders CRUD, analytics summary & algorithms. All 14 tests passing (7 deliveries + 7 riders). | Phase 4 Step 1 |
 | 5 | 2026-03-26 | Completed Phase 4: DSA Engine — graph.py, bfs, dfs, dijkstra, astar, greedy_nn, tsp_dp, merge_sort, benchmark, all 3 /routes endpoints. 33/33 tests passing. | Phase 5 Step 1 |
 | 6 | 2026-03-26 | Completed Phase 5: Frontend Foundation — Vite+React18+TS, Tailwind, all npm packages, axios.ts, api.ts, types/, schemas/, TanStack Query v5, React Router v6. npm run dev ✅ VITE v5.4.21 ready in 398ms at localhost:5173, zero errors. | Phase 6 Step 1 |
+| 7 | 2026-03-26 | Completed Phase 6: Auth UI — Login.tsx, Register.tsx, ProtectedRoute.tsx, useAuth.ts (TanStack Query v5). Role-based redirect, Sonner toasts, TS compile clean (tsc --noEmit: 0 errors). | Phase 7 Step 1 |
 
 ---
 
@@ -157,9 +158,9 @@ None yet.
 ## Important Notes for Next Session
 <!-- Update this section at end of every session -->
 - Backend is fully set up and running on port 8000.
-- Neon DB is connected; all 7 tables are live (run `alembic current` to verify).
-- Auth + Phase 3 + Phase 4 all complete.
-- All tests pass: 7 auth + 7 deliveries + 7 riders + 33 algorithms = 47 total.
-- Frontend (Phase 5) is complete: `npm run dev` runs cleanly at http://localhost:5173/ — VITE v5.4.21, zero compile errors.
-- Next: Phase 6 — Auth UI (Login page, protected routes, role-based redirect, Sonner toasts).
+- Neon DB is connected; all 7 tables are live.
+- All backend tests pass: 7 auth + 7 deliveries + 7 riders + 33 algorithms = 47 total.
+- Frontend Phase 5 + Phase 6 complete. `npm run dev` ✅, `tsc --noEmit` ✅ (zero errors).
+- Auth flow: visiting `/` → `/dashboard` → ProtectedRoute → `/login`. Login/register pages styled in dark Tailwind. Sonner toasts on error/success.
+- Next: Phase 7 — Dashboard & Core Pages (4 summary cards, ECharts chart, Deliveries table, Riders list).
 - Reminder: NEVER commit `backend/.env` or `frontend/.env` — both are in `.gitignore`.
