@@ -5,9 +5,9 @@
 ---
 
 ## Current Status
-**Active Phase:** Phase 1 — Backend Foundation
-**Last Completed Task:** Phase 0 — Project Setup
-**Next Task:** Phase 1, Step 1 — Create backend virtual environment and install packages
+**Active Phase:** Phase 2 — Auth System
+**Last Completed Task:** Phase 1 — Backend Foundation
+**Next Task:** Phase 2, Step 1 — POST /auth/register endpoint
 
 ---
 
@@ -22,18 +22,18 @@
 - [x] README.md created
 
 ### Phase 1 — Backend Foundation
-- [ ] Python virtual environment created (`/backend/venv`)
-- [ ] `requirements.txt` created with all pinned versions
-- [ ] All packages installed
-- [ ] `config.py` created (pydantic-settings BaseSettings)
-- [ ] `database.py` created (SQLAlchemy 2.x async engine)
-- [ ] `.env` and `.env.example` created
-- [ ] All SQLAlchemy models created (user, rider, delivery, route, route_stop, road_condition, algorithm_run)
-- [ ] All Pydantic v2 schemas created
-- [ ] Alembic initialized and first migration created
-- [ ] `alembic upgrade head` run successfully
-- [ ] FastAPI `main.py` with CORS middleware created
-- [ ] Backend runs: `uvicorn main:app --reload`
+- [x] Python virtual environment created (`/backend/venv`)
+- [x] `requirements.txt` created with all pinned versions
+- [x] All packages installed
+- [x] `config.py` created (pydantic-settings BaseSettings)
+- [x] `database.py` created (SQLAlchemy 2.x async engine)
+- [x] `.env` and `.env.example` created
+- [x] All SQLAlchemy models created (user, rider, delivery, route, route_stop, road_condition, algorithm_run)
+- [x] All Pydantic v2 schemas created
+- [x] Alembic initialized and first migration created
+- [x] `alembic upgrade head` run successfully
+- [x] FastAPI `main.py` with CORS middleware created
+- [x] Backend runs: `uvicorn main:app --reload`
 
 ### Phase 2 — Auth System
 - [ ] `POST /auth/register` endpoint
@@ -140,6 +140,7 @@
 | Session | Date | What Was Done | Stopped At |
 |---|---|---|---|
 | 1 | 2026-03-26 | Completed Phase 0: Project Setup, created folder structure, .gitignore, README.md | Phase 1 Step 1 |
+| 2 | 2026-03-26 | Completed Phase 1: Backend Foundation — venv, requirements.txt, config.py, database.py, all models, schemas, Alembic migration, main.py, uvicorn verified | Phase 2 Step 1 |
 
 ---
 
@@ -151,4 +152,7 @@ None yet.
 
 ## Important Notes for Next Session
 <!-- Update this section at end of every session -->
-Project not started yet. Begin with Phase 0.
+- Backend is fully set up and running on port 8000.
+- Neon DB is connected; all 7 tables are live (run `alembic current` to verify).
+- Next: Phase 2 — Auth System. Create `POST /auth/register`, `POST /auth/login` (httpOnly cookie), and `get_current_user` dependency in `routers/auth.py`.
+- Reminder: NEVER commit `backend/.env` — it is in `.gitignore`.
