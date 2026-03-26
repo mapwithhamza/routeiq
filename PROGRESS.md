@@ -5,9 +5,9 @@
 ---
 
 ## Current Status
-**Active Phase:** Phase 4 — DSA Engine
-**Last Completed Task:** Phase 3 — Core API Endpoints
-**Next Task:** Phase 4, Step 1 — dsa/graph.py Graph builder
+**Active Phase:** Phase 5 — Frontend Foundation
+**Last Completed Task:** Phase 4 — DSA Engine (all 33 tests passing)
+**Next Task:** Phase 5, Step 1 — Vite + React 18 + TypeScript project init
 
 ---
 
@@ -56,20 +56,20 @@
 - [x] Rider tests passing (7/7)
 
 ### Phase 4 — DSA Engine
-- [ ] `dsa/graph.py` — Graph builder from GeoJSON/mock data
-- [ ] `dsa/bfs.py` — BFS implementation + returns standard result dict
-- [ ] `dsa/dfs.py` — DFS implementation + returns standard result dict
-- [ ] `dsa/dijkstra.py` — Dijkstra implementation + returns standard result dict
-- [ ] `dsa/astar.py` — A* implementation + returns standard result dict
-- [ ] `dsa/greedy_nn.py` — Nearest Neighbor Greedy + returns standard result dict
-- [ ] `dsa/tsp_dp.py` — TSP bitmask DP + returns standard result dict
-- [ ] `dsa/merge_sort.py` — Merge Sort implementation
-- [ ] `dsa/benchmark.py` — Benchmark runner (10/50/200 nodes)
-- [ ] All algorithms validated against NetworkX reference
-- [ ] `POST /routes/optimize` endpoint
-- [ ] `GET /routes/{id}` endpoint
-- [ ] `POST /routes/benchmark` endpoint
-- [ ] Algorithm tests passing
+- [x] `dsa/graph.py` — Graph builder from GeoJSON/mock data
+- [x] `dsa/bfs.py` — BFS implementation + returns standard result dict
+- [x] `dsa/dfs.py` — DFS implementation + returns standard result dict
+- [x] `dsa/dijkstra.py` — Dijkstra implementation + returns standard result dict
+- [x] `dsa/astar.py` — A* implementation + returns standard result dict
+- [x] `dsa/greedy_nn.py` — Nearest Neighbor Greedy + returns standard result dict
+- [x] `dsa/tsp_dp.py` — TSP bitmask DP + returns standard result dict
+- [x] `dsa/merge_sort.py` — Merge Sort implementation
+- [x] `dsa/benchmark.py` — Benchmark runner (10/50/200 nodes)
+- [x] All algorithms validated against NetworkX reference
+- [x] `POST /routes/optimize` endpoint
+- [x] `GET /routes/{id}` endpoint
+- [x] `POST /routes/benchmark` endpoint
+- [x] Algorithm tests passing (33/33)
 
 ### Phase 5 — Frontend Foundation
 - [ ] Vite + React 18 + TypeScript project initialized
@@ -143,6 +143,7 @@
 | 2 | 2026-03-26 | Completed Phase 1: Backend Foundation — venv, requirements.txt, config.py, database.py, all models, schemas, Alembic migration, main.py, uvicorn verified | Phase 2 Step 1 |
 | 3 | 2026-03-26 | Completed Phase 2: Auth System — register, login (httpOnly cookie), logout, /me, get_current_user, require_admin, require_dispatcher. All 7 pytest tests passing. | Phase 3 Step 1 |
 | 4 | 2026-03-26 | Completed Phase 3: Core API Endpoints — deliveries CRUD, riders CRUD, analytics summary & algorithms. All 14 tests passing (7 deliveries + 7 riders). | Phase 4 Step 1 |
+| 5 | 2026-03-26 | Completed Phase 4: DSA Engine — graph.py, bfs, dfs, dijkstra, astar, greedy_nn, tsp_dp, merge_sort, benchmark, all 3 /routes endpoints. 33/33 tests passing. | Phase 5 Step 1 |
 
 ---
 
@@ -156,7 +157,7 @@ None yet.
 <!-- Update this section at end of every session -->
 - Backend is fully set up and running on port 8000.
 - Neon DB is connected; all 7 tables are live (run `alembic current` to verify).
-- Auth system complete + all Phase 3 endpoints complete.
-- All tests pass: 7 auth + 7 deliveries + 7 riders = 21 total.
-- Next: Phase 4 — DSA Engine (graph.py, bfs, dfs, dijkstra, astar, greedy_nn, tsp_dp, merge_sort, benchmark).
+- Auth + Phase 3 + Phase 4 all complete.
+- All tests pass: 7 auth + 7 deliveries + 7 riders + 33 algorithms = 47 total.
+- Next: Phase 5 — Frontend Foundation (Vite + React 18 + TS, Tailwind, TanStack Query, React Router).
 - Reminder: NEVER commit `backend/.env` — it is in `.gitignore`.
