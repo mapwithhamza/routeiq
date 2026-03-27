@@ -5,9 +5,9 @@
 ---
 
 ## Current Status
-**Active Phase:** Phase 9 — Algorithm Comparison Panel
-**Last Completed Task:** Phase 8 — Map & Route Optimization (MainMap + Optimization logic)
-**Next Task:** Phase 9, Step 1 — Algorithm comparison table and charts
+**Active Phase:** Phase 10 — Deployment
+**Last Completed Task:** Phase 9 — Algorithm Comparison Panel (benchmark table + ECharts bar charts + winner badge)
+**Next Task:** Phase 10, Step 1 — Deploy frontend to Vercel and backend to Railway
 
 ---
 
@@ -107,13 +107,13 @@
 - [ ] Blocked road toggle
 - [ ] Route Optimization Page fully wired (`/pages/RouteOptimization.tsx`)
 
-### Phase 9 — Algorithm Comparison Panel
-- [ ] Algorithm comparison table (all 7 algorithms)
-- [ ] ECharts bar charts (distance + runtime)
-- [ ] Winner badge logic
-- [ ] Click row → toggle algorithm route layer on map
-- [ ] Benchmark mode (10/50/200 nodes)
-- [ ] Algorithm Comparison Page complete (`/pages/AlgorithmComparison.tsx`)
+### Phase 9 — Algorithm Comparison Panel ✅
+- [x] Algorithm comparison table (all 7 algorithms)
+- [x] ECharts bar charts (distance + runtime)
+- [x] Winner badge logic
+- [x] Click row → show detailed metrics panel for selected algorithm
+- [x] Benchmark mode (10/50/200 nodes — client-side filter on full backend run)
+- [x] Algorithm Comparison Page complete (`/pages/AlgorithmComparison.tsx`)
 
 ### Phase 10 — Deployment
 - [ ] `.gitignore` verified (no .env files committed)
@@ -148,6 +148,7 @@
 | 7 | 2026-03-26 | Completed Phase 6: Auth UI — Login.tsx, Register.tsx, ProtectedRoute.tsx, useAuth.ts (TanStack Query v5). Role-based redirect, Sonner toasts, TS compile clean (tsc --noEmit: 0 errors). | Phase 7 Step 1 |
 | 8 | 2026-03-26 | Completed Phase 7: Dashboard & Core Pages — Layout.tsx, Dashboard.tsx (ECharts), Deliveries.tsx (CRUD modal), Riders.tsx (fleet assignment, MapLibre mini-map). Complete Tailwind styling. | Phase 8 Step 1 |
 | 9 | 2026-03-26 | Completed Phase 8: Map & Route Optimization — MainMap.tsx (MapLibre GL, markers, animated polyline using dashOffset shifting). RouteOptimization.tsx with algorithm selector dropdown and results panel. Clean TS compile. | Phase 9 Step 1 |
+| 10 | 2026-03-27 | Completed Phase 9: Algorithm Comparison Panel — AlgorithmComparison.tsx with benchmark runner, 10/50/200 node selector, 7-algo table with winner badge, distance + runtime ECharts bar charts, and row click detail view. 0 TS errors. | Phase 10 Step 1 |
 
 ---
 
@@ -162,8 +163,8 @@ None yet.
 - Backend is fully set up and running on port 8000.
 - Neon DB is connected; all 7 tables are live.
 - All backend tests pass: 7 auth + 7 deliveries + 7 riders + 33 algorithms = 47 total.
-- Frontend Phase 5 + 6 + 7 + 8 complete. `npm run dev` ✅, `tsc --noEmit` ✅ (zero errors).
+- Frontend Phases 5–9 all complete. `npm run dev` ✅, `tsc --noEmit` ✅ (zero errors).
 - Auth flow: visiting `/` → `/dashboard` → ProtectedRoute → `/login`. Sign in to test.
-- Phase 8 delivered: MainMap.tsx with animated routing logic, and RouteOptimization.tsx utilizing `routesApi.optimize` and `deliveriesApi.create` for click map waypoints.
-- Next: Phase 9 — Algorithm Comparison Panel (Table, distance/runtime bar charts, algorithm selection).
+- Phase 9 delivered: AlgorithmComparison.tsx at `/algorithms` — benchmark runner, comparison table, ECharts bar charts, winner badge.
+- Next: Phase 10 — Deploy frontend to Vercel, backend to Railway, update CORS/env vars.
 - Reminder: NEVER commit `backend/.env` or `frontend/.env` — both are in `.gitignore`.

@@ -12,18 +12,7 @@ import Dashboard from './pages/Dashboard';
 import Deliveries from './pages/Deliveries';
 import Riders from './pages/Riders';
 import RouteOptimization from './pages/RouteOptimization';
-
-// Placeholder pages — built in Phase 9
-const Page = ({ name }: { name: string }) => (
-  <div className="flex min-h-screen items-center justify-center bg-gray-950 text-white">
-    <div className="text-center">
-      <h1 className="text-3xl font-bold text-indigo-400">{name}</h1>
-      <p className="mt-2 text-gray-400">Phase 8–9 will build this page.</p>
-    </div>
-  </div>
-);
-
-const AlgoComp          = () => <Page name="Algorithm Comparison" />;
+import AlgorithmComparison from './pages/AlgorithmComparison';
 
 export default function App() {
   return (
@@ -38,7 +27,7 @@ export default function App() {
         <Route path="/deliveries" element={<Deliveries />} />
         <Route path="/riders"     element={<Riders />} />
         <Route path="/routes"     element={<RouteOptimization />} />
-        <Route path="/algorithms" element={<AlgoComp />} />
+        <Route path="/algorithms" element={<AlgorithmComparison />} />
       </Route>
 
       {/* Root: redirect to dashboard (ProtectedRoute will then redirect to /login if needed) */}
