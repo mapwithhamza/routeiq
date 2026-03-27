@@ -45,14 +45,13 @@ async def analytics_summary(
     total_riders = sum(rider_counts.values())
 
     return {
-        "deliveries": {
-            "total": total_deliveries,
-            "by_status": delivery_counts,
-        },
-        "riders": {
-            "total": total_riders,
-            "by_status": rider_counts,
-        },
+        "total_deliveries": total_deliveries,
+        "pending": delivery_counts.get(DeliveryStatus.pending.value, 0),
+        "in_transit": delivery_counts.get(DeliveryStatus.in_transit.value, 0),
+        "delivered": delivery_counts.get(DeliveryStatus.delivered.value, 0),
+        "failed": delivery_counts.get(DeliveryStatus.failed.value, 0),
+        "total_riders": total_riders,
+        "active_riders": rider_counts.get(RiderStatus.on_route.value, 0),
     }
 
 

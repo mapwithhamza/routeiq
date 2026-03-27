@@ -109,14 +109,14 @@ export default function Dashboard() {
         <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
           <h2 className="text-lg font-semibold text-white mb-6">Algorithm Performance</h2>
           {algos.length === 0 ? (
-            <div className="h-72 flex flex-col items-center justify-center text-center">
+            <div className="h-96 flex flex-col items-center justify-center text-center">
               <svg className="w-12 h-12 text-gray-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
               <p className="text-sm text-gray-500">No benchmark data yet. Run route optimization to populate this chart.</p>
             </div>
           ) : (
-            <div className="h-72">
+            <div className="h-96">
               <ReactECharts
                 option={{
                   tooltip: {
@@ -130,9 +130,19 @@ export default function Dashboard() {
                   grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
                   xAxis: {
                     type: 'category',
-                    data: algos.map(a => a.algorithm_name),
+                    data: algos.map(a => {
+                      const name = a.algorithm_name;
+                      if (name.includes('BFS')) return 'BFS';
+                      if (name.includes('DFS')) return 'DFS';
+                      if (name.includes('Dijkstra')) return 'Dijkstra';
+                      if (name.includes('A*')) return 'A*';
+                      if (name.includes('Greedy')) return 'Greedy';
+                      if (name.includes('TSP')) return 'TSP';
+                      if (name.includes('Sort')) return 'Sort';
+                      return name;
+                    }),
                     axisLine: { lineStyle: { color: '#4b5563' } },
-                    axisLabel: { color: '#9ca3af', interval: 0, rotate: 20, fontSize: 11 },
+                    axisLabel: { color: '#9ca3af', interval: 0, rotate: 45, fontSize: 11 },
                   },
                   yAxis: {
                     type: 'value',
