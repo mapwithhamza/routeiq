@@ -25,15 +25,6 @@ export default function Dashboard() {
   const sum = sumQuery.data;
   const algos = algoQuery.data || [];
 
-  // Calculate algorithm totals
-  const totalRuns = algos.reduce((acc, curr) => acc + curr.run_count, 0);
-  const avgDistancesStr = algos
-    .map(a => a.avg_distance_km)
-    .filter((v): v is number => v !== null);
-  const avgDist = avgDistancesStr.length > 0
-    ? (avgDistancesStr.reduce((a, b) => a + b, 0) / avgDistancesStr.length).toFixed(1)
-    : 0;
-
   // ECharts config
   const chartOptions = {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
@@ -78,8 +69,8 @@ export default function Dashboard() {
         {[
           { label: 'Total Deliveries', value: sum?.total_deliveries || 0, text: 'text-indigo-400' },
           { label: 'Active Riders', value: `${sum?.active_riders || 0} / ${sum?.total_riders || 0}`, text: 'text-green-400' },
-          { label: 'Routes Optimized', value: totalRuns, text: 'text-blue-400' },
-          { label: 'Avg Route Distance', value: `${avgDist} km`, text: 'text-yellow-400' },
+          { label: 'Routes Optimized', value: sum?.routes_optimized || 0, text: 'text-blue-400' },
+          { label: 'Avg Route Distance', value: `${sum?.avg_distance || 0} km`, text: 'text-yellow-400' },
         ].map((stat, i) => (
           <div key={i} className="rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-sm">
             <p className="text-sm font-medium text-gray-400">{stat.label}</p>
@@ -142,7 +133,7 @@ export default function Dashboard() {
                       return name;
                     }),
                     axisLine: { lineStyle: { color: '#4b5563' } },
-                    axisLabel: { color: '#9ca3af', interval: 0, rotate: 45, fontSize: 11 },
+                    axisLabel: { color: '#9ca3af', interval: 0, rotate: 45, fontSize: 10 },
                   },
                   yAxis: {
                     type: 'value',
@@ -166,7 +157,7 @@ export default function Dashboard() {
                     },
                   ],
                 }}
-                style={{ height: '100%', width: '100%' }}
+                style={{ height: '100%', width: '100%', minHeight: '300px' }}
                 theme="dark"
                 opts={{ renderer: 'svg' }}
               />

@@ -24,34 +24,31 @@ async def analytics_summary(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
-    # Delivery counts by status
-    delivery_counts: dict[str, int] = {}
-    for status_val in DeliveryStatus:
-        result = await db.execute(
-            select(func.count()).select_from(Delivery).where(Delivery.status == status_val)
-        )
-        delivery_counts[status_val.value] = result.scalar_one()
+    # Delivery counts
+    total_deliveries = await db.scalar(select(func.count()).select_from(Delivery)) or 0
+    pending = await db.scalar(select(func.count()).select_from(Delivery).where(Delivery.status == DeliveryStatus.pending)) or 0
+    in_transit = await db.scalar(select(func.count()).select_from(Delivery).where(Delivery.status == DeliveryStatus.in_transit)) or 0
+    delivered = await db.scalar(select(func.count()).select_from(Delivery).where(Delivery.status == DeliveryStatus.delivered)) or 0
+    failed = await db.scalar(select(func.count()).select_from(Delivery).where(Delivery.status == DeliveryStatus.failed)) or 0
 
-    total_deliveries = sum(delivery_counts.values())
+    # Rider counts
+    total_riders = await db.scalar(select(func.count()).select_from(Rider)) or 0
+    active_riders = await db.scalar(select(func.count()).select_from(Rider).where(Rider.status == RiderStatus.available)) or 0
 
-    # Rider counts by status
-    rider_counts: dict[str, int] = {}
-    for status_val in RiderStatus:
-        result = await db.execute(
-            select(func.count()).select_from(Rider).where(Rider.status == status_val)
-        )
-        rider_counts[status_val.value] = result.scalar_one()
-
-    total_riders = sum(rider_counts.values())
+    # Algorithm run stats
+    routes_optimized = await db.scalar(select(func.count()).select_from(AlgorithmRun)) or 0
+    avg_distance = await db.scalar(select(func.avg(AlgorithmRun.distance_km))) or 0.0
 
     return {
         "total_deliveries": total_deliveries,
-        "pending": delivery_counts.get(DeliveryStatus.pending.value, 0),
-        "in_transit": delivery_counts.get(DeliveryStatus.in_transit.value, 0),
-        "delivered": delivery_counts.get(DeliveryStatus.delivered.value, 0),
-        "failed": delivery_counts.get(DeliveryStatus.failed.value, 0),
+        "pending": pending,
+        "in_transit": in_transit,
+        "delivered": delivered,
+        "failed": failed,
         "total_riders": total_riders,
-        "active_riders": rider_counts.get(RiderStatus.on_route.value, 0),
+        "active_riders": active_riders,
+        "routes_optimized": routes_optimized,
+        "avg_distance": round(float(avg_distance), 2)
     }
 
 

@@ -145,6 +145,8 @@ export interface AnalyticsSummary {
   failed: number;
   total_riders: number;
   active_riders: number;
+  routes_optimized: number;
+  avg_distance: number;
 }
 
 export interface AlgorithmRunSummary {
