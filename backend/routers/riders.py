@@ -61,3 +61,13 @@ async def update_rider(
     await db.flush()
     await db.refresh(rider)
     return rider
+
+# ── DELETE /riders/{id} ──────────────────────────────────────────────────────
+@router.delete("/{rider_id}")
+async def delete_rider(rider_id: int, db: AsyncSession = Depends(get_db), current_user = Depends(get_current_user)):
+    rider = await db.get(Rider, rider_id)
+    if not rider:
+        raise HTTPException(status_code=404, detail="Rider not found")
+    await db.delete(rider)
+    await db.commit()
+    return {"message": "Rider deleted"}
