@@ -32,9 +32,9 @@ def _set_auth_cookie(response: Response, token: str) -> None:
         key=_COOKIE_NAME,
         value=token,
         httponly=True,
-        samesite="lax",
-        max_age=settings.JWT_EXPIRE_HOURS * 3600,
-        secure=False,  # Set True in production (HTTPS)
+        secure=True,
+        samesite="none",
+        max_age=86400
     )
 
 
@@ -77,7 +77,7 @@ async def login(payload: UserLogin, response: Response, db: AsyncSession = Depen
 # ── POST /auth/logout ─────────────────────────────────────────────────────────
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(response: Response):
-    response.delete_cookie(key=_COOKIE_NAME, samesite="lax")
+    response.delete_cookie(key=_COOKIE_NAME, samesite="none", secure=True)
 
 
 # ── GET /auth/me ──────────────────────────────────────────────────────────────
