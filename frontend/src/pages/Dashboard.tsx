@@ -105,13 +105,63 @@ export default function Dashboard() {
           </div>
         </div>
         
-        {/* Placeholder for future Map or secondary chart */}
-        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6 flex flex-col items-center justify-center text-center">
-             <svg className="w-16 h-16 text-gray-700 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-             </svg>
-             <h3 className="text-lg font-medium text-gray-300">Algorithm Performance</h3>
-             <p className="mt-2 text-sm text-gray-500">Available in Phase 9</p>
+        {/* Algorithm Performance Chart */}
+        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
+          <h2 className="text-lg font-semibold text-white mb-6">Algorithm Performance</h2>
+          {algos.length === 0 ? (
+            <div className="h-72 flex flex-col items-center justify-center text-center">
+              <svg className="w-12 h-12 text-gray-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <p className="text-sm text-gray-500">No benchmark data yet. Run route optimization to populate this chart.</p>
+            </div>
+          ) : (
+            <div className="h-72">
+              <ReactECharts
+                option={{
+                  tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    formatter: (params: any) => {
+                      const p = params[0];
+                      return `${p.name}<br/>Avg Runtime: <b>${p.value !== null ? Number(p.value).toFixed(2) : 'N/A'} ms</b>`;
+                    },
+                  },
+                  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                  xAxis: {
+                    type: 'category',
+                    data: algos.map(a => a.algorithm_name),
+                    axisLine: { lineStyle: { color: '#4b5563' } },
+                    axisLabel: { color: '#9ca3af', interval: 0, rotate: 20, fontSize: 11 },
+                  },
+                  yAxis: {
+                    type: 'value',
+                    name: 'ms',
+                    nameTextStyle: { color: '#6b7280', fontSize: 11 },
+                    splitLine: { lineStyle: { color: '#374151' } },
+                    axisLabel: { color: '#9ca3af' },
+                  },
+                  series: [
+                    {
+                      name: 'Avg Runtime (ms)',
+                      type: 'bar',
+                      barWidth: '55%',
+                      data: algos.map((a, i) => ({
+                        value: a.avg_runtime_ms ?? 0,
+                        itemStyle: {
+                          color: ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'][i % 7],
+                          borderRadius: [4, 4, 0, 0],
+                        },
+                      })),
+                    },
+                  ],
+                }}
+                style={{ height: '100%', width: '100%' }}
+                theme="dark"
+                opts={{ renderer: 'svg' }}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
