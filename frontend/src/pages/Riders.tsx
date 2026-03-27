@@ -59,6 +59,15 @@ export default function Riders() {
     onError: () => toast.error('Failed to add rider'),
   });
 
+  const deleteMut = useMutation({
+    mutationFn: ridersApi.remove,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['riders'] });
+      toast.success('Rider deleted');
+    },
+    onError: () => toast.error('Failed to delete rider'),
+  });
+
   if (ridersLoading || deliveriesLoading) {
     return <div className="flex h-full items-center justify-center"><Spinner className="h-10 w-10 text-indigo-500" /></div>;
   }
@@ -93,7 +102,7 @@ export default function Riders() {
                 <div 
                   key={rider.id}
                   onClick={() => setSelectedRider(rider.id)}
-                  className={`p-4 rounded-xl border transition cursor-pointer ${
+                  className={`group p-4 rounded-xl border transition cursor-pointer ${
                     selectedRider === rider.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-gray-800 bg-gray-800/50 hover:bg-gray-800'
                   }`}
                 >
@@ -102,9 +111,21 @@ export default function Riders() {
                       <h3 className="text-sm font-medium text-white">{rider.name}</h3>
                       <p className="text-xs text-gray-400">{rider.vehicle_type || 'Unknown vehicle'}</p>
                     </div>
-                    <Badge variant={rider.status === 'available' ? 'success' : rider.status === 'on_route' ? 'info' : 'default'}>
-                      {rider.status.replace('_', ' ')}
-                    </Badge>
+                    <div className="flex flex-col items-end gap-2">
+                      <Badge variant={rider.status === 'available' ? 'success' : rider.status === 'on_route' ? 'info' : 'default'}>
+                        {rider.status.replace('_', ' ')}
+                      </Badge>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`Delete rider ${rider.name}?`)) deleteMut.mutate(rider.id);
+                        }}
+                        className="text-xs text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition"
+                        disabled={deleteMut.isPending}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                   
                   {/* Assignment Dropdown (visible if selected) */}

@@ -64,6 +64,9 @@ export const ridersApi = {
 
   update: (id: number, data: RiderUpdate) =>
     api.put<Rider>(`/riders/${id}`, data).then((r) => r.data),
+
+  remove: (id: number) =>
+    api.delete(`/riders/${id}`).then((r) => r.data),
 };
 
 // ── Routes / Optimization ────────────────────────────────────────────────────
