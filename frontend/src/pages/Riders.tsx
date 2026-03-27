@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import Map, { Marker } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { ridersApi, deliveriesApi } from '../lib/api';
+import { riderCreateSchema, type RiderCreateForm } from '../schemas';
 import Spinner from '../components/ui/Spinner';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -13,6 +16,17 @@ export default function Riders() {
   const queryClient = useQueryClient();
   const [selectedRider, setSelectedRider] = useState<number | null>(null);
   const [assignDeliveryId, setAssignDeliveryId] = useState<number | ''>('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<RiderCreateForm>({
+    resolver: zodResolver(riderCreateSchema),
+    defaultValues: { vehicle_type: 'bike' },
+  });
 
   const { data: riders, isLoading: ridersLoading } = useQuery({
     queryKey: ['riders'],
@@ -34,6 +48,17 @@ export default function Riders() {
     onError: () => toast.error('Failed to assign delivery'),
   });
 
+  const createRiderMut = useMutation({
+    mutationFn: ridersApi.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['riders'] });
+      toast.success('Rider added successfully');
+      setIsModalOpen(false);
+      reset();
+    },
+    onError: () => toast.error('Failed to add rider'),
+  });
+
   if (ridersLoading || deliveriesLoading) {
     return <div className="flex h-full items-center justify-center"><Spinner className="h-10 w-10 text-indigo-500" /></div>;
   }
@@ -50,9 +75,12 @@ export default function Riders() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Riders</h1>
-        <p className="mt-1 text-gray-400">Track and manage your delivery fleet.</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Riders</h1>
+          <p className="mt-1 text-gray-400">Track and manage your delivery fleet.</p>
+        </div>
+        <Button onClick={() => setIsModalOpen(true)}>+ Add Rider</Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -74,8 +102,8 @@ export default function Riders() {
                       <h3 className="text-sm font-medium text-white">{rider.name}</h3>
                       <p className="text-xs text-gray-400">{rider.vehicle_type || 'Unknown vehicle'}</p>
                     </div>
-                    <Badge variant={rider.is_active ? 'success' : 'default'}>
-                      {rider.is_active ? 'Active' : 'Inactive'}
+                    <Badge variant={rider.status === 'available' ? 'success' : rider.status === 'on_route' ? 'info' : 'default'}>
+                      {rider.status.replace('_', ' ')}
                     </Badge>
                   </div>
                   
@@ -161,6 +189,82 @@ export default function Riders() {
           </div>
         </div>
       </div>
+
+      {/* Add Rider Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Add New Rider</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white transition">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit((d) => createRiderMut.mutate(d as any))} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                <input
+                  {...register('name')}
+                  type="text"
+                  placeholder="e.g. Ali Khan"
+                  className={`w-full rounded-lg bg-gray-800 border ${errors.name ? 'border-red-500' : 'border-gray-700'} px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500`}
+                />
+                {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Vehicle Type</label>
+                <select
+                  {...register('vehicle_type')}
+                  className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="bike">Bike</option>
+                  <option value="car">Car</option>
+                  <option value="truck">Truck</option>
+                </select>
+                {errors.vehicle_type && <p className="mt-1 text-xs text-red-500">{errors.vehicle_type.message}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Latitude</label>
+                  <input
+                    {...register('current_lat', { setValueAs: v => v === "" ? null : parseFloat(v) })}
+                    type="number"
+                    step="any"
+                    placeholder="33.6844"
+                    className={`w-full rounded-lg bg-gray-800 border ${errors.current_lat ? 'border-red-500' : 'border-gray-700'} px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500`}
+                  />
+                  {errors.current_lat && <p className="mt-1 text-xs text-red-500">{errors.current_lat.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Longitude</label>
+                  <input
+                    {...register('current_lon', { setValueAs: v => v === "" ? null : parseFloat(v) })}
+                    type="number"
+                    step="any"
+                    placeholder="73.0479"
+                    className={`w-full rounded-lg bg-gray-800 border ${errors.current_lon ? 'border-red-500' : 'border-gray-700'} px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500`}
+                  />
+                  {errors.current_lon && <p className="mt-1 text-xs text-red-500">{errors.current_lon.message}</p>}
+                </div>
+              </div>
+
+              <div className="pt-4 flex justify-end gap-3">
+                <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createRiderMut.isPending}>
+                  {createRiderMut.isPending ? 'Saving...' : 'Add Rider'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

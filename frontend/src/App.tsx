@@ -11,8 +11,9 @@ import Layout from './components/ui/Layout';
 import Dashboard from './pages/Dashboard';
 import Deliveries from './pages/Deliveries';
 import Riders from './pages/Riders';
+import RouteOptimization from './pages/RouteOptimization';
 
-// Placeholder pages — built in Phases 8-9
+// Placeholder pages — built in Phase 9
 const Page = ({ name }: { name: string }) => (
   <div className="flex min-h-screen items-center justify-center bg-gray-950 text-white">
     <div className="text-center">
@@ -22,7 +23,6 @@ const Page = ({ name }: { name: string }) => (
   </div>
 );
 
-const RouteOpt          = () => <Page name="Route Optimization" />;
 const AlgoComp          = () => <Page name="Algorithm Comparison" />;
 
 export default function App() {
@@ -37,7 +37,7 @@ export default function App() {
         <Route path="/dashboard"  element={<Dashboard />} />
         <Route path="/deliveries" element={<Deliveries />} />
         <Route path="/riders"     element={<Riders />} />
-        <Route path="/routes"     element={<RouteOpt />} />
+        <Route path="/routes"     element={<RouteOptimization />} />
         <Route path="/algorithms" element={<AlgoComp />} />
       </Route>
 

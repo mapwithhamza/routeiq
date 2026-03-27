@@ -61,7 +61,7 @@ export const riderCreateSchema = z.object({
 export type RiderCreateForm = z.infer<typeof riderCreateSchema>;
 
 export const riderUpdateSchema = riderCreateSchema.partial().extend({
-  is_active: z.boolean().optional(),
+  status: z.enum(['available', 'on_route', 'offline']).optional(),
 });
 export type RiderUpdateForm = z.infer<typeof riderUpdateSchema>;
 

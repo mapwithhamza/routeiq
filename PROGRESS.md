@@ -5,9 +5,9 @@
 ---
 
 ## Current Status
-**Active Phase:** Phase 8 — Map & Route Optimization
-**Last Completed Task:** Phase 7 — Dashboard & Core Pages (Dashboard, Deliveries, Riders, Layout)
-**Next Task:** Phase 8, Step 1 — MapLibre GL MainMap component
+**Active Phase:** Phase 9 — Algorithm Comparison Panel
+**Last Completed Task:** Phase 8 — Map & Route Optimization (MainMap + Optimization logic)
+**Next Task:** Phase 9, Step 1 — Algorithm comparison table and charts
 
 ---
 
@@ -147,6 +147,7 @@
 | 6 | 2026-03-26 | Completed Phase 5: Frontend Foundation — Vite+React18+TS, Tailwind, all npm packages, axios.ts, api.ts, types/, schemas/, TanStack Query v5, React Router v6. npm run dev ✅ VITE v5.4.21 ready in 398ms at localhost:5173, zero errors. | Phase 6 Step 1 |
 | 7 | 2026-03-26 | Completed Phase 6: Auth UI — Login.tsx, Register.tsx, ProtectedRoute.tsx, useAuth.ts (TanStack Query v5). Role-based redirect, Sonner toasts, TS compile clean (tsc --noEmit: 0 errors). | Phase 7 Step 1 |
 | 8 | 2026-03-26 | Completed Phase 7: Dashboard & Core Pages — Layout.tsx, Dashboard.tsx (ECharts), Deliveries.tsx (CRUD modal), Riders.tsx (fleet assignment, MapLibre mini-map). Complete Tailwind styling. | Phase 8 Step 1 |
+| 9 | 2026-03-26 | Completed Phase 8: Map & Route Optimization — MainMap.tsx (MapLibre GL, markers, animated polyline using dashOffset shifting). RouteOptimization.tsx with algorithm selector dropdown and results panel. Clean TS compile. | Phase 9 Step 1 |
 
 ---
 
@@ -161,8 +162,8 @@ None yet.
 - Backend is fully set up and running on port 8000.
 - Neon DB is connected; all 7 tables are live.
 - All backend tests pass: 7 auth + 7 deliveries + 7 riders + 33 algorithms = 47 total.
-- Frontend Phase 5 + 6 + 7 complete. `npm run dev` ✅, `tsc --noEmit` ✅ (zero errors).
-- Auth flow: visiting `/` → `/dashboard` → ProtectedRoute → `/login`. Login/register pages styled in dark Tailwind. Sonner toasts on error/success.
-- Phase 7 delivered: Layout (Sidebar/Navbar), Dashboard (ECharts deliveries by status), Deliveries table (modal CRUD), Riders list (mini MapLibre map + assignment dropdown).
-- Next: Phase 8 — Map & Route Optimization (MainMap component, click-to-add delivery, polyline drawing).
+- Frontend Phase 5 + 6 + 7 + 8 complete. `npm run dev` ✅, `tsc --noEmit` ✅ (zero errors).
+- Auth flow: visiting `/` → `/dashboard` → ProtectedRoute → `/login`. Sign in to test.
+- Phase 8 delivered: MainMap.tsx with animated routing logic, and RouteOptimization.tsx utilizing `routesApi.optimize` and `deliveriesApi.create` for click map waypoints.
+- Next: Phase 9 — Algorithm Comparison Panel (Table, distance/runtime bar charts, algorithm selection).
 - Reminder: NEVER commit `backend/.env` or `frontend/.env` — both are in `.gitignore`.

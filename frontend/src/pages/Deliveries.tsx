@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 
-import { deliveriesApi } from '../lib/api';
+import { deliveriesApi, ridersApi } from '../lib/api';
 import { deliveryCreateSchema, deliveryUpdateSchema, type DeliveryCreateForm, type DeliveryUpdateForm } from '../schemas';
 import type { Delivery } from '../types';
 
@@ -19,9 +19,14 @@ export default function Deliveries() {
   const [editingId, setEditingId] = useState<number | null>(null);
 
   // Queries
-  const { data: deliveries, isLoading } = useQuery({
+  const { data: deliveries, isLoading: deliveriesLoading } = useQuery({
     queryKey: ['deliveries'],
     queryFn: deliveriesApi.list,
+  });
+
+  const { data: riders, isLoading: ridersLoading } = useQuery({
+    queryKey: ['riders'],
+    queryFn: ridersApi.list,
   });
 
   const {
@@ -66,7 +71,7 @@ export default function Deliveries() {
 
   const openAddModal = () => {
     setEditingId(null);
-    reset({ priority: 'normal', status: 'pending', title: '', address: '', lat: 0, lon: 0, notes: '' });
+    reset({ priority: 'normal', status: 'pending', title: '', address: '', lat: 0, lon: 0, notes: '', rider_id: null });
     setModalOpen(true);
   };
 
@@ -79,6 +84,7 @@ export default function Deliveries() {
       lon: d.lon,
       priority: d.priority,
       status: d.status,
+      rider_id: d.rider_id,
       notes: d.notes || '',
     });
     setModalOpen(true);
@@ -117,7 +123,12 @@ export default function Deliveries() {
     }
   };
 
-  if (isLoading) return <div className="flex h-full items-center justify-center"><Spinner className="h-10 w-10 text-indigo-500" /></div>;
+  const getRiderName = (id: number | null) => {
+    if (!id) return 'Unassigned';
+    return riders?.find(r => r.id === id)?.name || `Rider #${id}`;
+  };
+
+  if (deliveriesLoading || ridersLoading) return <div className="flex h-full items-center justify-center"><Spinner className="h-10 w-10 text-indigo-500" /></div>;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -156,7 +167,7 @@ export default function Deliveries() {
                     <Badge variant={getPriorityColor(d.priority) as any}>{d.priority}</Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {d.rider_id ? `Rider #${d.rider_id}` : 'Unassigned'}
+                    {getRiderName(d.rider_id)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button onClick={() => openEditModal(d)} className="text-indigo-400 hover:text-indigo-300 mr-4 transition">Edit</button>
@@ -239,6 +250,20 @@ export default function Deliveries() {
                 <option value="urgent">Urgent</option>
               </select>
             </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Assign Rider</label>
+              <select
+                {...register('rider_id', { setValueAs: v => (v === "" || v === "null" || !v) ? null : parseInt(v, 10) })}
+                className="w-full rounded-lg bg-gray-800 border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">Unassigned</option>
+                {riders?.map(r => (
+                  <option key={r.id} value={r.id}>{r.name}</option>
+                ))}
+              </select>
+            </div>
+
             {editingId && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>

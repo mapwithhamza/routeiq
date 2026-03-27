@@ -29,7 +29,7 @@ export interface Rider {
   name: string;
   phone: string | null;
   vehicle_type: string | null;
-  is_active: boolean;
+  status: 'available' | 'on_route' | 'offline';
   current_lat: number | null;
   current_lon: number | null;
   created_at: string;
@@ -44,7 +44,7 @@ export interface RiderCreate {
 }
 
 export interface RiderUpdate extends Partial<RiderCreate> {
-  is_active?: boolean;
+  status?: 'available' | 'on_route' | 'offline';
 }
 
 // ── Delivery ──────────────────────────────────────────────────────────────────

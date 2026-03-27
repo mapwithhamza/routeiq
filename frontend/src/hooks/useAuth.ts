@@ -21,7 +21,10 @@ export function useAuth() {
   });
 
   const loginMutation = useMutation({
-    mutationFn: (data: LoginRequest) => authApi.login(data),
+    mutationFn: async (data: LoginRequest) => {
+      await authApi.login(data);
+      return await authApi.me();
+    },
     onSuccess: (u) => {
       queryClient.setQueryData(AUTH_KEY, u);
       toast.success(`Welcome back, ${u.email}!`);
@@ -35,7 +38,10 @@ export function useAuth() {
   });
 
   const registerMutation = useMutation({
-    mutationFn: (data: RegisterRequest) => authApi.register(data),
+    mutationFn: async (data: RegisterRequest) => {
+      await authApi.register(data);
+      return await authApi.me();
+    },
     onSuccess: (u) => {
       queryClient.setQueryData(AUTH_KEY, u);
       toast.success('Account created! Welcome to RouteIQ.');
