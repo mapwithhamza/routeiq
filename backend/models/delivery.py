@@ -8,8 +8,10 @@ from database import Base
 
 class DeliveryPriority(str, enum.Enum):
     low = "low"
+    normal = "normal"
     medium = "medium"
     high = "high"
+    urgent = "urgent"
 
 
 class DeliveryStatus(str, enum.Enum):

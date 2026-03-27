@@ -9,6 +9,7 @@ class VehicleType(str, enum.Enum):
     bike = "bike"
     car = "car"
     van = "van"
+    truck = "truck"
 
 
 class RiderStatus(str, enum.Enum):
