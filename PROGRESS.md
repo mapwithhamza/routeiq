@@ -19,7 +19,7 @@
 ### Phase 0 — Project Setup
 
 - [x] Git repo initialized
-- [x] Folder structure created (`/frontend`, `/backend`, `/PRD`)
+      I.cture created (`/frontend`, `/backend`, `/PRD`)
 - [x] `CLAUDE.md` placed in root
 - [x] `PROGRESS.md` placed in root
 - [x] `.gitignore` created
@@ -147,6 +147,24 @@
 - [x] Big-O complexity documented in each algorithm file
 - [x] Final performance benchmark charts generated
 
+### Phase 12 — UI Redesign ✅
+
+- [x] `lucide-react` installed
+- [x] `src/styles/design-system.ts` — DS token object (colors, priority, status, route mappings)
+- [x] `tailwind.config.js` updated — `darkMode: 'class'`, custom brand/surface colors, fadeIn/scaleIn keyframes
+- [x] `src/context/ThemeContext.tsx` — localStorage dark/light toggle, default dark, adds `dark` class to `<html>`
+- [x] `src/components/ui/Layout.tsx` rebuilt — collapsible sidebar, lucide icons, topbar (search, bell, dark toggle, avatar)
+- [x] `src/pages/Dashboard.tsx` rebuilt — welcome heading, 4 gradient metric cards, progress bars, algo chart
+- [x] `src/pages/Deliveries.tsx` rebuilt — filter tabs, clean table with icon cells, colored badges, scaleIn modal
+- [x] `src/pages/Riders.tsx` rebuilt — 35/65 split, 560px+ map, rider cards with vehicle type icons
+- [x] `src/pages/RouteOptimization.tsx` rebuilt — 70/30 split, full viewport height map, metric icon rows
+- [x] `src/pages/AlgorithmComparison.tsx` rebuilt — toggle node selector, winner banner, comparison table, 2 ECharts
+- [x] `src/pages/Login.tsx` + `Register.tsx` rebuilt — centered card, glow bg, cyan gradient button, scaleIn
+- [x] `src/main.tsx` updated — wrapped with `ThemeProvider`
+- [x] `src/index.css` updated — Inter + JetBrains Mono, custom scrollbar, dark pre-render
+- [x] `tsc --noEmit` — ✅ zero errors
+- [x] Pushed to GitHub
+
 ---
 
 ## Session Log
@@ -165,6 +183,7 @@
 | 8       | 2026-03-26 | Completed Phase 7: Dashboard & Core Pages — Layout.tsx, Dashboard.tsx (ECharts), Deliveries.tsx (CRUD modal), Riders.tsx (fleet assignment, MapLibre mini-map). Complete Tailwind styling.                                               | Phase 8 Step 1  |
 | 9       | 2026-03-26 | Completed Phase 8: Map & Route Optimization — MainMap.tsx (MapLibre GL, markers, animated polyline using dashOffset shifting). RouteOptimization.tsx with algorithm selector dropdown and results panel. Clean TS compile.               | Phase 9 Step 1  |
 | 10      | 2026-03-27 | Completed Phase 9: Algorithm Comparison Panel — AlgorithmComparison.tsx with benchmark runner, 10/50/200 node selector, 7-algo table with winner badge, distance + runtime ECharts bar charts, and row click detail view. 0 TS errors.   | Phase 10 Step 1 |
+| 11      | 2026-03-29 | UI Redesign complete — lucide-react installed; design-system.ts, ThemeContext, tailwind darkMode:class, font imports, collapsible Layout, all 7 pages rebuilt with cyan/slate DS, filter tabs, progress bars, 70/30 map split. tsc: 0 errors. | Phase 12 Done   |
 
 ---
 
@@ -183,8 +202,10 @@ None yet.
 - Backend is fully set up and running on port 8000.
 - Neon DB is connected; all 7 tables are live.
 - All backend tests pass: 7 auth + 7 deliveries + 7 riders + 33 algorithms = 47 total.
-- Frontend Phases 5–9 all complete. `npm run dev` ✅, `tsc --noEmit` ✅ (zero errors).
-- Auth flow: visiting `/` → `/dashboard` → ProtectedRoute → `/login`. Sign in to test.
-- Phase 9 delivered: AlgorithmComparison.tsx at `/algorithms` — benchmark runner, comparison table, ECharts bar charts, winner badge.
-- Next: Phase 10 — Deploy frontend to Vercel, backend to Railway, update CORS/env vars.
+- **Phase 12 UI Redesign is complete.** All pages rebuilt with slate/cyan dark design system.
+- Design tokens live at `frontend/src/styles/design-system.ts`.
+- Dark mode: `ThemeProvider` wraps app, `dark` class on `<html>`, toggle in topbar.
+- Sidebar: collapsible with lucide-react icons, collapses to 68px icon-only mode.
+- All API calls, hooks, Zod schemas, OSRM logic fully preserved — only UI changed.
+- `tsc --noEmit` ✅ zero errors. Pushed to GitHub main.
 - Reminder: NEVER commit `backend/.env` or `frontend/.env` — both are in `.gitignore`.
