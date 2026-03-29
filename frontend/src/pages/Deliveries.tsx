@@ -31,7 +31,7 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
 ];
 
 const STATUS_STYLES: Record<string, string> = {
-  pending:    'bg-slate-500/15 text-slate-300 border-slate-500/30',
+  pending:    'bg-amber-100 text-amber-700 border-amber-300 dark:bg-slate-500/15 dark:text-slate-300 dark:border-slate-500/30',
   assigned:   'bg-violet-500/15 text-violet-400 border-violet-500/30',
   in_transit: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
   delivered:  'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
@@ -40,9 +40,9 @@ const STATUS_STYLES: Record<string, string> = {
 
 const PRIORITY_STYLES: Record<string, string> = {
   urgent: 'bg-red-500/15 text-red-400 border-red-500/30',
-  high:   'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  normal: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-  low:    'bg-slate-500/15 text-slate-400 border-slate-500/30',
+  high:   'bg-red-100 text-red-700 border-red-300 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/30',
+  normal: 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-cyan-500/15 dark:text-cyan-400 dark:border-cyan-500/30',
+  low:    'bg-green-100 text-green-700 border-green-300 dark:bg-slate-500/15 dark:text-slate-400 dark:border-slate-500/30',
 };
 
 function ColBadge({ text, styleClass }: { text: string; styleClass: string }) {
@@ -151,7 +151,7 @@ export default function Deliveries() {
   };
 
   const getRiderName = (id: number | null) => {
-    if (!id) return 'Unassigned';
+    if (!id) return <span className="text-gray-500 italic dark:text-[#8B949E]">Unassigned</span>;
     return riders?.find(r => r.id === id)?.name || `Rider #${id}`;
   };
 
@@ -219,11 +219,11 @@ export default function Deliveries() {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-[#30363D]">
             <thead className="bg-gray-50 dark:bg-[#161B22]">
               <tr>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Title</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Status</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Priority</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Rider</th>
-                <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Actions</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 dark:text-[#8B949E] uppercase tracking-wider">Title</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 dark:text-[#8B949E] uppercase tracking-wider">Status</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 dark:text-[#8B949E] uppercase tracking-wider">Priority</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 dark:text-[#8B949E] uppercase tracking-wider">Rider</th>
+                <th className="px-5 py-3 text-right text-xs font-semibold text-gray-600 dark:text-[#8B949E] uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-[#30363D]">
@@ -248,7 +248,7 @@ export default function Deliveries() {
                   <td className="px-5 py-3.5 whitespace-nowrap">
                     <ColBadge text={d.priority} styleClass={PRIORITY_STYLES[d.priority] || PRIORITY_STYLES.normal} />
                   </td>
-                  <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-500 dark:text-[#8B949E]">
+                  <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-800 dark:text-[#8B949E]">
                     {getRiderName(d.rider_id)}
                   </td>
                   <td className="px-5 py-3.5 whitespace-nowrap text-right">
