@@ -27,12 +27,14 @@ async def health_check():
 # Routers
 # ---------------------------------------------------------------------------
 from routers import auth as auth_router
+from routers import google_auth as google_auth_router
 from routers import deliveries as deliveries_router
 from routers import riders as riders_router
 from routers import analytics as analytics_router
 from routers import routes as routes_router
 
 app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
+app.include_router(google_auth_router.router, prefix="/auth", tags=["auth"])
 app.include_router(deliveries_router.router, prefix="/deliveries", tags=["deliveries"])
 app.include_router(riders_router.router, prefix="/riders", tags=["riders"])
 app.include_router(analytics_router.router, prefix="/analytics", tags=["analytics"])

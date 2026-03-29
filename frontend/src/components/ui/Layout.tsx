@@ -179,9 +179,13 @@ export default function Layout() {
           {!collapsed ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
-                  {initials}
-                </div>
+                {user?.picture_url ? (
+                  <img src={user.picture_url} alt="Avatar" className="w-8 h-8 rounded-full shrink-0 object-cover" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                    {initials}
+                  </div>
+                )}
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-gray-800 dark:text-slate-200 truncate max-w-[110px]">
                     {user?.email}
@@ -356,9 +360,13 @@ export default function Layout() {
             </button>
 
             {/* Avatar */}
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ml-1 cursor-pointer ring-2 ring-cyan-500/20 hover:ring-cyan-500/50 transition">
-              {initials}
-            </div>
+            {user?.picture_url ? (
+              <img src={user.picture_url} alt="Avatar" className="w-8 h-8 rounded-full ml-1 cursor-pointer ring-2 ring-cyan-500/20 hover:ring-cyan-500/50 transition object-cover" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ml-1 cursor-pointer ring-2 ring-cyan-500/20 hover:ring-cyan-500/50 transition">
+                {initials}
+              </div>
+            )}
           </div>
         </header>
 

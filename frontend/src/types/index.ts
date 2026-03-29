@@ -10,6 +10,7 @@ export interface User {
   role: 'admin' | 'dispatcher' | 'rider';
   is_active: boolean;
   created_at: string;
+  picture_url?: string | null;
 }
 
 export interface LoginRequest {

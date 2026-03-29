@@ -20,5 +20,6 @@ class UserRead(BaseModel):
     role: UserRole
     is_active: bool
     created_at: datetime
+    picture_url: str | None = None
 
     model_config = {"from_attributes": True}
