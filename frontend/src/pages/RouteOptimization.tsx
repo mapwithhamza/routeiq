@@ -144,20 +144,41 @@ export default function RouteOptimization() {
       
       try {
         const promises = [];
+        let hasFailedSegment = false;
+        
         // call OSRM for each pair in parallel
         for (let i = 0; i < waypoints.length - 1; i++) {
           const wp1 = waypoints[i];
           const wp2 = waypoints[i + 1];
           const url = `https://router.project-osrm.org/route/v1/driving/${wp1.lon},${wp1.lat};${wp2.lon},${wp2.lat}?overview=full&geometries=geojson`;
           promises.push(
-            fetch(url).then(res => {
-              if (!res.ok) throw new Error('OSRM mapping failed');
-              return res.json();
-            })
+            fetch(url)
+              .then(res => {
+                if (!res.ok) throw new Error('OSRM mapping failed');
+                return res.json();
+              })
+              .catch(() => {
+                hasFailedSegment = true;
+                // Return fake response with straight line between the two waypoints
+                return {
+                  routes: [{
+                    geometry: {
+                      coordinates: [
+                        [wp1.lon, wp1.lat],
+                        [wp2.lon, wp2.lat]
+                      ]
+                    }
+                  }]
+                };
+              })
           );
         }
 
         const results = await Promise.all(promises);
+        
+        if (hasFailedSegment && isMounted) {
+          toast.warning('Some route segments could not be mapped to roads — showing straight lines for those segments');
+        }
         const combinedCoords: [number, number][] = [];
 
         for (let i = 0; i < results.length; i++) {
