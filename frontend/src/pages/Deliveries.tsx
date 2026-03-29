@@ -166,17 +166,17 @@ export default function Deliveries() {
     : (deliveries || []).filter(d => d.status === activeTab);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
+    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in bg-[#F0F2F5] dark:bg-[#0D1117] p-2 sm:p-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-500 dark:text-cyan-400 mb-1">
             Fleet Management
           </p>
-          <h1 className="text-3xl font-bold text-slate-100 dark:text-slate-100 text-slate-900 tracking-tight">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-[#E6EDF3] tracking-tight">
             Deliveries
           </h1>
-          <p className="mt-1 text-slate-400 dark:text-slate-400 text-slate-500 text-sm">
+          <p className="mt-1 text-gray-500 dark:text-[#8B949E] text-sm">
             Manage all package deliveries and waypoints.
           </p>
         </div>
@@ -187,7 +187,7 @@ export default function Deliveries() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-800/60 p-1 w-fit flex-wrap">
+      <div className="flex items-center gap-1 rounded-xl shadow-sm bg-white dark:bg-[#1C2128] p-1 w-fit flex-wrap">
         {FILTER_TABS.map(({ key, label }) => {
           const count = key === 'all'
             ? deliveries?.length || 0
@@ -198,13 +198,13 @@ export default function Deliveries() {
               onClick={() => setActiveTab(key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
                 activeTab === key
-                  ? 'bg-cyan-500/20 text-cyan-400 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
+                  ? 'bg-cyan-50 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 shadow-sm border border-cyan-100 dark:border-transparent'
+                  : 'text-gray-500 dark:text-[#8B949E] hover:text-gray-900 border border-transparent dark:hover:text-[#E6EDF3] hover:bg-gray-50 dark:hover:bg-[#262D36]'
               }`}
             >
               {label}
               <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${
-                activeTab === key ? 'bg-cyan-500/30 text-cyan-300' : 'bg-slate-700 text-slate-400'
+                activeTab === key ? 'bg-cyan-100 dark:bg-cyan-500/30 text-cyan-700 dark:text-cyan-300' : 'bg-gray-100 dark:bg-[#262D36] text-gray-500 dark:text-[#8B949E]'
               }`}>
                 {count}
               </span>
@@ -214,29 +214,29 @@ export default function Deliveries() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-700/60 bg-slate-800/60 backdrop-blur-sm">
+      <div className="overflow-hidden rounded-xl shadow-md border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128]">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-700/50">
-            <thead className="bg-slate-900/40">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-[#30363D]">
+            <thead className="bg-gray-50 dark:bg-[#161B22]">
               <tr>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Title</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Priority</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Rider</th>
-                <th className="px-5 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Title</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Status</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Priority</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Rider</th>
+                <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500 dark:text-[#8B949E] uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/30">
+            <tbody className="divide-y divide-gray-100 dark:divide-[#30363D]">
               {filteredDeliveries.map((d) => (
-                <tr key={d.id} className="hover:bg-slate-700/20 transition group">
+                <tr key={d.id} className="bg-white dark:bg-[#1C2128] hover:bg-gray-50 dark:hover:bg-[#262D36] transition group">
                   <td className="px-5 py-3.5 whitespace-nowrap">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-slate-700/50 flex items-center justify-center shrink-0">
-                        <Package size={14} className="text-slate-400" />
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-[#161B22] border border-gray-200 dark:border-transparent flex items-center justify-center shrink-0">
+                        <Package size={14} className="text-gray-500 dark:text-[#8B949E]" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-slate-100 dark:text-slate-100 text-slate-900">{d.title}</div>
-                        <div className="text-xs text-slate-500 truncate max-w-xs">
+                        <div className="text-sm font-medium text-gray-900 dark:text-[#E6EDF3]">{d.title}</div>
+                        <div className="text-xs text-gray-500 dark:text-[#8B949E] truncate max-w-xs">
                           {d.address || `${d.lat.toFixed(4)}, ${d.lon.toFixed(4)}`}
                         </div>
                       </div>
@@ -248,14 +248,14 @@ export default function Deliveries() {
                   <td className="px-5 py-3.5 whitespace-nowrap">
                     <ColBadge text={d.priority} styleClass={PRIORITY_STYLES[d.priority] || PRIORITY_STYLES.normal} />
                   </td>
-                  <td className="px-5 py-3.5 whitespace-nowrap text-sm text-slate-300 dark:text-slate-300 text-slate-600">
+                  <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-500 dark:text-[#8B949E]">
                     {getRiderName(d.rider_id)}
                   </td>
                   <td className="px-5 py-3.5 whitespace-nowrap text-right">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition">
                       <button
                         onClick={() => openEditModal(d)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition"
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-500/10 transition"
                         title="Edit"
                       >
                         <Pencil size={14} />
@@ -264,7 +264,7 @@ export default function Deliveries() {
                         onClick={() => {
                           if (confirm(`Delete delivery "${d.title}"?`)) deleteMut.mutate(d.id);
                         }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition"
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition"
                         title="Delete"
                         disabled={deleteMut.isPending}
                       >
@@ -275,10 +275,10 @@ export default function Deliveries() {
                 </tr>
               ))}
               {filteredDeliveries.length === 0 && (
-                <tr>
+                <tr className="bg-white dark:bg-[#1C2128]">
                   <td colSpan={5} className="px-6 py-16 text-center">
-                    <Package size={36} className="text-slate-700 mx-auto mb-3" />
-                    <p className="text-sm text-slate-500">
+                    <Package size={36} className="text-gray-300 dark:text-[#30363D] mx-auto mb-3" />
+                    <p className="text-sm text-gray-500 dark:text-[#8B949E]">
                       {activeTab === 'all' ? 'No deliveries yet. Create one to get started.' : `No ${activeTab} deliveries.`}
                     </p>
                   </td>

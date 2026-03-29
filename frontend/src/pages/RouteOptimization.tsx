@@ -181,17 +181,17 @@ export default function RouteOptimization() {
   const pendingDeliveries = deliveries?.filter(d => d.status === 'pending' && !d.rider_id) || [];
 
   return (
-    <div className="max-w-[1600px] mx-auto flex flex-col animate-fade-in" style={{ height: 'calc(100vh - 7rem)' }}>
+    <div className="max-w-[1600px] mx-auto flex flex-col animate-fade-in bg-[#F0F2F5] dark:bg-[#0D1117] p-2 sm:p-0" style={{ height: 'calc(100vh - 7rem)' }}>
       {/* Header */}
       <div className="flex justify-between items-end mb-5 shrink-0">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-500 dark:text-cyan-400 mb-1">
             DSA Pipeline
           </p>
-          <h1 className="text-3xl font-bold text-slate-100 dark:text-slate-100 text-slate-900 tracking-tight">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-[#E6EDF3] tracking-tight">
             Route Optimization
           </h1>
-          <p className="mt-1 text-slate-400 dark:text-slate-400 text-slate-500 text-sm">
+          <p className="mt-1 text-gray-500 dark:text-[#8B949E] text-sm">
             Generate intelligent paths through the DSA pipeline.
           </p>
         </div>
@@ -217,7 +217,7 @@ export default function RouteOptimization() {
       {/* 70/30 Split */}
       <div className="flex flex-col lg:flex-row gap-5 flex-1 min-h-0">
         {/* Map (70%) */}
-        <div className="flex-[70] rounded-xl border border-slate-700/60 bg-slate-800/60 overflow-hidden relative shadow-2xl min-h-0">
+        <div className="flex-[70] rounded-xl shadow-md dark:shadow-2xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] overflow-hidden relative min-h-0">
           {/* Map Status Bar */}
           <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
             {isAddMode && (
@@ -258,21 +258,21 @@ export default function RouteOptimization() {
         {/* Control Panel (30%) */}
         <div className="flex-[30] flex flex-col gap-4 overflow-y-auto min-w-[280px] max-w-[380px]">
           {/* Engine Controls */}
-          <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-5 shrink-0">
+          <div className="rounded-xl shadow-md dark:shadow-none border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] p-5 shrink-0">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 rounded-lg bg-cyan-500/15 flex items-center justify-center">
-                <Zap size={14} className="text-cyan-400" />
+              <div className="w-7 h-7 rounded-lg bg-cyan-100 dark:bg-cyan-500/15 flex items-center justify-center">
+                <Zap size={14} className="text-cyan-600 dark:text-cyan-400" />
               </div>
-              <h2 className="text-sm font-semibold text-slate-200">Optimization Engine</h2>
+              <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">Optimization Engine</h2>
             </div>
 
             <div className="space-y-3">
               {/* Rider selector */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">Select Fleet Rider</label>
+                <label className="block text-xs font-medium text-gray-600 dark:text-slate-400 mb-1.5">Select Fleet Rider</label>
                 <div className="relative">
                   <select
-                    className="w-full appearance-none rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 transition pr-8"
+                    className="w-full appearance-none rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 text-sm text-gray-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 transition pr-8"
                     value={selectedRiderId}
                     onChange={(e) => {
                       setSelectedRiderId(e.target.value ? Number(e.target.value) : '');
@@ -284,19 +284,19 @@ export default function RouteOptimization() {
                       <option key={r.id} value={r.id}>{r.name}</option>
                     ))}
                   </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 pointer-events-none" />
                 </div>
               </div>
 
               {/* Stats row */}
               <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-lg bg-slate-900/40 border border-slate-700/40 p-2.5 text-center">
-                  <p className="text-base font-bold text-cyan-400 font-mono">{pendingDeliveries.length}</p>
-                  <p className="text-[10px] text-slate-500">Pending drops</p>
+                <div className="rounded-lg bg-gray-50 dark:bg-slate-900/40 border border-gray-200 dark:border-slate-700/40 p-2.5 text-center">
+                  <p className="text-base font-bold text-cyan-600 dark:text-cyan-400 font-mono">{pendingDeliveries.length}</p>
+                  <p className="text-[10px] text-gray-500 dark:text-slate-500">Pending drops</p>
                 </div>
-                <div className="rounded-lg bg-slate-900/40 border border-slate-700/40 p-2.5 text-center">
-                  <p className="text-base font-bold text-violet-400 font-mono">7</p>
-                  <p className="text-[10px] text-slate-500">Algorithms</p>
+                <div className="rounded-lg bg-gray-50 dark:bg-slate-900/40 border border-gray-200 dark:border-slate-700/40 p-2.5 text-center">
+                  <p className="text-base font-bold text-violet-600 dark:text-violet-400 font-mono">7</p>
+                  <p className="text-[10px] text-gray-500 dark:text-slate-500">Algorithms</p>
                 </div>
               </div>
 
@@ -313,11 +313,11 @@ export default function RouteOptimization() {
 
           {/* Results Panel */}
           {optResponse && (
-            <div className="rounded-xl border border-cyan-500/30 bg-slate-800/60 p-5 flex-1 animate-scale-in">
-              <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-700/50">
+            <div className="rounded-xl shadow-md dark:shadow-none border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] p-5 flex-1 animate-scale-in">
+              <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-200 dark:border-slate-700/50">
                 <div className="flex items-center gap-2">
-                  <Activity size={14} className="text-cyan-400" />
-                  <h2 className="text-sm font-semibold text-slate-200">Results</h2>
+                  <Activity size={14} className="text-cyan-600 dark:text-cyan-400" />
+                  <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">Results</h2>
                 </div>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                   Complete
@@ -325,10 +325,10 @@ export default function RouteOptimization() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">Algorithm Viewer</label>
+                <label className="block text-xs font-medium text-gray-600 dark:text-slate-400 mb-1.5">Algorithm Viewer</label>
                 <div className="relative">
                   <select
-                    className="w-full appearance-none rounded-lg bg-cyan-950/40 border border-cyan-500/40 px-3 py-2 text-sm text-cyan-200 outline-none focus:ring-2 focus:ring-cyan-500/50 pr-8 font-semibold"
+                    className="w-full appearance-none rounded-lg bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-500/40 px-3 py-2 text-sm text-cyan-800 dark:text-cyan-200 outline-none focus:ring-2 focus:ring-cyan-500/50 pr-8 font-semibold"
                     value={selectedAlgoName}
                     onChange={e => setSelectedAlgoName(e.target.value)}
                   >
@@ -336,29 +336,29 @@ export default function RouteOptimization() {
                       <option key={r.algorithm} value={r.algorithm}>{r.algorithm} Engine</option>
                     ))}
                   </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-500/60 pointer-events-none" />
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-600 dark:text-cyan-500/60 pointer-events-none" />
                 </div>
               </div>
 
               {selectedAlgoResult ? (
                 <div className="space-y-2">
                   {[
-                    { label: 'Total Distance', value: `${selectedAlgoResult.distance.toFixed(2)} km`, color: 'text-emerald-400', icon: Navigation },
-                    { label: 'Compute Time', value: `${selectedAlgoResult.runtime_ms.toFixed(2)} ms`, color: 'text-amber-400', icon: Zap },
-                    { label: 'Nodes Explored', value: `${selectedAlgoResult.nodes_explored} units`, color: 'text-indigo-400', icon: Activity },
-                    { label: 'Route Stops', value: `${selectedAlgoResult.route.length} stops`, color: 'text-blue-400', icon: MapIcon },
+                    { label: 'Total Distance', value: `${selectedAlgoResult.distance.toFixed(2)} km`, color: 'text-emerald-600 dark:text-emerald-400', icon: Navigation },
+                    { label: 'Compute Time', value: `${selectedAlgoResult.runtime_ms.toFixed(2)} ms`, color: 'text-amber-600 dark:text-amber-400', icon: Zap },
+                    { label: 'Nodes Explored', value: `${selectedAlgoResult.nodes_explored} units`, color: 'text-indigo-600 dark:text-indigo-400', icon: Activity },
+                    { label: 'Route Stops', value: `${selectedAlgoResult.route.length} stops`, color: 'text-blue-600 dark:text-blue-400', icon: MapIcon },
                   ].map(({ label, value, color, icon: Icon }) => (
-                    <div key={label} className="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/50 border border-slate-700/40">
+                    <div key={label} className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700/40">
                       <div className="flex items-center gap-2">
-                        <Icon size={13} className="text-slate-500" />
-                        <span className="text-xs text-slate-400">{label}</span>
+                        <Icon size={13} className="text-gray-400 dark:text-slate-500" />
+                        <span className="text-xs text-gray-500 dark:text-[#8B949E]">{label}</span>
                       </div>
                       <span className={`text-sm font-bold font-mono ${color}`}>{value}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-slate-500 italic text-center py-4">
+                <p className="text-xs text-gray-500 dark:text-slate-500 italic text-center py-4">
                   Select an algorithm to view metrics.
                 </p>
               )}
@@ -367,12 +367,12 @@ export default function RouteOptimization() {
 
           {/* Empty State */}
           {!optResponse && (
-            <div className="rounded-xl border border-slate-700/60 border-dashed bg-slate-900/30 p-6 flex flex-col items-center justify-center text-center flex-1">
-              <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700/60 flex items-center justify-center mb-3">
-                <Zap size={20} className="text-slate-600" />
+            <div className="rounded-xl shadow-inner border border-gray-300 dark:border-slate-700/60 border-dashed bg-gray-50 dark:bg-slate-900/30 p-6 flex flex-col items-center justify-center text-center flex-1">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700/60 flex items-center justify-center mb-3">
+                <Zap size={20} className="text-gray-400 dark:text-slate-600" />
               </div>
-              <p className="text-sm font-medium text-slate-400">No Results Yet</p>
-              <p className="text-xs text-slate-600 mt-1 max-w-[200px]">
+              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">No Results Yet</p>
+              <p className="text-xs text-gray-400 dark:text-[#8B949E] mt-1 max-w-[200px]">
                 Select a rider and run optimization to compare DSA paths.
               </p>
             </div>

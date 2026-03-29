@@ -119,17 +119,17 @@ export default function Riders() {
   const activeRider = riders?.find(r => r.id === selectedRider);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
+    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in bg-[#F0F2F5] dark:bg-[#0D1117] p-2 sm:p-0">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-500 dark:text-cyan-400 mb-1">
             Fleet Management
           </p>
-          <h1 className="text-3xl font-bold text-slate-100 dark:text-slate-100 text-slate-900 tracking-tight">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-[#E6EDF3] tracking-tight">
             Riders
           </h1>
-          <p className="mt-1 text-slate-400 dark:text-slate-400 text-slate-500 text-sm">
+          <p className="mt-1 text-gray-500 dark:text-[#8B949E] text-sm">
             Track and manage your delivery fleet.
           </p>
         </div>
@@ -146,24 +146,24 @@ export default function Riders() {
           {/* Stats strip */}
           <div className="grid grid-cols-3 gap-2">
             {[
-              { label: 'Total',     value: riders?.length || 0,                                          color: 'text-slate-300' },
-              { label: 'Available', value: riders?.filter(r => r.status === 'available').length || 0,    color: 'text-emerald-400' },
-              { label: 'On Route',  value: riders?.filter(r => r.status === 'on_route').length  || 0,    color: 'text-blue-400' },
+              { label: 'Total',     value: riders?.length || 0,                                          color: 'text-gray-900 dark:text-slate-300' },
+              { label: 'Available', value: riders?.filter(r => r.status === 'available').length || 0,    color: 'text-emerald-600 dark:text-emerald-400' },
+              { label: 'On Route',  value: riders?.filter(r => r.status === 'on_route').length  || 0,    color: 'text-blue-600 dark:text-blue-400' },
             ].map(({ label, value, color }) => (
-              <div key={label} className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-3 text-center">
+              <div key={label} className="rounded-xl shadow-md dark:shadow-none border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] p-3 text-center">
                 <p className={`text-xl font-bold font-mono ${color}`}>{value}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{label}</p>
+                <p className="text-xs text-gray-500 dark:text-[#8B949E] mt-0.5">{label}</p>
               </div>
             ))}
           </div>
 
           {/* Rider list */}
-          <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
-            <div className="px-4 py-3 border-b border-slate-700/50 flex items-center gap-2">
-              <Users size={15} className="text-slate-400" />
-              <h2 className="text-sm font-semibold text-slate-200">Fleet Roster</h2>
+          <div className="rounded-xl shadow-md dark:shadow-none border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700/50 flex items-center gap-2">
+              <Users size={15} className="text-gray-500 dark:text-[#8B949E]" />
+              <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">Fleet Roster</h2>
             </div>
-            <div className="divide-y divide-slate-700/30 max-h-[520px] overflow-y-auto">
+            <div className="divide-y divide-gray-100 dark:divide-slate-700/30 max-h-[520px] overflow-y-auto">
               {riders?.map(rider => {
                 const VehicleIcon = VEHICLE_ICONS[rider.vehicle_type || 'bike'] || Bike;
                 const isSelected = selectedRider === rider.id;
@@ -173,22 +173,22 @@ export default function Riders() {
                     onClick={() => setSelectedRider(isSelected ? null : rider.id)}
                     className={`p-4 cursor-pointer transition-all duration-150 ${
                       isSelected
-                        ? 'bg-cyan-500/10 border-l-2 border-cyan-500'
-                        : 'hover:bg-slate-700/20 border-l-2 border-transparent'
+                        ? 'bg-cyan-50 dark:bg-cyan-500/10 border-l-2 border-cyan-500'
+                        : 'hover:bg-gray-50 dark:hover:bg-slate-700/20 border-l-2 border-transparent'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                          isSelected ? 'bg-cyan-500/20' : 'bg-slate-700/50'
+                          isSelected ? 'bg-cyan-100 dark:bg-cyan-500/20' : 'bg-gray-100 dark:bg-slate-700/50'
                         }`}>
-                          <VehicleIcon size={16} className={isSelected ? 'text-cyan-400' : 'text-slate-400'} />
+                          <VehicleIcon size={16} className={isSelected ? 'text-cyan-600 dark:text-cyan-400' : 'text-gray-500 dark:text-slate-400'} />
                         </div>
                         <div className="min-w-0">
-                          <h3 className="text-sm font-semibold text-slate-100 dark:text-slate-100 text-slate-900 truncate">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-[#E6EDF3] truncate">
                             {rider.name}
                           </h3>
-                          <p className="text-xs text-slate-500 capitalize">{rider.vehicle_type || 'Unknown'}</p>
+                          <p className="text-xs text-gray-500 dark:text-[#8B949E] capitalize">{rider.vehicle_type || 'Unknown'}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -213,15 +213,15 @@ export default function Riders() {
                     {/* Assignment section */}
                     {isSelected && (
                       <div
-                        className="mt-3 pt-3 border-t border-slate-700/40"
+                        className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-700/40"
                         onClick={e => e.stopPropagation()}
                       >
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-slate-400 mb-1.5">
                           Assign Delivery
                         </label>
                         <div className="flex items-center gap-2">
                           <select
-                            className="flex-1 rounded-lg bg-slate-900/60 border border-slate-700/60 px-2 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-cyan-500/50 transition outline-none"
+                            className="flex-1 rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-2 py-1.5 text-xs text-gray-700 dark:text-slate-200 focus:ring-1 focus:ring-cyan-500/50 transition outline-none"
                             value={assignDeliveryId}
                             onChange={(e) => setAssignDeliveryId(e.target.value ? Number(e.target.value) : '')}
                           >
@@ -251,8 +251,8 @@ export default function Riders() {
               })}
               {(!riders || riders.length === 0) && (
                 <div className="py-12 flex flex-col items-center gap-3">
-                  <Users size={32} className="text-slate-700" />
-                  <p className="text-sm text-slate-500 text-center">No riders configured yet.</p>
+                  <Users size={32} className="text-gray-300 dark:text-[#30363D]" />
+                  <p className="text-sm text-gray-500 dark:text-[#8B949E] text-center">No riders configured yet.</p>
                 </div>
               )}
             </div>
@@ -260,15 +260,15 @@ export default function Riders() {
         </div>
 
         {/* Right: Map (65%) */}
-        <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 overflow-hidden" style={{ minHeight: '560px' }}>
-          <div className="px-5 py-3 border-b border-slate-700/50 flex justify-between items-center bg-slate-900/40">
+        <div className="rounded-xl shadow-md dark:shadow-none border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] overflow-hidden" style={{ minHeight: '560px' }}>
+          <div className="px-5 py-3 border-b border-gray-200 dark:border-slate-700/50 flex justify-between items-center bg-gray-50 dark:bg-slate-900/40">
             <div className="flex items-center gap-2">
-              <MapPin size={15} className="text-cyan-400" />
-              <h2 className="text-sm font-semibold text-slate-200">Live Fleet Map</h2>
+              <MapPin size={15} className="text-cyan-600 dark:text-cyan-400" />
+              <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">Live Fleet Map</h2>
             </div>
             <div className="flex items-center gap-2">
               {activeRider && (
-                <span className="text-xs text-cyan-400 font-medium">
+                <span className="text-xs text-cyan-700 dark:text-cyan-400 font-medium">
                   Viewing: {activeRider.name}
                 </span>
               )}
