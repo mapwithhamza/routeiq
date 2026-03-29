@@ -119,20 +119,35 @@ export default function RouteOptimization() {
 
   // OSRM fetch — real road routing
   useEffect(() => {
-    if (routeWaypoints.length < 2) {
+    if (!optResponse) {
       setOsrmRoute(null);
-      setIsOsrmLoading(false);
       return;
     }
 
     let isMounted = true;
-    const fetchOsrm = async () => {
-      setIsOsrmLoading(true);
+    const fetchOSRM = async () => {
+      // get waypoints from optResponse depending on selected algo
+      const algoResult = optResponse.results.find(r => r.algorithm === selectedAlgoName);
+      const waypoints = algoResult && optResponse
+        ? algoResult.route.map(idx => optResponse.waypoints[idx])
+        : [];
+
+      if (waypoints.length < 2) {
+        if (isMounted) {
+          setOsrmRoute(null);
+          setIsOsrmLoading(false);
+        }
+        return;
+      }
+
+      if (isMounted) setIsOsrmLoading(true);
+      
       try {
         const promises = [];
-        for (let i = 0; i < routeWaypoints.length - 1; i++) {
-          const wp1 = routeWaypoints[i];
-          const wp2 = routeWaypoints[i + 1];
+        // call OSRM for each pair in parallel
+        for (let i = 0; i < waypoints.length - 1; i++) {
+          const wp1 = waypoints[i];
+          const wp2 = waypoints[i + 1];
           const url = `https://router.project-osrm.org/route/v1/driving/${wp1.lon},${wp1.lat};${wp2.lon},${wp2.lat}?overview=full&geometries=geojson`;
           promises.push(
             fetch(url).then(res => {
@@ -149,28 +164,27 @@ export default function RouteOptimization() {
           const res = results[i];
           if (res.routes && res.routes.length > 0) {
             const coords = res.routes[0].geometry.coordinates as [number, number][];
-            // Prevent duplicate coordinate points where segments join
             if (i > 0 && coords.length > 0) coords.shift();
             combinedCoords.push(...coords);
           }
         }
 
+        // update map layer with real road geometry
         if (isMounted && combinedCoords.length > 0) {
           setOsrmRoute(combinedCoords);
         } else if (isMounted) {
           setOsrmRoute(null);
         }
       } catch (err) {
-        // Fall back to straight line silently if OSRM fails
         if (isMounted) setOsrmRoute(null);
       } finally {
         if (isMounted) setIsOsrmLoading(false);
       }
     };
 
-    fetchOsrm();
+    fetchOSRM();
     return () => { isMounted = false; };
-  }, [selectedAlgoName, optResponse]);
+  }, [optResponse, selectedAlgoName]);
 
   if (deliveriesLoading || ridersLoading) {
     return (
