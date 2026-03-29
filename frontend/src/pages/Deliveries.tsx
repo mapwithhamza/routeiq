@@ -15,7 +15,6 @@ import { deliveryCreateSchema, deliveryUpdateSchema, type DeliveryCreateForm, ty
 import type { Delivery } from '../types';
 
 import Spinner from '../components/ui/Spinner';
-import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import AddressAutocomplete from '../components/forms/AddressAutocomplete';

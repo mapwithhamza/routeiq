@@ -15,7 +15,6 @@ import { Plus, Bike, Car, Truck, Trash2, X, MapPin, Users } from 'lucide-react';
 import { ridersApi, deliveriesApi } from '../lib/api';
 import { riderCreateSchema, type RiderCreateForm } from '../schemas';
 import Spinner from '../components/ui/Spinner';
-import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import AddressAutocomplete from '../components/forms/AddressAutocomplete';
 

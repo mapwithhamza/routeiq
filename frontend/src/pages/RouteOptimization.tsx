@@ -12,7 +12,6 @@ import MainMap from '../components/map/MainMap';
 import { deliveriesApi, ridersApi, routesApi } from '../lib/api';
 import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
-import Badge from '../components/ui/Badge';
 import { OptimizeRequest, OptimizeResponse, AlgorithmResult } from '../types';
 
 export default function RouteOptimization() {
