@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import jwt
-from fastapi import Cookie, Depends, HTTPException, status
+from fastapi import Cookie, Depends, HTTPException, Request, status
 from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -52,10 +52,16 @@ def decode_access_token(token: str) -> dict:
 async def get_current_user(
     access_token: Optional[str] = Cookie(default=None),
     db: AsyncSession = Depends(get_db),
+    request: "Request" = None,
 ) -> User:
-    if not access_token:
+    token = access_token
+    if not token and request is not None:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+    if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-    payload = decode_access_token(access_token)
+    payload = decode_access_token(token)
     user_id: Optional[int] = payload.get("sub")
     if user_id is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
