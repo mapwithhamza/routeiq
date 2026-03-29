@@ -126,7 +126,7 @@ export default function RouteOptimization() {
     ? selectedAlgoResult.route.map(idx => optResponse.waypoints[idx])
     : [];
 
-  // OSRM fetch — unchanged logic
+  // OSRM fetch — real road routing
   useEffect(() => {
     if (routeWaypoints.length < 2) {
       setOsrmRoute(null);
@@ -154,9 +154,12 @@ export default function RouteOptimization() {
         const results = await Promise.all(promises);
         const combinedCoords: [number, number][] = [];
 
-        for (const res of results) {
+        for (let i = 0; i < results.length; i++) {
+          const res = results[i];
           if (res.routes && res.routes.length > 0) {
             const coords = res.routes[0].geometry.coordinates as [number, number][];
+            // Prevent duplicate coordinate points where segments join
+            if (i > 0 && coords.length > 0) coords.shift();
             combinedCoords.push(...coords);
           }
         }
@@ -167,7 +170,7 @@ export default function RouteOptimization() {
           setOsrmRoute(null);
         }
       } catch (err) {
-        console.error('OSRM fetch error:', err);
+        // Fall back to straight line silently if OSRM fails
         if (isMounted) setOsrmRoute(null);
       } finally {
         if (isMounted) setIsOsrmLoading(false);
