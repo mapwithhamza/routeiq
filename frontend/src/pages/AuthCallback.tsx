@@ -15,17 +15,16 @@ export default function AuthCallback() {
       navigate('/login', { replace: true });
       return;
     }
-    // Set cookie first
-    document.cookie = `access_token=${token}; path=/; max-age=86400; SameSite=None; Secure`;
-    // Wait one tick for browser to register cookie, then fetch user
-    setTimeout(() => {
-      api.get('/auth/me')
-        .then((res) => {
-          queryClient.setQueryData(AUTH_KEY, res.data);
-          navigate('/dashboard', { replace: true });
-        })
-        .catch(() => navigate('/login', { replace: true }));
-    }, 100);
+    sessionStorage.setItem('oauth_token', token);
+    api.get('/auth/me')
+      .then((res) => {
+        queryClient.setQueryData(AUTH_KEY, res.data);
+        navigate('/dashboard', { replace: true });
+      })
+      .catch(() => {
+        sessionStorage.removeItem('oauth_token');
+        navigate('/login', { replace: true });
+      });
   }, [navigate, queryClient]);
 
   return (
