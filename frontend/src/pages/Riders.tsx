@@ -11,22 +11,33 @@ import { riderCreateSchema, type RiderCreateForm } from '../schemas';
 import Spinner from '../components/ui/Spinner';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
+import AddressAutocomplete from '../components/forms/AddressAutocomplete';
 
 export default function Riders() {
   const queryClient = useQueryClient();
   const [selectedRider, setSelectedRider] = useState<number | null>(null);
   const [assignDeliveryId, setAssignDeliveryId] = useState<number | ''>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [addressSearch, setAddressSearch] = useState('');
+  const [addressResolved, setAddressResolved] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<RiderCreateForm>({
     resolver: zodResolver(riderCreateSchema),
     defaultValues: { vehicle_type: 'bike' },
   });
+
+  const openModal = () => {
+    setAddressSearch('');
+    setAddressResolved(false);
+    reset({ vehicle_type: 'bike' });
+    setIsModalOpen(true);
+  };
 
   const { data: riders, isLoading: ridersLoading } = useQuery({
     queryKey: ['riders'],
@@ -54,7 +65,9 @@ export default function Riders() {
       queryClient.invalidateQueries({ queryKey: ['riders'] });
       toast.success('Rider added successfully');
       setIsModalOpen(false);
-      reset();
+      setAddressSearch('');
+      setAddressResolved(false);
+      reset({ vehicle_type: 'bike' });
     },
     onError: () => toast.error('Failed to add rider'),
   });
@@ -89,7 +102,7 @@ export default function Riders() {
           <h1 className="text-3xl font-bold text-white tracking-tight">Riders</h1>
           <p className="mt-1 text-gray-400">Track and manage your delivery fleet.</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)}>+ Add Rider</Button>
+        <Button onClick={openModal}>+ Add Rider</Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -249,29 +262,31 @@ export default function Riders() {
                 {errors.vehicle_type && <p className="mt-1 text-xs text-red-500">{errors.vehicle_type.message}</p>}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Latitude</label>
-                  <input
-                    {...register('current_lat', { setValueAs: v => v === "" ? null : parseFloat(v) })}
-                    type="number"
-                    step="any"
-                    placeholder="33.6844"
-                    className={`w-full rounded-lg bg-gray-800 border ${errors.current_lat ? 'border-red-500' : 'border-gray-700'} px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500`}
-                  />
-                  {errors.current_lat && <p className="mt-1 text-xs text-red-500">{errors.current_lat.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Longitude</label>
-                  <input
-                    {...register('current_lon', { setValueAs: v => v === "" ? null : parseFloat(v) })}
-                    type="number"
-                    step="any"
-                    placeholder="73.0479"
-                    className={`w-full rounded-lg bg-gray-800 border ${errors.current_lon ? 'border-red-500' : 'border-gray-700'} px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500`}
-                  />
-                  {errors.current_lon && <p className="mt-1 text-xs text-red-500">{errors.current_lon.message}</p>}
-                </div>
+              <div className="hidden">
+                <input type="hidden" {...register('current_lat')} />
+                <input type="hidden" {...register('current_lon')} />
+              </div>
+              <div className="z-50 relative">
+                <AddressAutocomplete
+                  label="Search Location"
+                  value={addressSearch}
+                  onChange={(val) => {
+                    setAddressSearch(val);
+                  }}
+                  onSelect={(addr, lat, lon) => {
+                    setAddressSearch(addr);
+                    setValue('current_lat', lat, { shouldValidate: true });
+                    setValue('current_lon', lon, { shouldValidate: true });
+                    setAddressResolved(true);
+                  }}
+                  resolved={addressResolved}
+                  onClearResolve={() => {
+                    setAddressResolved(false);
+                    setValue('current_lat', null as any);
+                    setValue('current_lon', null as any);
+                  }}
+                  error={(errors.current_lat || errors.current_lon)?.message as string}
+                />
               </div>
 
               <div className="pt-4 flex justify-end gap-3">

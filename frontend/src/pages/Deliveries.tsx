@@ -12,11 +12,13 @@ import Spinner from '../components/ui/Spinner';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
+import AddressAutocomplete from '../components/forms/AddressAutocomplete';
 
 export default function Deliveries() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [addressResolved, setAddressResolved] = useState(false);
 
   // Queries
   const { data: deliveries, isLoading: deliveriesLoading } = useQuery({
@@ -33,6 +35,8 @@ export default function Deliveries() {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<DeliveryCreateForm | DeliveryUpdateForm>({
     resolver: zodResolver(editingId ? deliveryUpdateSchema : deliveryCreateSchema),
@@ -71,12 +75,14 @@ export default function Deliveries() {
 
   const openAddModal = () => {
     setEditingId(null);
+    setAddressResolved(false);
     reset({ priority: 'normal', status: 'pending', title: '', address: '', lat: 0, lon: 0, notes: '', rider_id: null });
     setModalOpen(true);
   };
 
   const openEditModal = (d: Delivery) => {
     setEditingId(d.id);
+    setAddressResolved(!!d.address && d.lat !== 0 && d.lon !== 0);
     reset({
       title: d.title,
       address: d.address || '',
@@ -207,33 +213,32 @@ export default function Deliveries() {
             {errors.title && <p className="mt-1 text-xs text-red-400">{errors.title.message as string}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Lat</label>
-              <input
-                type="number" step="any"
-                {...register('lat', { valueAsNumber: true })}
-                className="w-full rounded-lg bg-gray-800 border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              {errors.lat && <p className="mt-1 text-xs text-red-400">{errors.lat.message as string}</p>}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Lon</label>
-              <input
-                type="number" step="any"
-                {...register('lon', { valueAsNumber: true })}
-                className="w-full rounded-lg bg-gray-800 border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              {errors.lon && <p className="mt-1 text-xs text-red-400">{errors.lon.message as string}</p>}
-            </div>
+          <div className="hidden">
+            <input type="hidden" {...register('lat', { valueAsNumber: true })} />
+            <input type="hidden" {...register('lon', { valueAsNumber: true })} />
+            <input type="hidden" {...register('address')} />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Address</label>
-            <input
-              type="text"
-              {...register('address')}
-              className="w-full rounded-lg bg-gray-800 border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+          <div className="z-50 relative">
+            <AddressAutocomplete
+              label="Search Address"
+              value={watch('address') || ''}
+              onChange={(val) => {
+                setValue('address', val);
+              }}
+              onSelect={(addr, lat, lon) => {
+                setValue('address', addr, { shouldValidate: true });
+                setValue('lat', lat, { shouldValidate: true });
+                setValue('lon', lon, { shouldValidate: true });
+                setAddressResolved(true);
+              }}
+              resolved={addressResolved}
+              onClearResolve={() => {
+                setAddressResolved(false);
+                setValue('lat', '' as any);
+                setValue('lon', '' as any);
+              }}
+              error={(errors.address || errors.lat || errors.lon)?.message as string}
             />
           </div>
 
