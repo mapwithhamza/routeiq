@@ -282,8 +282,10 @@ def test_benchmark_nx_validation_passes():
 async def _authed_client(client: AsyncClient) -> AsyncClient:
     import uuid
     email = f"alg_{uuid.uuid4().hex[:8]}@routeiq-test.dev"
-    await client.post("/auth/register", json={"email": email, "password": "Pass123!"})
-    await client.post("/auth/login", json={"email": email, "password": "Pass123!"})
+    reg = await client.post("/auth/register", json={"email": email, "password": "Pass123!"})
+    assert reg.status_code in (201, 400), f"Register failed: {reg.text}"
+    log = await client.post("/auth/login", json={"email": email, "password": "Pass123!"})
+    assert log.status_code == 200, f"Login failed: {log.text}"
     return client
 
 
