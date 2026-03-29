@@ -83,51 +83,51 @@ export default function Dashboard() {
       value: totalDeliveries,
       sub: 'All time',
       Icon: Package,
-      gradient: 'from-cyan-500/20 to-cyan-600/5',
-      iconColor: 'text-cyan-400',
-      ring: 'ring-cyan-500/20',
+      gradient: 'dark:from-cyan-500/20 dark:to-cyan-600/5',
+      iconColor: 'text-cyan-500 dark:text-cyan-400',
+      ring: 'dark:ring-cyan-500/20 ring-gray-100',
     },
     {
       label: 'Active Riders',
       value: `${sum?.active_riders || 0}/${sum?.total_riders || 0}`,
       sub: 'On duty',
       Icon: Users,
-      gradient: 'from-emerald-500/20 to-emerald-600/5',
-      iconColor: 'text-emerald-400',
-      ring: 'ring-emerald-500/20',
+      gradient: 'dark:from-emerald-500/20 dark:to-emerald-600/5',
+      iconColor: 'text-emerald-500 dark:text-emerald-400',
+      ring: 'dark:ring-emerald-500/20 ring-gray-100',
     },
     {
       label: 'Routes Optimized',
       value: sum?.routes_optimized || 0,
       sub: 'All time',
       Icon: Route,
-      gradient: 'from-indigo-500/20 to-indigo-600/5',
-      iconColor: 'text-indigo-400',
-      ring: 'ring-indigo-500/20',
+      gradient: 'dark:from-indigo-500/20 dark:to-indigo-600/5',
+      iconColor: 'text-indigo-500 dark:text-indigo-400',
+      ring: 'dark:ring-indigo-500/20 ring-gray-100',
     },
     {
       label: 'Avg Distance',
       value: `${sum?.avg_distance || 0} km`,
       sub: 'Per route',
       Icon: TrendingUp,
-      gradient: 'from-amber-500/20 to-amber-600/5',
-      iconColor: 'text-amber-400',
-      ring: 'ring-amber-500/20',
+      gradient: 'dark:from-amber-500/20 dark:to-amber-600/5',
+      iconColor: 'text-amber-500 dark:text-amber-400',
+      ring: 'dark:ring-amber-500/20 ring-gray-100',
     },
   ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 bg-[#F6F8FA] dark:bg-[#0D1117]">
+    <div className="max-w-7xl mx-auto space-y-8 bg-[#F0F2F5] dark:bg-[#0D1117] p-2 sm:p-0">
       {/* Welcome Heading */}
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-500 dark:text-cyan-400 mb-1">
             Route Intelligence
           </p>
-          <h1 className="text-3xl font-bold text-[#1C2128] dark:text-[#E6EDF3] tracking-tight">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-[#E6EDF3] tracking-tight">
             Dashboard Overview
           </h1>
-          <p className="mt-1 text-[#656D76] dark:text-[#8B949E] text-sm">
+          <p className="mt-1 text-gray-500 dark:text-[#8B949E] text-sm">
             High-level insights across all deliveries and riders.
           </p>
         </div>
@@ -142,21 +142,21 @@ export default function Dashboard() {
         {metricCards.map(({ label, value, sub, Icon, gradient, iconColor, ring }) => (
           <div
             key={label}
-            className={`rounded-xl border border-[#D0D7DE] dark:border-[#30363D] bg-white dark:bg-[#1C2128] p-5 backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 bg-gradient-to-br ${gradient}`}
+            className={`rounded-xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] shadow-md dark:shadow-none p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 dark:bg-gradient-to-br ${gradient}`}
           >
             <div className="flex items-start justify-between mb-4">
-              <div className={`w-9 h-9 rounded-lg bg-slate-900/60 ring-1 ${ring} flex items-center justify-center`}>
+              <div className={`w-9 h-9 rounded-lg bg-gray-50 dark:bg-slate-900/60 ring-1 ${ring} flex items-center justify-center`}>
                 <Icon size={18} className={iconColor} />
               </div>
-              <ArrowUpRight size={14} className="text-[#656D76] dark:text-[#8B949E]" />
+              <ArrowUpRight size={14} className="text-gray-400 dark:text-[#8B949E]" />
             </div>
-            <p className="text-2xl font-bold text-[#1C2128] dark:text-[#E6EDF3] font-mono">
+            <p className="text-2xl font-bold text-gray-900 dark:text-[#E6EDF3] font-mono">
               {value}
             </p>
-            <p className="mt-0.5 text-sm font-medium text-[#1C2128] dark:text-[#E6EDF3]">
+            <p className="mt-0.5 text-sm font-medium text-gray-500 dark:text-[#E6EDF3]">
               {label}
             </p>
-            <p className="mt-0.5 text-xs text-[#656D76] dark:text-[#8B949E]">{sub}</p>
+            <p className="mt-0.5 text-xs text-gray-400 dark:text-[#8B949E]">{sub}</p>
           </div>
         ))}
       </div>
@@ -164,8 +164,8 @@ export default function Dashboard() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Delivery Status Progress Bars */}
-        <div className="rounded-xl border border-[#D0D7DE] dark:border-[#30363D] bg-white dark:bg-[#1C2128] p-6 backdrop-blur-sm">
-          <h2 className="text-base font-semibold text-[#1C2128] dark:text-[#E6EDF3] mb-5">
+        <div className="rounded-xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] shadow-md dark:shadow-none p-6">
+          <h2 className="text-base font-semibold text-gray-800 dark:text-[#E6EDF3] mb-5">
             Deliveries by Status
           </h2>
           <div className="space-y-4">
@@ -175,13 +175,13 @@ export default function Dashboard() {
               return (
                 <div key={key}>
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-sm text-[#656D76] dark:text-[#8B949E]">{label}</span>
+                    <span className="text-sm text-gray-500 dark:text-[#8B949E]">{label}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-[#1C2128] dark:text-[#E6EDF3] font-mono">{val}</span>
-                      <span className="text-xs text-[#656D76] dark:text-[#8B949E]">{pct}%</span>
+                      <span className="text-sm font-bold text-gray-900 dark:text-[#E6EDF3] font-mono">{val}</span>
+                      <span className="text-xs text-gray-400 dark:text-[#8B949E]">{pct}%</span>
                     </div>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-700/50 dark:bg-slate-700/50 bg-slate-200 overflow-hidden">
+                  <div className="h-2 rounded-full bg-gray-200 dark:bg-slate-700/50 overflow-hidden">
                     <div
                       className={`h-full rounded-full ${bg} transition-all duration-700`}
                       style={{ width: `${pct}%` }}
@@ -194,14 +194,14 @@ export default function Dashboard() {
         </div>
 
         {/* Algorithm Performance Chart */}
-        <div className="rounded-xl border border-[#D0D7DE] dark:border-[#30363D] bg-white dark:bg-[#1C2128] p-6 backdrop-blur-sm">
-          <h2 className="text-base font-semibold text-[#1C2128] dark:text-[#E6EDF3] mb-5">
+        <div className="rounded-xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] shadow-md dark:shadow-none p-6">
+          <h2 className="text-base font-semibold text-gray-800 dark:text-[#E6EDF3] mb-5">
             Algorithm Performance
           </h2>
           {!hasAlgoData ? (
             <div className="h-64 flex flex-col items-center justify-center text-center gap-3">
               <BarChart3Icon />
-              <p className="text-sm text-[#656D76] dark:text-[#8B949E] max-w-xs">
+              <p className="text-sm text-gray-500 dark:text-[#8B949E] max-w-xs">
                 Run a benchmark on the Algorithms page to see performance data
               </p>
             </div>
@@ -264,7 +264,7 @@ export default function Dashboard() {
 
 function BarChart3Icon() {
   return (
-    <svg className="w-12 h-12 text-[#656D76] dark:text-[#8B949E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="w-12 h-12 text-gray-400 dark:text-[#8B949E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
