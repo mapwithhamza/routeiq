@@ -19,6 +19,7 @@ export default function RouteOptimization() {
   const [optResponse, setOptResponse] = useState<OptimizeResponse | null>(null);
   const [selectedAlgoName, setSelectedAlgoName] = useState<string>('');
   const [osrmRoute, setOsrmRoute] = useState<[number, number][] | null>(null);
+  const [isOsrmLoading, setIsOsrmLoading] = useState(false);
 
   // Data fetch
   const { data: deliveries, isLoading: deliveriesLoading } = useQuery({
@@ -119,11 +120,13 @@ export default function RouteOptimization() {
   useEffect(() => {
     if (routeWaypoints.length < 2) {
       setOsrmRoute(null);
+      setIsOsrmLoading(false);
       return;
     }
 
     let isMounted = true;
     const fetchOsrm = async () => {
+      setIsOsrmLoading(true);
       try {
         const promises = [];
         for (let i = 0; i < routeWaypoints.length - 1; i++) {
@@ -156,6 +159,8 @@ export default function RouteOptimization() {
       } catch (err) {
         console.error('OSRM fetch error:', err);
         if (isMounted) setOsrmRoute(null);
+      } finally {
+        if (isMounted) setIsOsrmLoading(false);
       }
     };
 
@@ -199,6 +204,12 @@ export default function RouteOptimization() {
             isBlockedRoadMode={isBlockedMode}
             onMapClick={handleMapClick}
           />
+          {(optimizeMut.isPending || isOsrmLoading) && (
+            <div className="absolute inset-0 bg-gray-950/70 flex flex-col items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300">
+              <Spinner className="h-10 w-10 text-indigo-500 mb-4" />
+              <p className="text-white font-medium text-lg tracking-wide">Calculating road routes...</p>
+            </div>
+          )}
         </div>
 
         {/* Right Side: Panel */}
