@@ -1,6 +1,6 @@
 /**
  * src/main.tsx — App entry point.
- * Sets up TanStack Query v5 provider + React Router v6.
+ * Sets up ThemeContext + TanStack Query v5 provider + React Router v6.
  */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -8,6 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import App from './App';
+import { ThemeProvider } from './context/ThemeContext';
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -21,11 +22,13 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-        <Toaster richColors position="top-right" />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <App />
+          <Toaster richColors position="top-right" />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
   </React.StrictMode>,
 );

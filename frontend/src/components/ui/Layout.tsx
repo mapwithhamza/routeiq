@@ -1,81 +1,180 @@
+/**
+ * src/components/ui/Layout.tsx
+ * Collapsible sidebar with lucide-react icons.
+ * Topbar: logo, search, bell, dark toggle, user avatar.
+ */
+import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Package,
+  Users,
+  Map,
+  BarChart3,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  Bell,
+  Sun,
+  Moon,
+  Search,
+  Truck,
+} from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../context/ThemeContext';
+
+const navItems = [
+  { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+  { to: '/deliveries', label: 'Deliveries', Icon: Package },
+  { to: '/riders', label: 'Riders', Icon: Users },
+  { to: '/routes', label: 'Optimization', Icon: Map },
+  { to: '/algorithms', label: 'Algorithms', Icon: BarChart3 },
+];
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
+  const [collapsed, setCollapsed] = useState(false);
 
-  const navItems = [
-    { to: '/dashboard', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-    { to: '/deliveries', label: 'Deliveries', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
-    { to: '/riders', label: 'Riders', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
-    { to: '/routes', label: 'Optimization', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
-    { to: '/algorithms', label: 'Algorithms', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
-  ];
+  const sidebarW = collapsed ? 'w-[68px]' : 'w-64';
+
+  const initials = user?.email
+    ? user.email.substring(0, 2).toUpperCase()
+    : 'RQ';
 
   return (
-    <div className="flex min-h-screen bg-gray-950">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-gray-800 bg-gray-900 flex flex-col">
-        <div className="p-6">
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">
-            Route<span className="text-indigo-400">IQ</span>
-          </h1>
-          <p className="mt-1 text-xs text-gray-400 uppercase tracking-wider font-semibold">
-            {user?.role} Portal
-          </p>
+    <div className="flex min-h-screen bg-surface-900 dark:bg-surface-900 bg-slate-50 font-sans">
+      {/* ─── Sidebar ─── */}
+      <aside
+        className={`
+          relative flex flex-col border-r border-slate-700/50 bg-surface-800 dark:bg-surface-800 bg-white
+          transition-all duration-300 ease-in-out z-30 shrink-0
+          ${sidebarW}
+        `}
+      >
+        {/* Logo */}
+        <div className={`flex items-center gap-3 px-4 py-5 border-b border-slate-700/40 ${collapsed ? 'justify-center' : ''}`}>
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <Truck size={16} className="text-white" />
+          </div>
+          {!collapsed && (
+            <span className="text-lg font-bold tracking-tight text-slate-100 dark:text-slate-100 text-slate-900">
+              Route<span className="text-cyan-400">IQ</span>
+            </span>
+          )}
         </div>
-        
-        <nav className="flex-1 px-4 space-y-1">
-          {navItems.map((item) => (
+
+        {/* Navigation */}
+        <nav className="flex-1 px-2 py-4 space-y-0.5">
+          {navItems.map(({ to, label, Icon }) => (
             <NavLink
-              key={item.to}
-              to={item.to}
+              key={to}
+              to={to}
+              title={collapsed ? label : undefined}
               className={({ isActive }) =>
-                `flex items-center px-4 py-3 text-sm font-medium rounded-xl transition ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150
+                ${collapsed ? 'justify-center' : ''}
+                ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-cyan-500/15 text-cyan-400 shadow-sm shadow-cyan-500/10'
+                    : 'text-slate-400 dark:text-slate-400 text-slate-600 hover:bg-slate-700/40 dark:hover:bg-slate-700/40 hover:bg-slate-100 hover:text-slate-100 dark:hover:text-slate-100 hover:text-slate-900'
                 }`
               }
             >
-              <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-              </svg>
-              {item.label}
+              <Icon size={18} className="shrink-0" />
+              {!collapsed && <span>{label}</span>}
             </NavLink>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-gray-800 mt-auto">
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <p className="text-white font-medium truncate w-40" title={user?.email}>{user?.email}</p>
+        {/* User Footer */}
+        <div className={`p-3 border-t border-slate-700/40 ${collapsed ? 'flex justify-center' : ''}`}>
+          {!collapsed ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                  {initials}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-slate-200 dark:text-slate-200 text-slate-800 truncate max-w-[110px]">
+                    {user?.email}
+                  </p>
+                  <p className="text-[10px] text-slate-500 capitalize">{user?.role}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => logout()}
+                className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                title="Sign out"
+              >
+                <LogOut size={15} />
+              </button>
             </div>
+          ) : (
             <button
               onClick={() => logout()}
-              className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition"
+              className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
               title="Sign out"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              <LogOut size={16} />
             </button>
-          </div>
+          )}
         </div>
+
+        {/* Collapse Toggle */}
+        <button
+          onClick={() => setCollapsed((c) => !c)}
+          className="absolute -right-3 top-[72px] z-40 w-6 h-6 rounded-full border border-slate-600 bg-surface-800 dark:bg-surface-800 bg-white flex items-center justify-center text-slate-400 hover:text-cyan-400 transition shadow-md"
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+        </button>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile Header (Hidden on md and up) */}
-        <header className="lg:hidden border-b border-gray-800 bg-gray-900 px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white">Route<span className="text-indigo-400">IQ</span></h1>
-          {/* Mobile menu button could go here */}
+      {/* ─── Main Area ─── */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Topbar */}
+        <header className="h-14 flex items-center gap-4 px-6 border-b border-slate-700/40 bg-surface-800/80 dark:bg-surface-800/80 bg-white/90 backdrop-blur-sm sticky top-0 z-20">
+          {/* Search */}
+          <div className="relative flex-1 max-w-sm hidden md:block">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <input
+              type="search"
+              placeholder="Quick search…"
+              className="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg bg-slate-900/60 dark:bg-slate-900/60 bg-slate-100 border border-slate-700/40 dark:border-slate-700/40 border-slate-200 text-slate-300 dark:text-slate-300 text-slate-700 placeholder-slate-600 dark:placeholder-slate-600 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition"
+            />
+          </div>
+
+          <div className="ml-auto flex items-center gap-2">
+            {/* Bell */}
+            <button className="relative p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/40 transition">
+              <Bell size={17} />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-cyan-400 ring-1 ring-surface-800" />
+            </button>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/40 transition"
+              title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
+
+            {/* Avatar */}
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ml-1 cursor-pointer ring-2 ring-cyan-500/20 hover:ring-cyan-500/50 transition">
+              {initials}
+            </div>
+          </div>
         </header>
-        
-        <div className="flex-1 overflow-auto p-8">
-          <Outlet />
-        </div>
-      </main>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-auto p-6 lg:p-8">
+          <div className="animate-fade-in">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

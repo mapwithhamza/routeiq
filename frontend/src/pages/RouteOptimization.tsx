@@ -1,6 +1,12 @@
+/**
+ * src/pages/RouteOptimization.tsx — Phase 12 (UI Redesign)
+ * 70/30 split, full viewport height map, route colored by priority.
+ * All API calls, hooks, OSRM logic preserved untouched.
+ */
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { Map as MapIcon, Zap, Plus, Lock, ChevronDown, Activity, Navigation } from 'lucide-react';
 
 import MainMap from '../components/map/MainMap';
 import { deliveriesApi, ridersApi, routesApi } from '../lib/api';
@@ -15,7 +21,7 @@ export default function RouteOptimization() {
   const [isAddMode, setIsAddMode] = useState(false);
   const [isBlockedMode, setIsBlockedMode] = useState(false);
   const [selectedRiderId, setSelectedRiderId] = useState<number | ''>('');
-  
+
   const [optResponse, setOptResponse] = useState<OptimizeResponse | null>(null);
   const [selectedAlgoName, setSelectedAlgoName] = useState<string>('');
   const [osrmRoute, setOsrmRoute] = useState<[number, number][] | null>(null);
@@ -47,7 +53,6 @@ export default function RouteOptimization() {
     onSuccess: (data) => {
       setOptResponse(data);
       if (data.results && data.results.length > 0) {
-        // Default to TSP-DP if available or first
         const p = data.results.find(r => r.algorithm === 'TSP-DP') || data.results[0];
         setSelectedAlgoName(p.algorithm);
       }
@@ -103,20 +108,26 @@ export default function RouteOptimization() {
   };
 
   if (deliveriesLoading || ridersLoading) {
-    return <div className="flex h-full items-center justify-center"><Spinner className="h-10 w-10 text-indigo-500" /></div>;
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Spinner className="h-10 w-10 text-cyan-500" />
+      </div>
+    );
   }
 
   // Derived state for Map
   const activeRider = riders?.find(r => r.id === Number(selectedRiderId)) || null;
-  // Show all deliveries on map
   const activeDeliveries = deliveries || [];
 
-  const selectedAlgoResult: AlgorithmResult | undefined = optResponse?.results.find(r => r.algorithm === selectedAlgoName);
+  const selectedAlgoResult: AlgorithmResult | undefined = optResponse?.results.find(
+    r => r.algorithm === selectedAlgoName
+  );
 
-  const routeWaypoints = selectedAlgoResult && optResponse 
+  const routeWaypoints = selectedAlgoResult && optResponse
     ? selectedAlgoResult.route.map(idx => optResponse.waypoints[idx])
     : [];
 
+  // OSRM fetch — unchanged logic
   useEffect(() => {
     if (routeWaypoints.length < 2) {
       setOsrmRoute(null);
@@ -143,7 +154,7 @@ export default function RouteOptimization() {
 
         const results = await Promise.all(promises);
         const combinedCoords: [number, number][] = [];
-        
+
         for (const res of results) {
           if (res.routes && res.routes.length > 0) {
             const coords = res.routes[0].geometry.coordinates as [number, number][];
@@ -168,34 +179,60 @@ export default function RouteOptimization() {
     return () => { isMounted = false; };
   }, [selectedAlgoName, optResponse]);
 
+  const pendingDeliveries = deliveries?.filter(d => d.status === 'pending' && !d.rider_id) || [];
+
   return (
-    <div className="max-w-7xl mx-auto flex flex-col h-[calc(100vh-8rem)]">
-      <div className="flex justify-between items-end mb-6">
+    <div className="max-w-[1600px] mx-auto flex flex-col animate-fade-in" style={{ height: 'calc(100vh - 7rem)' }}>
+      {/* Header */}
+      <div className="flex justify-between items-end mb-5 shrink-0">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Route Optimization</h1>
-          <p className="mt-1 text-gray-400">Generate intelligent paths through the DSA pipeline.</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-1">
+            DSA Pipeline
+          </p>
+          <h1 className="text-3xl font-bold text-slate-100 dark:text-slate-100 text-slate-900 tracking-tight">
+            Route Optimization
+          </h1>
+          <p className="mt-1 text-slate-400 dark:text-slate-400 text-slate-500 text-sm">
+            Generate intelligent paths through the DSA pipeline.
+          </p>
         </div>
-        
-        <div className="flex gap-3">
-          <Button 
+
+        <div className="flex gap-2">
+          <Button
             variant={isBlockedMode ? 'danger' : 'secondary'}
             onClick={() => { setIsBlockedMode(!isBlockedMode); setIsAddMode(false); }}
           >
-            {isBlockedMode ? 'Cancel Road Block' : 'Block Road'}
+            <Lock size={14} className="mr-1.5" />
+            {isBlockedMode ? 'Cancel' : 'Block Road'}
           </Button>
-          <Button 
+          <Button
             variant={isAddMode ? 'primary' : 'secondary'}
             onClick={() => { setIsAddMode(!isAddMode); setIsBlockedMode(false); }}
           >
-            {isAddMode ? 'Click Map...' : 'Add Delivery on Map'}
+            <Plus size={14} className="mr-1.5" />
+            {isAddMode ? 'Click Map…' : 'Add Delivery'}
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
-        {/* Left Side: Map */}
-        <div className="flex-1 rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden relative shadow-2xl">
-          <MainMap 
+      {/* 70/30 Split */}
+      <div className="flex flex-col lg:flex-row gap-5 flex-1 min-h-0">
+        {/* Map (70%) */}
+        <div className="flex-[70] rounded-xl border border-slate-700/60 bg-slate-800/60 overflow-hidden relative shadow-2xl min-h-0">
+          {/* Map Status Bar */}
+          <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
+            {isAddMode && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-white text-xs font-semibold shadow-lg animate-pulse">
+                <Plus size={12} /> Click map to add delivery
+              </div>
+            )}
+            {isBlockedMode && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500 text-white text-xs font-semibold shadow-lg animate-pulse">
+                <Lock size={12} /> Click road to block
+              </div>
+            )}
+          </div>
+          <MainMap
             deliveries={activeDeliveries}
             rider={activeRider}
             routeWaypoints={routeWaypoints}
@@ -205,105 +242,140 @@ export default function RouteOptimization() {
             onMapClick={handleMapClick}
           />
           {(optimizeMut.isPending || isOsrmLoading) && (
-            <div className="absolute inset-0 bg-gray-950/70 flex flex-col items-center justify-center z-50 backdrop-blur-sm transition-opacity duration-300">
-              <Spinner className="h-10 w-10 text-indigo-500 mb-4" />
-              <p className="text-white font-medium text-lg tracking-wide">Calculating road routes...</p>
+            <div className="absolute inset-0 bg-slate-950/70 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-4 bg-slate-900/80 rounded-2xl border border-slate-700/60 px-8 py-6 shadow-2xl">
+                <Spinner className="h-10 w-10 text-cyan-500" />
+                <div className="text-center">
+                  <p className="text-white font-semibold text-base">
+                    {optimizeMut.isPending ? 'Running DSA algorithms…' : 'Fetching road geometry…'}
+                  </p>
+                  <p className="text-slate-400 text-sm mt-1">Calculating optimal routes</p>
+                </div>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Right Side: Panel */}
-        <div className="w-full lg:w-96 flex flex-col gap-6 overflow-y-auto">
+        {/* Control Panel (30%) */}
+        <div className="flex-[30] flex flex-col gap-4 overflow-y-auto min-w-[280px] max-w-[380px]">
           {/* Engine Controls */}
-          <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5 shadow-lg">
-            <h2 className="text-lg font-semibold text-white mb-4">Optimization Engine</h2>
-            
-            <div className="space-y-4">
+          <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-5 shrink-0">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-7 h-7 rounded-lg bg-cyan-500/15 flex items-center justify-center">
+                <Zap size={14} className="text-cyan-400" />
+              </div>
+              <h2 className="text-sm font-semibold text-slate-200">Optimization Engine</h2>
+            </div>
+
+            <div className="space-y-3">
+              {/* Rider selector */}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1.5">Select Fleet Rider</label>
-                <select 
-                  className="w-full rounded-lg bg-gray-950 border border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                  value={selectedRiderId}
-                  onChange={(e) => {
-                    setSelectedRiderId(e.target.value ? Number(e.target.value) : '');
-                    setOptResponse(null);
-                  }}
-                >
-                  <option value="">-- Choose Rider --</option>
-                  {riders?.filter(r => r.status === 'available').map(r => (
-                    <option key={r.id} value={r.id}>{r.name}</option>
-                  ))}
-                </select>
+                <label className="block text-xs font-medium text-slate-400 mb-1.5">Select Fleet Rider</label>
+                <div className="relative">
+                  <select
+                    className="w-full appearance-none rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 transition pr-8"
+                    value={selectedRiderId}
+                    onChange={(e) => {
+                      setSelectedRiderId(e.target.value ? Number(e.target.value) : '');
+                      setOptResponse(null);
+                    }}
+                  >
+                    <option value="">— Choose Rider —</option>
+                    {riders?.filter(r => r.status === 'available').map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                </div>
               </div>
 
-              <Button 
-                className="w-full py-3 shadow-indigo-500/20 shadow-lg"
+              {/* Stats row */}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-lg bg-slate-900/40 border border-slate-700/40 p-2.5 text-center">
+                  <p className="text-base font-bold text-cyan-400 font-mono">{pendingDeliveries.length}</p>
+                  <p className="text-[10px] text-slate-500">Pending drops</p>
+                </div>
+                <div className="rounded-lg bg-slate-900/40 border border-slate-700/40 p-2.5 text-center">
+                  <p className="text-base font-bold text-violet-400 font-mono">7</p>
+                  <p className="text-[10px] text-slate-500">Algorithms</p>
+                </div>
+              </div>
+
+              <Button
+                className="w-full py-2.5 shadow-lg shadow-cyan-500/10"
                 onClick={handleOptimize}
                 isLoading={optimizeMut.isPending}
               >
+                <Zap size={14} className="mr-2" />
                 Run Multi-Algorithm Search
               </Button>
             </div>
           </div>
 
-          {/* Results Display */}
+          {/* Results Panel */}
           {optResponse && (
-            <div className="rounded-2xl border border-indigo-500/30 bg-gray-900 p-5 shadow-lg flex-1">
-              <div className="flex justify-between items-center mb-4 border-b border-gray-800 pb-4">
-                <h2 className="text-lg font-bold text-white leading-tight">
-                  Optimization Results
-                </h2>
-                <Badge variant="success">Completed</Badge>
+            <div className="rounded-xl border border-cyan-500/30 bg-slate-800/60 p-5 flex-1 animate-scale-in">
+              <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-700/50">
+                <div className="flex items-center gap-2">
+                  <Activity size={14} className="text-cyan-400" />
+                  <h2 className="text-sm font-semibold text-slate-200">Results</h2>
+                </div>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  Complete
+                </span>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1.5">Algorithm Viewer</label>
-                <select
-                  className="w-full rounded-lg bg-indigo-950/40 border border-indigo-500/50 px-3 py-2 text-indigo-200 outline-none focus:ring-2 focus:ring-indigo-500 mb-6 font-semibold"
-                  value={selectedAlgoName}
-                  onChange={e => setSelectedAlgoName(e.target.value)}
-                >
-                  {optResponse.results.map(r => (
-                    <option key={r.algorithm} value={r.algorithm}>{r.algorithm} Engine</option>
-                  ))}
-                </select>
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-slate-400 mb-1.5">Algorithm Viewer</label>
+                <div className="relative">
+                  <select
+                    className="w-full appearance-none rounded-lg bg-cyan-950/40 border border-cyan-500/40 px-3 py-2 text-sm text-cyan-200 outline-none focus:ring-2 focus:ring-cyan-500/50 pr-8 font-semibold"
+                    value={selectedAlgoName}
+                    onChange={e => setSelectedAlgoName(e.target.value)}
+                  >
+                    {optResponse.results.map(r => (
+                      <option key={r.algorithm} value={r.algorithm}>{r.algorithm} Engine</option>
+                    ))}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-500/60 pointer-events-none" />
+                </div>
               </div>
 
               {selectedAlgoResult ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-950 border border-gray-800">
-                    <span className="text-sm text-gray-400">Total Distance</span>
-                    <span className="font-bold text-white font-mono">{selectedAlgoResult.distance.toFixed(2)} km</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-950 border border-gray-800">
-                    <span className="text-sm text-gray-400">Compute Time</span>
-                    <span className="font-bold text-yellow-400 font-mono">{selectedAlgoResult.runtime_ms.toFixed(2)} ms</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-950 border border-gray-800">
-                    <span className="text-sm text-gray-400">Nodes Explored</span>
-                    <span className="font-bold text-indigo-400 font-mono">{selectedAlgoResult.nodes_explored} units</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-950 border border-gray-800">
-                    <span className="text-sm text-gray-400">Total Waypoints</span>
-                    <span className="font-bold text-blue-400 font-mono">{selectedAlgoResult.route.length} stops</span>
-                  </div>
+                <div className="space-y-2">
+                  {[
+                    { label: 'Total Distance', value: `${selectedAlgoResult.distance.toFixed(2)} km`, color: 'text-emerald-400', icon: Navigation },
+                    { label: 'Compute Time', value: `${selectedAlgoResult.runtime_ms.toFixed(2)} ms`, color: 'text-amber-400', icon: Zap },
+                    { label: 'Nodes Explored', value: `${selectedAlgoResult.nodes_explored} units`, color: 'text-indigo-400', icon: Activity },
+                    { label: 'Route Stops', value: `${selectedAlgoResult.route.length} stops`, color: 'text-blue-400', icon: MapIcon },
+                  ].map(({ label, value, color, icon: Icon }) => (
+                    <div key={label} className="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/50 border border-slate-700/40">
+                      <div className="flex items-center gap-2">
+                        <Icon size={13} className="text-slate-500" />
+                        <span className="text-xs text-slate-400">{label}</span>
+                      </div>
+                      <span className={`text-sm font-bold font-mono ${color}`}>{value}</span>
+                    </div>
+                  ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 italic text-center py-4">Select an algorithm to view metrics.</p>
+                <p className="text-xs text-slate-500 italic text-center py-4">
+                  Select an algorithm to view metrics.
+                </p>
               )}
             </div>
           )}
 
-          {/* Fallback Empty Region */}
+          {/* Empty State */}
           {!optResponse && (
-            <div className="rounded-2xl border border-gray-800 border-dashed bg-gray-900/50 p-5 flex flex-col items-center justify-center text-center flex-1 opacity-60">
-              <svg className="w-12 h-12 text-gray-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <p className="text-sm text-gray-400">Run optimization to compare DSA paths instantly.</p>
+            <div className="rounded-xl border border-slate-700/60 border-dashed bg-slate-900/30 p-6 flex flex-col items-center justify-center text-center flex-1">
+              <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700/60 flex items-center justify-center mb-3">
+                <Zap size={20} className="text-slate-600" />
+              </div>
+              <p className="text-sm font-medium text-slate-400">No Results Yet</p>
+              <p className="text-xs text-slate-600 mt-1 max-w-[200px]">
+                Select a rider and run optimization to compare DSA paths.
+              </p>
             </div>
           )}
         </div>

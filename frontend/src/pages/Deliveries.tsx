@@ -1,8 +1,14 @@
+/**
+ * src/pages/Deliveries.tsx — Phase 12 (UI Redesign)
+ * Filter tabs, clean table, colored badges, modal with scaleIn animation.
+ * All API calls, hooks, Zod schemas, form handlers preserved untouched.
+ */
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { Plus, Pencil, Trash2, Package } from 'lucide-react';
 
 import { deliveriesApi, ridersApi } from '../lib/api';
 import { deliveryCreateSchema, deliveryUpdateSchema, type DeliveryCreateForm, type DeliveryUpdateForm } from '../schemas';
@@ -14,11 +20,46 @@ import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import AddressAutocomplete from '../components/forms/AddressAutocomplete';
 
+type FilterTab = 'all' | 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'failed';
+
+const FILTER_TABS: { key: FilterTab; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'pending', label: 'Pending' },
+  { key: 'assigned', label: 'Assigned' },
+  { key: 'in_transit', label: 'In Transit' },
+  { key: 'delivered', label: 'Delivered' },
+  { key: 'failed', label: 'Failed' },
+];
+
+const STATUS_STYLES: Record<string, string> = {
+  pending:    'bg-slate-500/15 text-slate-300 border-slate-500/30',
+  assigned:   'bg-violet-500/15 text-violet-400 border-violet-500/30',
+  in_transit: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  delivered:  'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  failed:     'bg-red-500/15 text-red-400 border-red-500/30',
+};
+
+const PRIORITY_STYLES: Record<string, string> = {
+  urgent: 'bg-red-500/15 text-red-400 border-red-500/30',
+  high:   'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  normal: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+  low:    'bg-slate-500/15 text-slate-400 border-slate-500/30',
+};
+
+function ColBadge({ text, styleClass }: { text: string; styleClass: string }) {
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styleClass}`}>
+      {text.replace('_', ' ')}
+    </span>
+  );
+}
+
 export default function Deliveries() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [addressResolved, setAddressResolved] = useState(false);
+  const [activeTab, setActiveTab] = useState<FilterTab>('all');
 
   // Queries
   const { data: deliveries, isLoading: deliveriesLoading } = useQuery({
@@ -110,89 +151,137 @@ export default function Deliveries() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'default';
-      case 'in_transit': return 'info';
-      case 'delivered': return 'success';
-      case 'failed': return 'error';
-      default: return 'warning'; // assigned
-    }
-  };
-
-  const getPriorityColor = (prio: string) => {
-    switch (prio) {
-      case 'urgent': return 'error';
-      case 'high': return 'warning';
-      case 'normal': return 'info';
-      default: return 'default';
-    }
-  };
-
   const getRiderName = (id: number | null) => {
     if (!id) return 'Unassigned';
     return riders?.find(r => r.id === id)?.name || `Rider #${id}`;
   };
 
-  if (deliveriesLoading || ridersLoading) return <div className="flex h-full items-center justify-center"><Spinner className="h-10 w-10 text-indigo-500" /></div>;
+  if (deliveriesLoading || ridersLoading) return (
+    <div className="flex h-full items-center justify-center">
+      <Spinner className="h-10 w-10 text-cyan-500" />
+    </div>
+  );
+
+  const filteredDeliveries = activeTab === 'all'
+    ? deliveries || []
+    : (deliveries || []).filter(d => d.status === activeTab);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Deliveries</h1>
-          <p className="mt-1 text-gray-400">Manage all your package deliveries and waypoints.</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-1">
+            Fleet Management
+          </p>
+          <h1 className="text-3xl font-bold text-slate-100 dark:text-slate-100 text-slate-900 tracking-tight">
+            Deliveries
+          </h1>
+          <p className="mt-1 text-slate-400 dark:text-slate-400 text-slate-500 text-sm">
+            Manage all package deliveries and waypoints.
+          </p>
         </div>
-        <Button onClick={openAddModal}>+ New Delivery</Button>
+        <Button onClick={openAddModal}>
+          <Plus size={16} className="mr-1.5" />
+          New Delivery
+        </Button>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-800/60 p-1 w-fit flex-wrap">
+        {FILTER_TABS.map(({ key, label }) => {
+          const count = key === 'all'
+            ? deliveries?.length || 0
+            : deliveries?.filter(d => d.status === key).length || 0;
+          return (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
+                activeTab === key
+                  ? 'bg-cyan-500/20 text-cyan-400 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
+              }`}
+            >
+              {label}
+              <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${
+                activeTab === key ? 'bg-cyan-500/30 text-cyan-300' : 'bg-slate-700 text-slate-400'
+              }`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">
+      <div className="overflow-hidden rounded-xl border border-slate-700/60 bg-slate-800/60 backdrop-blur-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-800">
-            <thead className="bg-gray-800/50">
+          <table className="min-w-full divide-y divide-slate-700/50">
+            <thead className="bg-slate-900/40">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Title</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Priority</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Rider</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Title</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Priority</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Rider</th>
+                <th className="px-5 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
-              {deliveries?.map((d) => (
-                <tr key={d.id} className="hover:bg-gray-800/20 transition">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-white">{d.title}</div>
-                    <div className="text-xs text-gray-500 truncate max-w-xs">{d.address || `${d.lat.toFixed(4)}, ${d.lon.toFixed(4)}`}</div>
+            <tbody className="divide-y divide-slate-700/30">
+              {filteredDeliveries.map((d) => (
+                <tr key={d.id} className="hover:bg-slate-700/20 transition group">
+                  <td className="px-5 py-3.5 whitespace-nowrap">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-slate-700/50 flex items-center justify-center shrink-0">
+                        <Package size={14} className="text-slate-400" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-slate-100 dark:text-slate-100 text-slate-900">{d.title}</div>
+                        <div className="text-xs text-slate-500 truncate max-w-xs">
+                          {d.address || `${d.lat.toFixed(4)}, ${d.lon.toFixed(4)}`}
+                        </div>
+                      </div>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Badge variant={getStatusColor(d.status) as any}>{d.status}</Badge>
+                  <td className="px-5 py-3.5 whitespace-nowrap">
+                    <ColBadge text={d.status} styleClass={STATUS_STYLES[d.status] || STATUS_STYLES.pending} />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Badge variant={getPriorityColor(d.priority) as any}>{d.priority}</Badge>
+                  <td className="px-5 py-3.5 whitespace-nowrap">
+                    <ColBadge text={d.priority} styleClass={PRIORITY_STYLES[d.priority] || PRIORITY_STYLES.normal} />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <td className="px-5 py-3.5 whitespace-nowrap text-sm text-slate-300 dark:text-slate-300 text-slate-600">
                     {getRiderName(d.rider_id)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => openEditModal(d)} className="text-indigo-400 hover:text-indigo-300 mr-4 transition">Edit</button>
-                    <button 
-                      onClick={() => {
-                        if (confirm(`Delete delivery ${d.title}?`)) deleteMut.mutate(d.id);
-                      }} 
-                      className="text-red-400 hover:text-red-300 transition"
-                      disabled={deleteMut.isPending}
-                    >
-                      Delete
-                    </button>
+                  <td className="px-5 py-3.5 whitespace-nowrap text-right">
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition">
+                      <button
+                        onClick={() => openEditModal(d)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition"
+                        title="Edit"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm(`Delete delivery "${d.title}"?`)) deleteMut.mutate(d.id);
+                        }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition"
+                        title="Delete"
+                        disabled={deleteMut.isPending}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
-              {deliveries?.length === 0 && (
+              {filteredDeliveries.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-500">
-                    No deliveries found. Create one to get started.
+                  <td colSpan={5} className="px-6 py-16 text-center">
+                    <Package size={36} className="text-slate-700 mx-auto mb-3" />
+                    <p className="text-sm text-slate-500">
+                      {activeTab === 'all' ? 'No deliveries yet. Create one to get started.' : `No ${activeTab} deliveries.`}
+                    </p>
                   </td>
                 </tr>
               )}
@@ -201,14 +290,16 @@ export default function Deliveries() {
         </div>
       </div>
 
+      {/* Modal */}
       <Modal isOpen={modalOpen} onClose={closeModal} title={editingId ? 'Edit Delivery' : 'New Delivery'}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 animate-scale-in">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Title</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">Title</label>
             <input
               type="text"
               {...register('title')}
-              className="w-full rounded-lg bg-gray-800 border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="e.g. Package to Gulberg"
+              className="w-full rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-slate-100 placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition"
             />
             {errors.title && <p className="mt-1 text-xs text-red-400">{errors.title.message as string}</p>}
           </div>
@@ -223,9 +314,7 @@ export default function Deliveries() {
             <AddressAutocomplete
               label="Search Address"
               value={watch('address') || ''}
-              onChange={(val) => {
-                setValue('address', val);
-              }}
+              onChange={(val) => { setValue('address', val); }}
               onSelect={(addr, lat, lon) => {
                 setValue('address', addr, { shouldValidate: true });
                 setValue('lat', lat, { shouldValidate: true });
@@ -244,10 +333,10 @@ export default function Deliveries() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Priority</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Priority</label>
               <select
                 {...register('priority')}
-                className="w-full rounded-lg bg-gray-800 border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
               >
                 <option value="low">Low</option>
                 <option value="normal">Normal</option>
@@ -255,12 +344,12 @@ export default function Deliveries() {
                 <option value="urgent">Urgent</option>
               </select>
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Assign Rider</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Assign Rider</label>
               <select
-                {...register('rider_id', { setValueAs: v => (v === "" || v === "null" || !v) ? null : parseInt(v, 10) })}
-                className="w-full rounded-lg bg-gray-800 border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                {...register('rider_id', { setValueAs: v => (v === '' || v === 'null' || !v) ? null : parseInt(v, 10) })}
+                className="w-full rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
               >
                 <option value="">Unassigned</option>
                 {riders?.map(r => (
@@ -270,11 +359,11 @@ export default function Deliveries() {
             </div>
 
             {editingId && (
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">Status</label>
                 <select
                   {...register('status')}
-                  className="w-full rounded-lg bg-gray-800 border-gray-700 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
                 >
                   <option value="pending">Pending</option>
                   <option value="assigned">Assigned</option>
@@ -286,7 +375,7 @@ export default function Deliveries() {
             )}
           </div>
 
-          <div className="pt-4 flex justify-end gap-3">
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-700/50">
             <Button type="button" variant="ghost" onClick={closeModal}>Cancel</Button>
             <Button type="submit" isLoading={createMut.isPending || updateMut.isPending}>
               {editingId ? 'Save Changes' : 'Create Delivery'}

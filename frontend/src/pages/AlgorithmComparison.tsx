@@ -1,17 +1,18 @@
 /**
- * src/pages/AlgorithmComparison.tsx — Phase 9
- * Benchmark runner + comparison table + ECharts bar charts.
+ * src/pages/AlgorithmComparison.tsx — Phase 12 (UI Redesign)
+ * Toggle node selector, winner banner, comparison table, 2 ECharts charts.
+ * All benchmark logic, mutation calls, data filtering preserved untouched.
  * Uses echarts-for-react wrapper only — never raw echarts DOM API.
  */
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import ReactECharts from 'echarts-for-react';
+import { Play, Trophy, BarChart3, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 import { routesApi } from '../lib/api';
 import type { BenchmarkResult } from '../types';
 import Button from '../components/ui/Button';
-import Badge from '../components/ui/Badge';
 import Spinner from '../components/ui/Spinner';
 
 // All 7 algorithms the backend runs
@@ -50,7 +51,7 @@ export default function AlgorithmComparison() {
     (r) => r.nodes === nodeSize && !r.algorithm.includes('_vs_'),
   );
 
-  // Find the best algorithm by shortest distance (excluding MergeSort which has no distance)
+  // Find the best algorithm by shortest distance
   const routableFiltered = filtered.filter((r) => r.distance_km != null && !r.error);
   const winnerAlgo =
     routableFiltered.length > 0
@@ -59,23 +60,23 @@ export default function AlgorithmComparison() {
         ).algorithm
       : null;
 
-  // ECharts: Distance comparison bar chart
+  // ECharts: Distance comparison
   const distanceChartOptions = {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', formatter: (p: any[]) => `${p[0].name}<br/>${p[0].value?.toFixed(4) ?? 'N/A'} km` },
-    grid: { top: 20, bottom: 40, left: 55, right: 20 },
+    grid: { top: 12, bottom: 40, left: 55, right: 20 },
     xAxis: {
       type: 'category' as const,
       data: ALL_ALGOS as unknown as string[],
-      axisLabel: { color: '#94a3b8', rotate: 15, fontSize: 11 },
-      axisLine: { lineStyle: { color: '#374151' } },
+      axisLabel: { color: '#64748b', rotate: 15, fontSize: 11 },
+      axisLine: { lineStyle: { color: '#334155' } },
     },
     yAxis: {
       type: 'value' as const,
       name: 'km',
-      nameTextStyle: { color: '#94a3b8' },
-      axisLabel: { color: '#94a3b8' },
-      splitLine: { lineStyle: { color: '#1f2937' } },
+      nameTextStyle: { color: '#475569' },
+      axisLabel: { color: '#64748b' },
+      splitLine: { lineStyle: { color: '#1e293b' } },
     },
     series: [
       {
@@ -93,23 +94,23 @@ export default function AlgorithmComparison() {
     ],
   };
 
-  // ECharts: Runtime comparison bar chart
+  // ECharts: Runtime comparison
   const runtimeChartOptions = {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', formatter: (p: any[]) => `${p[0].name}<br/>${p[0].value?.toFixed(4) ?? 'N/A'} ms` },
-    grid: { top: 20, bottom: 40, left: 65, right: 20 },
+    grid: { top: 12, bottom: 40, left: 65, right: 20 },
     xAxis: {
       type: 'category' as const,
       data: ALL_ALGOS as unknown as string[],
-      axisLabel: { color: '#94a3b8', rotate: 15, fontSize: 11 },
-      axisLine: { lineStyle: { color: '#374151' } },
+      axisLabel: { color: '#64748b', rotate: 15, fontSize: 11 },
+      axisLine: { lineStyle: { color: '#334155' } },
     },
     yAxis: {
       type: 'value' as const,
       name: 'ms',
-      nameTextStyle: { color: '#94a3b8' },
-      axisLabel: { color: '#94a3b8' },
-      splitLine: { lineStyle: { color: '#1f2937' } },
+      nameTextStyle: { color: '#475569' },
+      axisLabel: { color: '#64748b' },
+      splitLine: { lineStyle: { color: '#1e293b' } },
     },
     series: [
       {
@@ -128,30 +129,36 @@ export default function AlgorithmComparison() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Algorithm Comparison</h1>
-          <p className="mt-1 text-gray-400">
+          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-1">
+            DSA Analysis
+          </p>
+          <h1 className="text-3xl font-bold text-slate-100 dark:text-slate-100 text-slate-900 tracking-tight">
+            Algorithm Comparison
+          </h1>
+          <p className="mt-1 text-slate-400 dark:text-slate-400 text-slate-500 text-sm">
             Benchmark all 7 DSA algorithms and compare performance metrics.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Node size selector */}
-          <div className="flex rounded-xl border border-gray-700 overflow-hidden bg-gray-900">
+          {/* Node size toggle */}
+          <div className="flex rounded-xl border border-slate-700/60 overflow-hidden bg-slate-800/60">
             {([10, 50, 200] as NodeSize[]).map((n) => (
               <button
                 key={n}
                 onClick={() => setNodeSize(n)}
-                className={`px-4 py-2 text-sm font-semibold transition ${
+                className={`px-4 py-2 text-sm font-semibold transition-all duration-150 ${
                   nodeSize === n
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                    ? 'bg-cyan-500/20 text-cyan-400'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
                 }`}
               >
-                {n} nodes
+                {n}
+                <span className="ml-1 text-xs opacity-70">nodes</span>
               </button>
             ))}
           </div>
@@ -159,20 +166,24 @@ export default function AlgorithmComparison() {
           <Button
             onClick={() => benchmarkMut.mutate()}
             isLoading={benchmarkMut.isPending}
-            className="shadow-lg shadow-indigo-500/20"
+            className="shadow-lg shadow-cyan-500/10"
           >
-            {benchmarkMut.isPending ? 'Running…' : '▶ Run Benchmark'}
+            <Play size={14} className="mr-1.5" />
+            {benchmarkMut.isPending ? 'Running…' : 'Run Benchmark'}
           </Button>
         </div>
       </div>
 
-      {/* Loading overlay */}
+      {/* Loading */}
       {benchmarkMut.isPending && (
-        <div className="flex flex-col items-center justify-center py-16 gap-4">
-          <Spinner className="h-12 w-12 text-indigo-500" />
-          <p className="text-gray-400 text-sm animate-pulse">
-            Running all 7 algorithms on 10 / 50 / 200 node graphs…
-          </p>
+        <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 py-16 flex flex-col items-center gap-4">
+          <Spinner className="h-12 w-12 text-cyan-500" />
+          <div className="text-center">
+            <p className="text-slate-200 font-semibold">Running benchmark suite…</p>
+            <p className="text-slate-400 text-sm mt-1 animate-pulse">
+              Executing all 7 algorithms on 10 / 50 / 200 node graphs
+            </p>
+          </div>
         </div>
       )}
 
@@ -181,21 +192,27 @@ export default function AlgorithmComparison() {
         <>
           {/* Winner Banner */}
           {winnerAlgo && (
-            <div className="rounded-2xl border border-green-500/30 bg-green-500/5 px-6 py-4 flex items-center gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-5 py-4 flex items-center gap-4 animate-scale-in">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
+                <Trophy size={18} className="text-emerald-400" />
               </div>
-              <div>
-                <p className="text-xs text-green-400 font-semibold uppercase tracking-wider">Best Algorithm at {nodeSize} nodes</p>
-                <p className="text-xl font-bold text-white mt-0.5">
-                  {winnerAlgo}{' '}
-                  <Badge variant="success">Winner</Badge>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">
+                  Best Algorithm @ {nodeSize} nodes
                 </p>
-                <p className="text-sm text-gray-400 mt-0.5">
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span
+                    className="w-3 h-3 rounded-full shrink-0"
+                    style={{ backgroundColor: ALGO_COLORS[winnerAlgo] ?? '#10b981' }}
+                  />
+                  <p className="text-xl font-bold text-slate-100">{winnerAlgo}</p>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    Winner
+                  </span>
+                </div>
+                <p className="text-sm text-slate-400 mt-0.5">
                   Shortest total distance:{' '}
-                  <span className="text-green-400 font-mono font-semibold">
+                  <span className="text-emerald-400 font-mono font-semibold">
                     {filtered.find(r => r.algorithm === winnerAlgo)?.distance_km?.toFixed(4)} km
                   </span>
                 </p>
@@ -204,30 +221,36 @@ export default function AlgorithmComparison() {
           )}
 
           {/* Comparison Table */}
-          <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-800">
-              <h2 className="text-lg font-semibold text-white">
-                Results @ {nodeSize} nodes
-                {selectedAlgo && (
-                  <button onClick={() => setSelectedAlgo(null)} className="ml-3 text-xs text-gray-400 hover:text-white transition">
-                    (clear selection)
-                  </button>
-                )}
-              </h2>
+          <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-slate-700/50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <BarChart3 size={15} className="text-slate-400" />
+                <h2 className="text-sm font-semibold text-slate-200">
+                  Results @ {nodeSize} nodes
+                </h2>
+              </div>
+              {selectedAlgo && (
+                <button
+                  onClick={() => setSelectedAlgo(null)}
+                  className="text-xs text-slate-500 hover:text-slate-300 transition"
+                >
+                  Clear selection
+                </button>
+              )}
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-800">
-                <thead className="bg-gray-800/50">
+              <table className="min-w-full divide-y divide-slate-700/30">
+                <thead className="bg-slate-900/40">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Algorithm</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Distance (km)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Runtime (ms)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Nodes Explored</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Route Stops</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Algorithm</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Distance (km)</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Runtime (ms)</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Nodes</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Stops</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-800">
+                <tbody className="divide-y divide-slate-700/20">
                   {ALL_ALGOS.map((algo) => {
                     const row = filtered.find((r) => r.algorithm === algo);
                     const isWinner = algo === winnerAlgo;
@@ -236,51 +259,61 @@ export default function AlgorithmComparison() {
                       <tr
                         key={algo}
                         onClick={() => setSelectedAlgo(isSelected ? null : algo)}
-                        className={`transition cursor-pointer ${
+                        className={`cursor-pointer transition-all duration-150 ${
                           isSelected
-                            ? 'bg-indigo-600/10 border-l-2 border-indigo-500'
+                            ? 'bg-cyan-500/10 border-l-2 border-cyan-500'
                             : isWinner
-                            ? 'bg-green-500/5 hover:bg-green-500/10'
-                            : 'hover:bg-gray-800/30'
+                            ? 'bg-emerald-500/5 hover:bg-emerald-500/10'
+                            : 'hover:bg-slate-700/20 border-l-2 border-transparent'
                         }`}
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <div className="flex items-center gap-2.5">
                             <span
-                              className="w-3 h-3 rounded-full flex-shrink-0"
+                              className="w-2.5 h-2.5 rounded-full shrink-0"
                               style={{ backgroundColor: ALGO_COLORS[algo] ?? '#6366f1' }}
                             />
-                            <span className="text-sm font-semibold text-white">{algo}</span>
-                            {isWinner && <Badge variant="success">Best</Badge>}
+                            <span className="text-sm font-semibold text-slate-100">{algo}</span>
+                            {isWinner && (
+                              <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full px-1.5 py-0.5">
+                                Best
+                              </span>
+                            )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-300">
+                        <td className="px-5 py-3.5 whitespace-nowrap text-sm font-mono">
                           {row?.error ? (
                             <span className="text-red-400">Error</span>
                           ) : row?.distance_km != null ? (
-                            <span className={isWinner ? 'text-green-400 font-bold' : ''}>
+                            <span className={isWinner ? 'text-emerald-400 font-bold' : 'text-slate-300'}>
                               {row.distance_km.toFixed(4)}
                             </span>
                           ) : (
-                            <span className="text-gray-600">N/A</span>
+                            <span className="text-slate-600">N/A</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-yellow-300">
+                        <td className="px-5 py-3.5 whitespace-nowrap text-sm font-mono text-amber-300">
                           {row?.runtime_ms != null ? row.runtime_ms.toFixed(4) : '—'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-indigo-300">
+                        <td className="px-5 py-3.5 whitespace-nowrap text-sm font-mono text-indigo-300">
                           {row?.nodes_explored ?? '—'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-blue-300">
+                        <td className="px-5 py-3.5 whitespace-nowrap text-sm font-mono text-blue-300">
                           {row?.route_length ?? '—'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-5 py-3.5 whitespace-nowrap">
                           {!row ? (
-                            <Badge variant="default">No Data</Badge>
+                            <span className="inline-flex items-center gap-1 text-xs text-slate-500">
+                              <Clock size={11} /> No Data
+                            </span>
                           ) : row.error ? (
-                            <Badge variant="error">Failed</Badge>
+                            <span className="inline-flex items-center gap-1 text-xs text-red-400">
+                              <AlertCircle size={11} /> Failed
+                            </span>
                           ) : (
-                            <Badge variant="success">OK</Badge>
+                            <span className="inline-flex items-center gap-1 text-xs text-emerald-400">
+                              <CheckCircle2 size={11} /> OK
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -292,13 +325,15 @@ export default function AlgorithmComparison() {
           </div>
 
           {/* Charts Row */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {/* Distance Chart */}
-            <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
-              <h2 className="text-base font-semibold text-white mb-4">
-                Distance Comparison{' '}
-                <span className="text-gray-500 font-normal text-sm">@ {nodeSize} nodes (km)</span>
-              </h2>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+            <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 size={14} className="text-cyan-400" />
+                <h2 className="text-sm font-semibold text-slate-200">
+                  Distance Comparison
+                  <span className="ml-1.5 text-slate-500 font-normal text-xs">@ {nodeSize} nodes (km)</span>
+                </h2>
+              </div>
               <ReactECharts
                 option={distanceChartOptions}
                 style={{ height: 240 }}
@@ -306,12 +341,14 @@ export default function AlgorithmComparison() {
               />
             </div>
 
-            {/* Runtime Chart */}
-            <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
-              <h2 className="text-base font-semibold text-white mb-4">
-                Runtime Comparison{' '}
-                <span className="text-gray-500 font-normal text-sm">@ {nodeSize} nodes (ms)</span>
-              </h2>
+            <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Clock size={14} className="text-amber-400" />
+                <h2 className="text-sm font-semibold text-slate-200">
+                  Runtime Comparison
+                  <span className="ml-1.5 text-slate-500 font-normal text-xs">@ {nodeSize} nodes (ms)</span>
+                </h2>
+              </div>
               <ReactECharts
                 option={runtimeChartOptions}
                 style={{ height: 240 }}
@@ -320,28 +357,28 @@ export default function AlgorithmComparison() {
             </div>
           </div>
 
-          {/* Selected Algorithm Detail */}
+          {/* Selected algorithm detail */}
           {selectedAlgo && (() => {
             const row = filtered.find((r) => r.algorithm === selectedAlgo);
             if (!row) return null;
             return (
-              <div className="rounded-2xl border border-indigo-500/30 bg-indigo-500/5 p-6">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-5 animate-scale-in">
+                <div className="flex items-center gap-2.5 mb-4">
                   <span
                     className="w-4 h-4 rounded-full"
                     style={{ backgroundColor: ALGO_COLORS[selectedAlgo] ?? '#6366f1' }}
                   />
-                  {selectedAlgo} — Detailed Metrics
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <h2 className="text-base font-bold text-slate-100">{selectedAlgo} — Detailed Metrics</h2>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
-                    { label: 'Distance', value: row.distance_km != null ? `${row.distance_km.toFixed(4)} km` : 'N/A', color: 'text-green-400' },
-                    { label: 'Runtime', value: `${row.runtime_ms?.toFixed(4)} ms`, color: 'text-yellow-400' },
+                    { label: 'Distance', value: row.distance_km != null ? `${row.distance_km.toFixed(4)} km` : 'N/A', color: 'text-emerald-400' },
+                    { label: 'Runtime', value: `${row.runtime_ms?.toFixed(4)} ms`, color: 'text-amber-400' },
                     { label: 'Nodes Explored', value: String(row.nodes_explored ?? '—'), color: 'text-indigo-400' },
                     { label: 'Route Stops', value: String(row.route_length ?? '—'), color: 'text-blue-400' },
                   ].map(({ label, value, color }) => (
-                    <div key={label} className="bg-gray-900 rounded-xl border border-gray-800 p-4">
-                      <p className="text-xs text-gray-400 mb-1">{label}</p>
+                    <div key={label} className="rounded-xl border border-slate-700/60 bg-slate-900/50 p-4">
+                      <p className="text-xs text-slate-400 mb-1">{label}</p>
                       <p className={`text-xl font-bold font-mono ${color}`}>{value}</p>
                     </div>
                   ))}
@@ -352,20 +389,25 @@ export default function AlgorithmComparison() {
         </>
       )}
 
-      {/* Empty state */}
+      {/* Empty State */}
       {!results && !benchmarkMut.isPending && (
-        <div className="flex flex-col items-center justify-center py-24 gap-5 rounded-2xl border border-gray-800 border-dashed bg-gray-900/50">
-          <svg className="w-16 h-16 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
+        <div className="rounded-xl border border-slate-700/60 border-dashed bg-slate-900/30 py-20 flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center">
+            <BarChart3 size={28} className="text-slate-600" />
+          </div>
           <div className="text-center">
-            <p className="text-white font-semibold text-lg">No benchmark data yet</p>
-            <p className="text-gray-400 text-sm mt-1">
-              Select a node count and click <span className="text-indigo-400 font-medium">▶ Run Benchmark</span> to compare all 7 algorithms.
+            <p className="text-lg font-semibold text-slate-300">No benchmark data yet</p>
+            <p className="text-sm text-slate-500 mt-1 max-w-xs">
+              Select a node count above and click{' '}
+              <span className="text-cyan-400 font-medium">Run Benchmark</span> to compare all 7 algorithms.
             </p>
           </div>
-          <Button onClick={() => benchmarkMut.mutate()} className="shadow-lg shadow-indigo-500/20">
-            ▶ Run Benchmark Now
+          <Button
+            onClick={() => benchmarkMut.mutate()}
+            className="shadow-lg shadow-cyan-500/10"
+          >
+            <Play size={14} className="mr-1.5" />
+            Run Benchmark Now
           </Button>
         </div>
       )}

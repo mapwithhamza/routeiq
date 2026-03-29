@@ -1,5 +1,11 @@
+/**
+ * src/pages/Dashboard.tsx — Phase 12 (UI Redesign)
+ * Welcome heading, 4 metric cards, delivery status progress bars,
+ * algorithm performance chart. Keeps all existing API calls & logic untouched.
+ */
 import { useQuery } from '@tanstack/react-query';
 import ReactECharts from 'echarts-for-react';
+import { Package, Users, Route, TrendingUp, ArrowUpRight } from 'lucide-react';
 import { analyticsApi } from '../lib/api';
 import Spinner from '../components/ui/Spinner';
 
@@ -14,7 +20,15 @@ const ALGO_LABELS: { short: string; match: RegExp }[] = [
   { short: 'Sort',     match: /sort/i },
 ];
 
-const ALGO_COLORS = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'];
+const ALGO_COLORS = ['#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+const STATUS_CONFIG = [
+  { key: 'pending',    label: 'Pending',    color: '#64748b', bg: 'bg-slate-500' },
+  { key: 'assigned',   label: 'Assigned',   color: '#8b5cf6', bg: 'bg-violet-500' },
+  { key: 'in_transit', label: 'In Transit', color: '#3b82f6', bg: 'bg-blue-500' },
+  { key: 'delivered',  label: 'Delivered',  color: '#10b981', bg: 'bg-emerald-500' },
+  { key: 'failed',     label: 'Failed',     color: '#ef4444', bg: 'bg-red-500' },
+] as const;
 
 export default function Dashboard() {
   const sumQuery = useQuery({
@@ -30,7 +44,7 @@ export default function Dashboard() {
   if (sumQuery.isLoading || algoQuery.isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Spinner className="h-10 w-10 text-indigo-500" />
+        <Spinner className="h-10 w-10 text-cyan-500" />
       </div>
     );
   }
@@ -51,112 +65,151 @@ export default function Dashboard() {
 
   const hasAlgoData = avgRuntimes.some((v) => v !== null);
 
-  // ECharts config for Deliveries by Status chart
-  const statusChartOptions = {
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: {
-      type: 'category',
-      data: ['Pending', 'Assigned', 'In Transit', 'Delivered', 'Failed'],
-      axisLine: { lineStyle: { color: '#4b5563' } },
-      axisLabel: { color: '#9ca3af' },
-    },
-    yAxis: {
-      type: 'value',
-      splitLine: { lineStyle: { color: '#374151' } },
-      axisLabel: { color: '#9ca3af' },
-    },
-    series: [
-      {
-        name: 'Deliveries',
-        type: 'bar',
-        barWidth: '50%',
-        data: [
-          { value: sum?.pending || 0, itemStyle: { color: '#6b7280' } },
-          {
-            value: sum?.total_deliveries
-              ? sum.total_deliveries -
-                ((sum.pending || 0) +
-                  (sum.in_transit || 0) +
-                  (sum.delivered || 0) +
-                  (sum.failed || 0))
-              : 0,
-            itemStyle: { color: '#8b5cf6' },
-          },
-          { value: sum?.in_transit || 0, itemStyle: { color: '#3b82f6' } },
-          { value: sum?.delivered || 0, itemStyle: { color: '#10b981' } },
-          { value: sum?.failed || 0, itemStyle: { color: '#ef4444' } },
-        ],
-        itemStyle: { borderRadius: [4, 4, 0, 0] },
-      },
-    ],
+  const totalDeliveries = sum?.total_deliveries || 0;
+
+  const statusValues: Record<string, number> = {
+    pending:    sum?.pending || 0,
+    in_transit: sum?.in_transit || 0,
+    delivered:  sum?.delivered || 0,
+    failed:     sum?.failed || 0,
+    assigned:   totalDeliveries
+      ? totalDeliveries - ((sum?.pending || 0) + (sum?.in_transit || 0) + (sum?.delivered || 0) + (sum?.failed || 0))
+      : 0,
   };
+
+  const metricCards = [
+    {
+      label: 'Total Deliveries',
+      value: totalDeliveries,
+      sub: 'All time',
+      Icon: Package,
+      gradient: 'from-cyan-500/20 to-cyan-600/5',
+      iconColor: 'text-cyan-400',
+      ring: 'ring-cyan-500/20',
+    },
+    {
+      label: 'Active Riders',
+      value: `${sum?.active_riders || 0}/${sum?.total_riders || 0}`,
+      sub: 'On duty',
+      Icon: Users,
+      gradient: 'from-emerald-500/20 to-emerald-600/5',
+      iconColor: 'text-emerald-400',
+      ring: 'ring-emerald-500/20',
+    },
+    {
+      label: 'Routes Optimized',
+      value: sum?.routes_optimized || 0,
+      sub: 'All time',
+      Icon: Route,
+      gradient: 'from-indigo-500/20 to-indigo-600/5',
+      iconColor: 'text-indigo-400',
+      ring: 'ring-indigo-500/20',
+    },
+    {
+      label: 'Avg Distance',
+      value: `${sum?.avg_distance || 0} km`,
+      sub: 'Per route',
+      Icon: TrendingUp,
+      gradient: 'from-amber-500/20 to-amber-600/5',
+      iconColor: 'text-amber-400',
+      ring: 'ring-amber-500/20',
+    },
+  ];
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard Overview</h1>
-        <p className="mt-1 text-gray-400">High-level insights across all deliveries and riders.</p>
+      {/* Welcome Heading */}
+      <div className="flex items-end justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-1">
+            Route Intelligence
+          </p>
+          <h1 className="text-3xl font-bold text-slate-100 dark:text-slate-100 text-slate-900 tracking-tight">
+            Dashboard Overview
+          </h1>
+          <p className="mt-1 text-slate-400 dark:text-slate-400 text-slate-500 text-sm">
+            High-level insights across all deliveries and riders.
+          </p>
+        </div>
+        <span className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Live
+        </span>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: 'Total Deliveries', value: sum?.total_deliveries || 0, text: 'text-indigo-400' },
-          { label: 'Active Riders', value: `${sum?.active_riders || 0} / ${sum?.total_riders || 0}`, text: 'text-green-400' },
-          { label: 'Routes Optimized', value: sum?.routes_optimized || 0, text: 'text-blue-400' },
-          { label: 'Avg Route Distance', value: `${sum?.avg_distance || 0} km`, text: 'text-yellow-400' },
-        ].map((stat, i) => (
-          <div key={i} className="rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-sm">
-            <p className="text-sm font-medium text-gray-400">{stat.label}</p>
-            <p className={`mt-2 text-4xl font-extrabold tracking-tight ${stat.text}`}>
-              {stat.value}
+      {/* Metric Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {metricCards.map(({ label, value, sub, Icon, gradient, iconColor, ring }) => (
+          <div
+            key={label}
+            className={`rounded-xl border border-slate-700/60 bg-slate-800/60 p-5 backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 bg-gradient-to-br ${gradient}`}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className={`w-9 h-9 rounded-lg bg-slate-900/60 ring-1 ${ring} flex items-center justify-center`}>
+                <Icon size={18} className={iconColor} />
+              </div>
+              <ArrowUpRight size={14} className="text-slate-600" />
+            </div>
+            <p className="text-2xl font-bold text-slate-100 dark:text-slate-100 text-slate-900 font-mono">
+              {value}
             </p>
+            <p className="mt-0.5 text-sm font-medium text-slate-300 dark:text-slate-300 text-slate-700">
+              {label}
+            </p>
+            <p className="mt-0.5 text-xs text-slate-500">{sub}</p>
           </div>
         ))}
       </div>
 
-      {/* Charts Section — both cards share same structure for equal height */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        {/* Deliveries by Status */}
-        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
-          <h2 className="text-lg font-semibold text-white mb-6">Deliveries by Status</h2>
-          <div className="h-72">
-            <ReactECharts
-              option={statusChartOptions}
-              style={{ height: '100%', width: '100%' }}
-              theme="dark"
-              opts={{ renderer: 'svg' }}
-            />
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Delivery Status Progress Bars */}
+        <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-6 backdrop-blur-sm">
+          <h2 className="text-base font-semibold text-slate-100 dark:text-slate-100 text-slate-900 mb-5">
+            Deliveries by Status
+          </h2>
+          <div className="space-y-4">
+            {STATUS_CONFIG.map(({ key, label, bg }) => {
+              const val = statusValues[key] || 0;
+              const pct = totalDeliveries > 0 ? Math.round((val / totalDeliveries) * 100) : 0;
+              return (
+                <div key={key}>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-sm text-slate-300 dark:text-slate-300 text-slate-600">{label}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-slate-100 dark:text-slate-100 text-slate-900 font-mono">{val}</span>
+                      <span className="text-xs text-slate-500">{pct}%</span>
+                    </div>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-700/50 dark:bg-slate-700/50 bg-slate-200 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${bg} transition-all duration-700`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Algorithm Performance Chart */}
-        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
-          <h2 className="text-lg font-semibold text-white mb-6">Algorithm Performance</h2>
+        <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-6 backdrop-blur-sm">
+          <h2 className="text-base font-semibold text-slate-100 dark:text-slate-100 text-slate-900 mb-5">
+            Algorithm Performance
+          </h2>
           {!hasAlgoData ? (
-            <div className="h-72 flex flex-col items-center justify-center text-center">
-              <svg
-                className="w-12 h-12 text-gray-700 mb-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-              <p className="text-sm text-gray-500">
+            <div className="h-64 flex flex-col items-center justify-center text-center gap-3">
+              <BarChart3Icon />
+              <p className="text-sm text-slate-500 max-w-xs">
                 Run a benchmark on the Algorithms page to see performance data
               </p>
             </div>
           ) : (
-            <div style={{ height: '288px' }}>
+            <div style={{ height: '256px' }}>
               <ReactECharts
                 option={{
+                  backgroundColor: 'transparent',
                   tooltip: {
                     trigger: 'axis',
                     axisPointer: { type: 'shadow' },
@@ -167,24 +220,19 @@ export default function Dashboard() {
                       } ms</b>`;
                     },
                   },
-                  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                  grid: { left: '3%', right: '4%', bottom: '3%', top: '4%', containLabel: true },
                   xAxis: {
                     type: 'category',
                     data: ALGO_LABELS.map((a) => a.short),
-                    axisLine: { lineStyle: { color: '#4b5563' } },
-                    axisLabel: {
-                      color: '#9ca3af',
-                      interval: 0,
-                      rotate: 0,
-                      fontSize: 11,
-                    },
+                    axisLine: { lineStyle: { color: '#334155' } },
+                    axisLabel: { color: '#64748b', interval: 0, fontSize: 11 },
                   },
                   yAxis: {
                     type: 'value',
                     name: 'ms',
-                    nameTextStyle: { color: '#6b7280', fontSize: 11 },
-                    splitLine: { lineStyle: { color: '#374151' } },
-                    axisLabel: { color: '#9ca3af' },
+                    nameTextStyle: { color: '#475569', fontSize: 10 },
+                    splitLine: { lineStyle: { color: '#1e293b' } },
+                    axisLabel: { color: '#64748b' },
                   },
                   series: [
                     {
@@ -211,5 +259,18 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+function BarChart3Icon() {
+  return (
+    <svg className="w-12 h-12 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1}
+        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+      />
+    </svg>
   );
 }

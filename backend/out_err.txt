@@ -1,0 +1,428 @@
+﻿...........................FFFFFF........FFFFFF.FFFFFF                   [100%]
+================================== FAILURES ===================================
+_______________________ test_optimize_too_few_waypoints _______________________
+
+client = <httpx.AsyncClient object at 0x0000022C182FBED0>
+
+    async def test_optimize_too_few_waypoints(client: AsyncClient):
+        await _authed_client(client)
+        resp = await client.post(
+            "/routes/optimize",
+            json={"waypoints": [{"lat": 33.72, "lon": 73.04}]},
+        )
+>       assert resp.status_code == 422, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 422
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_algorithms.py:308: AssertionError
+____________________ test_optimize_returns_all_algorithms _____________________
+
+client = <httpx.AsyncClient object at 0x0000022C182FB390>
+
+    async def test_optimize_returns_all_algorithms(client: AsyncClient):
+        await _authed_client(client)
+        resp = await client.post(
+            "/routes/optimize",
+            json={"name": "Test Route", "waypoints": WAYPOINTS},
+        )
+>       assert resp.status_code == 201, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 201
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_algorithms.py:317: AssertionError
+_______________________ test_optimize_result_structure ________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19919350>
+
+    async def test_optimize_result_structure(client: AsyncClient):
+        await _authed_client(client)
+        resp = await client.post(
+            "/routes/optimize",
+            json={"name": "Structure Test", "waypoints": WAYPOINTS},
+        )
+>       assert resp.status_code == 201, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 201
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_algorithms.py:333: AssertionError
+_______________________________ test_get_route ________________________________
+
+client = <httpx.AsyncClient object at 0x0000022C199196E0>
+
+    async def test_get_route(client: AsyncClient):
+        await _authed_client(client)
+        create = await client.post(
+            "/routes/optimize",
+            json={"name": "Fetch Test", "waypoints": WAYPOINTS},
+        )
+>       assert create.status_code == 201, create.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 201
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_algorithms.py:345: AssertionError
+__________________________ test_get_route_not_found ___________________________
+
+client = <httpx.AsyncClient object at 0x0000022C199BC290>
+
+    async def test_get_route_not_found(client: AsyncClient):
+        await _authed_client(client)
+        resp = await client.get("/routes/999999")
+>       assert resp.status_code == 404, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 404
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_algorithms.py:357: AssertionError
+___________________________ test_benchmark_endpoint ___________________________
+
+client = <httpx.AsyncClient object at 0x0000022C199D8160>
+
+    async def test_benchmark_endpoint(client: AsyncClient):
+        await _authed_client(client)
+        resp = await client.post("/routes/benchmark")
+>       assert resp.status_code == 200, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 200
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_algorithms.py:363: AssertionError
+____________________________ test_create_delivery _____________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19925910>
+
+    async def test_create_delivery(client: AsyncClient):
+        await authed_client(client)
+        resp = await client.post("/deliveries", json=DELIVERY_PAYLOAD)
+>       assert resp.status_code == 201, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 201
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_deliveries.py:39: AssertionError
+____________________________ test_list_deliveries _____________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19926750>
+
+    async def test_list_deliveries(client: AsyncClient):
+        await authed_client(client)
+        await client.post("/deliveries", json=DELIVERY_PAYLOAD)
+        resp = await client.get("/deliveries")
+>       assert resp.status_code == 200, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 200
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_deliveries.py:52: AssertionError
+____________________________ test_update_delivery _____________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19927350>
+
+    async def test_update_delivery(client: AsyncClient):
+        await authed_client(client)
+        create = await client.post("/deliveries", json=DELIVERY_PAYLOAD)
+>       assert create.status_code == 201, create.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 201
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_deliveries.py:61: AssertionError
+_______________________ test_update_delivery_not_found ________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19927710>
+
+    async def test_update_delivery_not_found(client: AsyncClient):
+        await authed_client(client)
+        resp = await client.put("/deliveries/999999", json={"priority": "low"})
+>       assert resp.status_code == 404, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 404
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_deliveries.py:79: AssertionError
+____________________________ test_delete_delivery _____________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19927B90>
+
+    async def test_delete_delivery(client: AsyncClient):
+        await authed_client(client)
+        create = await client.post("/deliveries", json=DELIVERY_PAYLOAD)
+>       assert create.status_code == 201, create.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 201
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_deliveries.py:86: AssertionError
+_______________________ test_delete_delivery_not_found ________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19927950>
+
+    async def test_delete_delivery_not_found(client: AsyncClient):
+        await authed_client(client)
+        resp = await client.delete("/deliveries/999999")
+>       assert resp.status_code == 404, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 404
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_deliveries.py:97: AssertionError
+______________________________ test_create_rider ______________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19927AD0>
+
+    async def test_create_rider(client: AsyncClient):
+        await authed_client(client)
+        resp = await client.post("/riders", json=RIDER_PAYLOAD)
+>       assert resp.status_code == 201, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 201
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_riders.py:38: AssertionError
+______________________________ test_list_riders _______________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19926390>
+
+    async def test_list_riders(client: AsyncClient):
+        await authed_client(client)
+        await client.post("/riders", json=RIDER_PAYLOAD)
+        resp = await client.get("/riders")
+>       assert resp.status_code == 200, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 200
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_riders.py:51: AssertionError
+______________________________ test_update_rider ______________________________
+
+client = <httpx.AsyncClient object at 0x0000022C19927110>
+
+    async def test_update_rider(client: AsyncClient):
+        await authed_client(client)
+        create = await client.post("/riders", json=RIDER_PAYLOAD)
+>       assert create.status_code == 201, create.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 201
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_riders.py:60: AssertionError
+_________________________ test_update_rider_not_found _________________________
+
+client = <httpx.AsyncClient object at 0x0000022C1989C950>
+
+    async def test_update_rider_not_found(client: AsyncClient):
+        await authed_client(client)
+        resp = await client.put("/riders/999999", json={"status": "offline"})
+>       assert resp.status_code == 404, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 404
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_riders.py:78: AssertionError
+___________________________ test_analytics_summary ____________________________
+
+client = <httpx.AsyncClient object at 0x0000022C1989D190>
+
+    async def test_analytics_summary(client: AsyncClient):
+        await authed_client(client)
+        resp = await client.get("/analytics/summary")
+>       assert resp.status_code == 200, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 200
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_riders.py:85: AssertionError
+__________________________ test_analytics_algorithms __________________________
+
+client = <httpx.AsyncClient object at 0x0000022C1989D910>
+
+    async def test_analytics_algorithms(client: AsyncClient):
+        await authed_client(client)
+        resp = await client.get("/analytics/algorithms")
+>       assert resp.status_code == 200, resp.text
+E       AssertionError: {"detail":"Not authenticated"}
+E       assert 401 == 200
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests\test_riders.py:97: AssertionError
+============================== warnings summary ===============================
+config.py:4
+  D:\Semester 4\DSA\Project\routeiq\backend\config.py:4: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class Settings(BaseSettings):
+
+venv\Lib\site-packages\pytest_asyncio\plugin.py:169: 1879 warnings
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:169: DeprecationWarning: 'asyncio.iscoroutinefunction' is deprecated and slated for removal in Python 3.16; use inspect.iscoroutinefunction() instead
+    return asyncio.iscoroutinefunction(obj) or inspect.isasyncgenfunction(obj)
+
+venv\Lib\site-packages\pytest_asyncio\plugin.py:433: 54 warnings
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:433: DeprecationWarning: 'asyncio.iscoroutinefunction' is deprecated and slated for removal in Python 3.16; use inspect.iscoroutinefunction() instead
+    return asyncio.iscoroutinefunction(func)
+
+tests/test_algorithms.py::test_graph_build_from_coords_node_count
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:1005: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    return asyncio.get_event_loop_policy()
+
+tests/test_algorithms.py::test_graph_build_from_coords_node_count
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:751: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    _restore_event_loop_policy(asyncio.get_event_loop_policy()),
+
+tests/test_algorithms.py::test_graph_build_from_coords_node_count
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:761: DeprecationWarning: The event_loop fixture provided by pytest-asyncio has been redefined in
+  D:\Semester 4\DSA\Project\routeiq\backend\tests\conftest.py:15
+  Replacing the event_loop fixture with a custom implementation is deprecated
+  and will lead to errors in the future.
+  If you want to request an asyncio event loop with a scope other than function
+  scope, use the "scope" argument to the asyncio mark when marking the tests.
+  If you want to return different types of event loops, use the event_loop_policy
+  fixture.
+  
+    warnings.warn(
+
+tests/test_algorithms.py::test_graph_build_from_coords_node_count
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:766: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    policy = asyncio.get_event_loop_policy()
+
+tests/test_algorithms.py::test_graph_build_from_coords_node_count
+  tests\test_algorithms.py:22: PytestWarning: The test <Function test_graph_build_from_coords_node_count> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_graph_build_from_coords_node_count():
+
+tests/test_algorithms.py::test_graph_build_from_coords_complete
+  tests\test_algorithms.py:29: PytestWarning: The test <Function test_graph_build_from_coords_complete> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_graph_build_from_coords_complete():
+
+tests/test_algorithms.py::test_graph_haversine_positive
+  tests\test_algorithms.py:39: PytestWarning: The test <Function test_graph_haversine_positive> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_graph_haversine_positive():
+
+tests/test_algorithms.py::test_graph_min_nodes_error
+  tests\test_algorithms.py:46: PytestWarning: The test <Function test_graph_min_nodes_error> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_graph_min_nodes_error():
+
+tests/test_algorithms.py::test_graph_geojson
+  tests\test_algorithms.py:53: PytestWarning: The test <Function test_graph_geojson> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_graph_geojson():
+
+tests/test_algorithms.py::test_bfs_finds_path
+  tests\test_algorithms.py:77: PytestWarning: The test <Function test_bfs_finds_path> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_bfs_finds_path():
+
+tests/test_algorithms.py::test_bfs_same_start_end
+  tests\test_algorithms.py:89: PytestWarning: The test <Function test_bfs_same_start_end> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_bfs_same_start_end():
+
+tests/test_algorithms.py::test_bfs_result_keys
+  tests\test_algorithms.py:97: PytestWarning: The test <Function test_bfs_result_keys> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_bfs_result_keys():
+
+tests/test_algorithms.py::test_dfs_finds_path
+  tests\test_algorithms.py:107: PytestWarning: The test <Function test_dfs_finds_path> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_dfs_finds_path():
+
+tests/test_algorithms.py::test_dfs_result_keys
+  tests\test_algorithms.py:117: PytestWarning: The test <Function test_dfs_result_keys> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_dfs_result_keys():
+
+tests/test_algorithms.py::test_dijkstra_finds_shortest
+  tests\test_algorithms.py:127: PytestWarning: The test <Function test_dijkstra_finds_shortest> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_dijkstra_finds_shortest():
+
+tests/test_algorithms.py::test_dijkstra_optimal_vs_bfs
+  tests\test_algorithms.py:137: PytestWarning: The test <Function test_dijkstra_optimal_vs_bfs> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_dijkstra_optimal_vs_bfs():
+
+tests/test_algorithms.py::test_astar_finds_path
+  tests\test_algorithms.py:149: PytestWarning: The test <Function test_astar_finds_path> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_astar_finds_path():
+
+tests/test_algorithms.py::test_astar_matches_dijkstra
+  tests\test_algorithms.py:158: PytestWarning: The test <Function test_astar_matches_dijkstra> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_astar_matches_dijkstra():
+
+tests/test_algorithms.py::test_greedy_nn_tour
+  tests\test_algorithms.py:170: PytestWarning: The test <Function test_greedy_nn_tour> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_greedy_nn_tour():
+
+tests/test_algorithms.py::test_tsp_dp_small
+  tests\test_algorithms.py:185: PytestWarning: The test <Function test_tsp_dp_small> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_tsp_dp_small():
+
+tests/test_algorithms.py::test_tsp_dp_optimal_le_greedy
+  tests\test_algorithms.py:196: PytestWarning: The test <Function test_tsp_dp_optimal_le_greedy> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_tsp_dp_optimal_le_greedy():
+
+tests/test_algorithms.py::test_tsp_dp_safe_large
+  tests\test_algorithms.py:206: PytestWarning: The test <Function test_tsp_dp_safe_large> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_tsp_dp_safe_large():
+
+tests/test_algorithms.py::test_merge_sort_integers
+  tests\test_algorithms.py:218: PytestWarning: The test <Function test_merge_sort_integers> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_merge_sort_integers():
+
+tests/test_algorithms.py::test_merge_sort_empty
+  tests\test_algorithms.py:223: PytestWarning: The test <Function test_merge_sort_empty> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_merge_sort_empty():
+
+tests/test_algorithms.py::test_merge_sort_single
+  tests\test_algorithms.py:228: PytestWarning: The test <Function test_merge_sort_single> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_merge_sort_single():
+
+tests/test_algorithms.py::test_merge_sort_with_key
+  tests\test_algorithms.py:233: PytestWarning: The test <Function test_merge_sort_with_key> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_merge_sort_with_key():
+
+tests/test_algorithms.py::test_merge_sort_does_not_mutate
+  tests\test_algorithms.py:240: PytestWarning: The test <Function test_merge_sort_does_not_mutate> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_merge_sort_does_not_mutate():
+
+tests/test_algorithms.py::test_benchmark_runs_without_error
+  tests\test_algorithms.py:249: PytestWarning: The test <Function test_benchmark_runs_without_error> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_benchmark_runs_without_error():
+
+tests/test_algorithms.py::test_benchmark_all_sizes_covered
+  tests\test_algorithms.py:256: PytestWarning: The test <Function test_benchmark_all_sizes_covered> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_benchmark_all_sizes_covered():
+
+tests/test_algorithms.py::test_benchmark_nx_validation_passes
+  tests\test_algorithms.py:264: PytestWarning: The test <Function test_benchmark_nx_validation_passes> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+    def test_benchmark_nx_validation_passes():
+
+tests/test_auth.py::test_me_authenticated
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\httpx\_client.py:1768: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return await self.request(
+
+tests/test_riders.py::test_analytics_algorithms
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:811: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    policy = asyncio.get_event_loop_policy()
+
+tests/test_riders.py::test_analytics_algorithms
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:835: DeprecationWarning: 'asyncio.set_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    asyncio.set_event_loop_policy(previous_policy)
+
+tests/test_riders.py::test_analytics_algorithms
+  D:\Semester 4\DSA\Project\routeiq\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:847: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    policy = asyncio.get_event_loop_policy()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_algorithms.py::test_optimize_too_few_waypoints - AssertionE...
+FAILED tests/test_algorithms.py::test_optimize_returns_all_algorithms - Asser...
+FAILED tests/test_algorithms.py::test_optimize_result_structure - AssertionEr...
+FAILED tests/test_algorithms.py::test_get_route - AssertionError: {"detail":"...
+FAILED tests/test_algorithms.py::test_get_route_not_found - AssertionError: {...
+FAILED tests/test_algorithms.py::test_benchmark_endpoint - AssertionError: {"...
+FAILED tests/test_deliveries.py::test_create_delivery - AssertionError: {"det...
+FAILED tests/test_deliveries.py::test_list_deliveries - AssertionError: {"det...
+FAILED tests/test_deliveries.py::test_update_delivery - AssertionError: {"det...
+FAILED tests/test_deliveries.py::test_update_delivery_not_found - AssertionEr...
+FAILED tests/test_deliveries.py::test_delete_delivery - AssertionError: {"det...
+FAILED tests/test_deliveries.py::test_delete_delivery_not_found - AssertionEr...
+FAILED tests/test_riders.py::test_create_rider - AssertionError: {"detail":"N...
+FAILED tests/test_riders.py::test_list_riders - AssertionError: {"detail":"No...
+FAILED tests/test_riders.py::test_update_rider - AssertionError: {"detail":"N...
+FAILED tests/test_riders.py::test_update_rider_not_found - AssertionError: {"...
+FAILED tests/test_riders.py::test_analytics_summary - AssertionError: {"detai...
+FAILED tests/test_riders.py::test_analytics_algorithms - AssertionError: {"de...
+18 failed, 36 passed, 1968 warnings in 157.41s (0:02:37)
