@@ -21,6 +21,12 @@ Graph structure
 graph.nodes  : list[int]          — node ids (0-indexed)
 graph.coords : dict[int, (lat,lon)] — lat/lon per node
 graph.adj    : dict[int, list[(neighbour_id, weight_km)]]
+
+Big-O Complexity
+----------------
+add_node, add_edge, distance, edge_weight: Time O(1), Space O(1)
+build_from_coords: Time O(V²), Space O(V²)
+build_from_geojson: Time O(E), Space O(V + E)
 """
 
 import math
@@ -49,12 +55,14 @@ class Graph:
     """Lightweight weighted adjacency-list graph."""
 
     def __init__(self) -> None:
+        """Initialize an empty Graph data structure."""
         self.nodes: list[int] = []
         self.coords: dict[int, tuple[float, float]] = {}      # node_id -> (lat, lon)
         self.adj: dict[int, list[tuple[int, float]]] = {}     # node_id -> [(nbr, km)]
 
     # ------------------------------------------------------------------
     def add_node(self, node_id: int, lat: float, lon: float) -> None:
+        """Add a new node to the graph with its geographic coordinates."""
         if node_id not in self.coords:
             self.nodes.append(node_id)
             self.coords[node_id] = (lat, lon)
@@ -85,9 +93,11 @@ class Graph:
         return self.distance(u, v)
 
     def __len__(self) -> int:
+        """Return the total number of nodes in the graph."""
         return len(self.nodes)
 
     def __repr__(self) -> str:
+        """Return a string representation showing node and edge counts."""
         return f"Graph(nodes={len(self.nodes)}, edges={sum(len(v) for v in self.adj.values())//2})"
 
 

@@ -3,8 +3,8 @@ backend/dsa/merge_sort.py — Merge Sort implementation (pure Python).
 
 Sorts a list of delivery waypoints (or any comparable list) by a given key.
 
-Big-O
------
+Big-O Complexity
+----------------
 Time:  O(n log n)  — all cases
 Space: O(n)        — auxiliary array
 

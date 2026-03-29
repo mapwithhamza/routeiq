@@ -5,6 +5,7 @@ Uses a binary min-heap (Python's heapq) instead of any library graph.
 Finds the shortest-distance path between two nodes.
 
 Time complexity: O((V + E) log V)
+Space complexity: O(V)
 
 Return format:
 {

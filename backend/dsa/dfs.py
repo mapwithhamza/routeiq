@@ -14,6 +14,11 @@ Return format mirrors all other DSA modules:
     "nodes_explored": int,
     "runtime_ms":     float,
 }
+
+Big-O Complexity
+----------------
+Time:  O(V + E) — visits every vertex and edge once in the worst case.
+Space: O(V)     — stack and visited set store at most V elements.
 """
 
 import time

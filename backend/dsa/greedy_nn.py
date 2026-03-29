@@ -4,6 +4,11 @@ backend/dsa/greedy_nn.py — Nearest-Neighbour Greedy TSP heuristic (pure Python
 Constructs a tour by always moving to the closest unvisited node.
 Fast (O(n²)) but not optimal.  Useful as a quick upper-bound on tour length.
 
+Big-O Complexity
+----------------
+Time:  O(n²) — nested loops over unvisited nodes.
+Space: O(n)  — unvisited set and route array store at most n elements.
+
 Return format:
 {
     "algorithm":      "Greedy-NN",

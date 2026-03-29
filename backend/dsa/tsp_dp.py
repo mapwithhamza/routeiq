@@ -4,8 +4,10 @@ backend/dsa/tsp_dp.py — TSP exact solver via bitmask DP (Held-Karp, pure Pytho
 Solves the Travelling Salesman Problem exactly using dynamic programming with
 bitmask state representation.
 
-Time complexity : O(2ⁿ · n²)  — practical only for n ≤ ~20 nodes.
-Space complexity: O(2ⁿ · n)
+Big-O Complexity
+----------------
+Time:  O(2ⁿ · n²)  — practical only for n ≤ ~20 nodes.
+Space: O(2ⁿ · n)   — DP table dimensions.
 
 Return format:
 {
@@ -61,6 +63,7 @@ def tsp_dp(graph: Graph, start: int = 0) -> dict:
     idx = {nd: i for i, nd in enumerate(ordered)}  # node_id -> local index
 
     def cost(i: int, j: int) -> float:
+        """Return distance cost between ordered nodes i and j."""
         return graph.distance(ordered[i], ordered[j])
 
     FULL_MASK = (1 << n) - 1

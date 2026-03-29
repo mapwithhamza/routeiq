@@ -13,6 +13,11 @@ Return format (all algorithms use this same dict):
     "nodes_explored": int,
     "runtime_ms":     float,
 }
+
+Big-O Complexity
+----------------
+Time:  O(V + E) — visits every vertex and edge once in the worst case.
+Space: O(V)     — queue and visited set store at most V elements.
 """
 
 import time

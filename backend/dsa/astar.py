@@ -7,6 +7,7 @@ goal as an *admissible* heuristic (never over-estimates real road distance).
 
 Time complexity: O(E log V) in the best case; degrades to Dijkstra when
 the heuristic provides no information.
+Space complexity: O(V)
 
 Return format:
 {
