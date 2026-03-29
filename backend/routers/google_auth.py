@@ -108,7 +108,7 @@ async def callback_google(code: str, db: AsyncSession = Depends(get_db)):
     )
     
     # 5. Redirect and drop cookie
-    redirect_res = RedirectResponse(url=f"{settings.FRONTEND_URL}/dashboard")
+    redirect_res = RedirectResponse(url="https://routeiq-eight.vercel.app/dashboard")
     redirect_res.set_cookie(
         key="access_token",
         value=token,
