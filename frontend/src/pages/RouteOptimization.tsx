@@ -105,15 +105,6 @@ export default function RouteOptimization() {
 
     optimizeMut.mutate(payload);
   };
-
-  if (deliveriesLoading || ridersLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Spinner className="h-10 w-10 text-cyan-500" />
-      </div>
-    );
-  }
-
   // Derived state for Map
   const activeRider = riders?.find(r => r.id === Number(selectedRiderId)) || null;
   const activeDeliveries = deliveries || [];
@@ -180,6 +171,15 @@ export default function RouteOptimization() {
     fetchOsrm();
     return () => { isMounted = false; };
   }, [selectedAlgoName, optResponse]);
+
+  if (deliveriesLoading || ridersLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Spinner className="h-10 w-10 text-cyan-500" />
+      </div>
+    );
+  }
+
 
   const pendingDeliveries = deliveries?.filter(d => d.status === 'pending' && !d.rider_id) || [];
 
