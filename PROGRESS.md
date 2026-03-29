@@ -184,6 +184,7 @@
 | 9       | 2026-03-26 | Completed Phase 8: Map & Route Optimization — MainMap.tsx (MapLibre GL, markers, animated polyline using dashOffset shifting). RouteOptimization.tsx with algorithm selector dropdown and results panel. Clean TS compile.               | Phase 9 Step 1  |
 | 10      | 2026-03-27 | Completed Phase 9: Algorithm Comparison Panel — AlgorithmComparison.tsx with benchmark runner, 10/50/200 node selector, 7-algo table with winner badge, distance + runtime ECharts bar charts, and row click detail view. 0 TS errors.   | Phase 10 Step 1 |
 | 11      | 2026-03-29 | UI Redesign complete — lucide-react installed; design-system.ts, ThemeContext, tailwind darkMode:class, font imports, collapsible Layout, all 7 pages rebuilt with cyan/slate DS, filter tabs, progress bars, 70/30 map split. tsc: 0 errors. | Phase 12 Done   |
+| 12      | 2026-03-29 | Phase 13 Light Mode Fix — Login/Register: removed invalid bg-surface-900 token, fixed all conflicting dark/light class ordering; Deliveries/Riders/AlgorithmComparison: removed spurious bg-[#F0F2F5] page wrappers; modal forms now have full light+dark variants; Dashboard metric cards: fixed conflicting dark:bg-gradient-to-br using absolute overlay; Layout: active nav now bg-blue-50 text-blue-600 per design spec; tsc --noEmit: 0 errors. Pushed to GitHub. | Phase 13 Done   |
 
 ---
 
