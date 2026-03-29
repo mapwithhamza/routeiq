@@ -129,7 +129,7 @@ export default function AlgorithmComparison() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in bg-[#F0F2F5] dark:bg-[#0D1117] p-2 sm:p-0">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0D1117] p-6 max-w-7xl mx-auto space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
@@ -368,7 +368,7 @@ export default function AlgorithmComparison() {
                     className="w-4 h-4 rounded-full"
                     style={{ backgroundColor: ALGO_COLORS[selectedAlgo] ?? '#6366f1' }}
                   />
-                  <h2 className="text-base font-bold text-slate-100">{selectedAlgo} — Detailed Metrics</h2>
+                  <h2 className="text-base font-bold text-gray-900 dark:text-slate-100">{selectedAlgo} — Detailed Metrics</h2>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[

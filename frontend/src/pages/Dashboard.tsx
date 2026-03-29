@@ -117,7 +117,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 bg-[#F0F2F5] dark:bg-[#0D1117] p-2 sm:p-0">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0D1117] p-6 max-w-7xl mx-auto space-y-8">
       {/* Welcome Heading */}
       <div className="flex items-end justify-between">
         <div>
@@ -142,21 +142,25 @@ export default function Dashboard() {
         {metricCards.map(({ label, value, sub, Icon, gradient, iconColor, ring }) => (
           <div
             key={label}
-            className={`rounded-xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] shadow-md dark:shadow-none p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 dark:bg-gradient-to-br ${gradient}`}
+            className={`rounded-xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] shadow-md dark:shadow-none p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 relative overflow-hidden`}
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className={`w-9 h-9 rounded-lg bg-gray-50 dark:bg-slate-900/60 ring-1 ${ring} flex items-center justify-center`}>
-                <Icon size={18} className={iconColor} />
+            {/* Subtle gradient overlay for dark mode */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${gradient} pointer-events-none`} />
+            <div className="relative z-10">
+              <div className="flex items-start justify-between mb-4">
+                <div className={`w-9 h-9 rounded-lg bg-gray-50 dark:bg-slate-900/60 ring-1 ${ring} flex items-center justify-center`}>
+                  <Icon size={18} className={iconColor} />
+                </div>
+                <ArrowUpRight size={14} className="text-gray-400 dark:text-[#8B949E]" />
               </div>
-              <ArrowUpRight size={14} className="text-gray-400 dark:text-[#8B949E]" />
+              <p className="text-2xl font-bold text-gray-900 dark:text-[#E6EDF3] font-mono">
+                {value}
+              </p>
+              <p className="mt-0.5 text-sm font-medium text-gray-700 dark:text-[#8B949E]">
+                {label}
+              </p>
+              <p className="mt-0.5 text-xs text-gray-400 dark:text-[#8B949E]">{sub}</p>
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-[#E6EDF3] font-mono">
-              {value}
-            </p>
-            <p className="mt-0.5 text-sm font-medium text-gray-500 dark:text-[#E6EDF3]">
-              {label}
-            </p>
-            <p className="mt-0.5 text-xs text-gray-400 dark:text-[#8B949E]">{sub}</p>
           </div>
         ))}
       </div>

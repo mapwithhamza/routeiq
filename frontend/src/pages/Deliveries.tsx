@@ -166,7 +166,7 @@ export default function Deliveries() {
     : (deliveries || []).filter(d => d.status === activeTab);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in bg-[#F0F2F5] dark:bg-[#0D1117] p-2 sm:p-0">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0D1117] p-6 max-w-7xl mx-auto space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -293,12 +293,12 @@ export default function Deliveries() {
       <Modal isOpen={modalOpen} onClose={closeModal} title={editingId ? 'Edit Delivery' : 'New Delivery'}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 animate-scale-in">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">Title</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Title</label>
             <input
               type="text"
               {...register('title')}
               placeholder="e.g. Package to Gulberg"
-              className="w-full rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-slate-100 placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition"
+              className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition"
             />
             {errors.title && <p className="mt-1 text-xs text-red-400">{errors.title.message as string}</p>}
           </div>
@@ -332,10 +332,10 @@ export default function Deliveries() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Priority</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Priority</label>
               <select
                 {...register('priority')}
-                className="w-full rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
+                className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 text-gray-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
               >
                 <option value="low">Low</option>
                 <option value="normal">Normal</option>
@@ -345,10 +345,10 @@ export default function Deliveries() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Assign Rider</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Assign Rider</label>
               <select
                 {...register('rider_id', { setValueAs: v => (v === '' || v === 'null' || !v) ? null : parseInt(v, 10) })}
-                className="w-full rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
+                className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 text-gray-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
               >
                 <option value="">Unassigned</option>
                 {riders?.map(r => (
@@ -359,10 +359,10 @@ export default function Deliveries() {
 
             {editingId && (
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Status</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Status</label>
                 <select
                   {...register('status')}
-                  className="w-full rounded-lg bg-slate-900/60 border border-slate-700/60 px-3 py-2 text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
+                  className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 text-gray-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
                 >
                   <option value="pending">Pending</option>
                   <option value="assigned">Assigned</option>
@@ -374,7 +374,7 @@ export default function Deliveries() {
             )}
           </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-slate-700/50">
+          <div className="pt-4 flex justify-end gap-3 border-t border-gray-200 dark:border-slate-700/50">
             <Button type="button" variant="ghost" onClick={closeModal}>Cancel</Button>
             <Button type="submit" isLoading={createMut.isPending || updateMut.isPending}>
               {editingId ? 'Save Changes' : 'Create Delivery'}

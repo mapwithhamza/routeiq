@@ -119,7 +119,7 @@ export default function Riders() {
   const activeRider = riders?.find(r => r.id === selectedRider);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in bg-[#F0F2F5] dark:bg-[#0D1117] p-2 sm:p-0">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0D1117] p-6 max-w-7xl mx-auto space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -239,7 +239,7 @@ export default function Riders() {
                           </Button>
                         </div>
                         {rider.current_lat && rider.current_lon && (
-                          <p className="mt-2 text-[10px] text-slate-600 flex items-center gap-1">
+                          <p className="mt-2 text-[10px] text-gray-500 dark:text-slate-500 flex items-center gap-1">
                             <MapPin size={10} />
                             {rider.current_lat.toFixed(4)}, {rider.current_lon.toFixed(4)}
                           </p>
@@ -327,17 +327,17 @@ export default function Riders() {
       {/* Add Rider Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-xl border border-slate-700/60 bg-slate-800 p-6 shadow-2xl animate-scale-in">
+          <div className="w-full max-w-md rounded-xl border border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-800 p-6 shadow-2xl animate-scale-in">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center">
                   <Users size={16} className="text-cyan-400" />
                 </div>
-                <h2 className="text-lg font-bold text-slate-100">Add New Rider</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">Add New Rider</h2>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-slate-500 hover:text-slate-200 hover:bg-slate-700 rounded-lg transition"
+                className="p-1.5 text-gray-500 hover:text-gray-900 dark:text-slate-500 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition"
               >
                 <X size={18} />
               </button>
@@ -348,20 +348,20 @@ export default function Riders() {
               className="space-y-4"
             >
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Name</label>
                 <input
                   {...register('name')}
                   type="text"
                   placeholder="e.g. Ali Khan"
-                  className={`w-full rounded-lg bg-slate-900/60 border ${
-                    errors.name ? 'border-red-500/60' : 'border-slate-700/60'
-                  } px-3 py-2 text-slate-100 placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition`}
+                  className={`w-full rounded-lg bg-white dark:bg-slate-900/60 border ${
+                    errors.name ? 'border-red-500/60' : 'border-gray-300 dark:border-slate-700/60'
+                  } px-3 py-2 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition`}
                 />
                 {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name.message}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Vehicle Type</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Vehicle Type</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(['bike', 'car', 'truck'] as const).map((vt) => {
                     const VIcon = VEHICLE_ICONS[vt];
@@ -376,7 +376,7 @@ export default function Riders() {
                           {...register('vehicle_type')}
                           className="sr-only peer"
                         />
-                        <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-slate-700/60 bg-slate-900/40 peer-checked:border-cyan-500/60 peer-checked:bg-cyan-500/10 transition capitalize text-slate-400 peer-checked:text-cyan-400 hover:border-slate-600">
+                        <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-200 dark:border-slate-700/60 bg-gray-50 dark:bg-slate-900/40 peer-checked:border-cyan-500/60 peer-checked:bg-cyan-500/10 transition capitalize text-gray-500 dark:text-slate-400 peer-checked:text-cyan-500 dark:peer-checked:text-cyan-400 hover:border-gray-300 dark:hover:border-slate-600">
                           <VIcon size={20} />
                           <span className="text-xs font-medium capitalize">{vt}</span>
                         </div>
@@ -414,7 +414,7 @@ export default function Riders() {
                 />
               </div>
 
-              <div className="pt-4 flex justify-end gap-3 border-t border-slate-700/50">
+              <div className="pt-4 flex justify-end gap-3 border-t border-gray-200 dark:border-slate-700/50">
                 <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
                   Cancel
                 </Button>

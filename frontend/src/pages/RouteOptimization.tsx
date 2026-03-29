@@ -181,7 +181,7 @@ export default function RouteOptimization() {
   const pendingDeliveries = deliveries?.filter(d => d.status === 'pending' && !d.rider_id) || [];
 
   return (
-    <div className="max-w-[1600px] mx-auto flex flex-col animate-fade-in bg-[#F0F2F5] dark:bg-[#0D1117] p-2 sm:p-0" style={{ height: 'calc(100vh - 7rem)' }}>
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0D1117] p-6 max-w-[1600px] mx-auto flex flex-col animate-fade-in" style={{ height: 'calc(100vh - 7rem)' }}>
       {/* Header */}
       <div className="flex justify-between items-end mb-5 shrink-0">
         <div>
@@ -217,7 +217,7 @@ export default function RouteOptimization() {
       {/* 70/30 Split */}
       <div className="flex flex-col lg:flex-row gap-5 flex-1 min-h-0">
         {/* Map (70%) */}
-        <div className="flex-[70] rounded-xl shadow-md dark:shadow-2xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] overflow-hidden relative min-h-0">
+        <div className="flex-[70] rounded-xl shadow-lg overflow-hidden relative min-h-0 border border-gray-200 dark:border-[#30363D]">
           {/* Map Status Bar */}
           <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
             {isAddMode && (

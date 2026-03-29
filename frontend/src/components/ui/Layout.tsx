@@ -44,23 +44,23 @@ export default function Layout() {
     : 'RQ';
 
   return (
-    <div className="flex min-h-screen bg-surface-900 dark:bg-surface-900 bg-slate-50 font-sans">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-[#0D1117] font-sans transition-colors duration-300">
       {/* ─── Sidebar ─── */}
       <aside
         className={`
-          fixed inset-y-0 left-0 flex flex-col border-r border-slate-700/50 bg-surface-800 dark:bg-surface-800 bg-white
+          fixed inset-y-0 left-0 flex flex-col border-r border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#161B22]
           transition-all duration-300 ease-in-out z-30 shrink-0
           ${sidebarW}
         `}
       >
         {/* Logo */}
-        <div className={`flex items-center gap-3 px-4 py-5 border-b border-slate-700/40 ${collapsed ? 'justify-center' : ''}`}>
+        <div className={`flex items-center gap-3 px-4 py-5 border-b border-gray-200 dark:border-[#30363D] ${collapsed ? 'justify-center' : ''}`}>
           <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
             <Truck size={16} className="text-white" />
           </div>
           {!collapsed && (
-            <span className="text-lg font-bold tracking-tight text-slate-100 dark:text-slate-100 text-slate-900">
-              Route<span className="text-cyan-400">IQ</span>
+            <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-slate-100">
+              Route<span className="text-cyan-500 dark:text-cyan-400">IQ</span>
             </span>
           )}
         </div>
@@ -77,8 +77,8 @@ export default function Layout() {
                 ${collapsed ? 'justify-center' : ''}
                 ${
                   isActive
-                    ? 'bg-cyan-500/15 text-cyan-400 shadow-sm shadow-cyan-500/10'
-                    : 'text-slate-400 dark:text-slate-400 text-slate-600 hover:bg-slate-700/40 dark:hover:bg-slate-700/40 hover:bg-slate-100 hover:text-slate-100 dark:hover:text-slate-100 hover:text-slate-900'
+                    ? 'bg-blue-50 text-blue-600 dark:bg-[#1C2128] dark:text-[#00D4FF] shadow-sm'
+                    : 'text-gray-700 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700/40 hover:text-gray-900 dark:hover:text-slate-100'
                 }`
               }
             >
@@ -89,7 +89,7 @@ export default function Layout() {
         </nav>
 
         {/* User Footer */}
-        <div className={`p-3 border-t border-slate-700/40 ${collapsed ? 'flex justify-center' : ''}`}>
+        <div className={`p-3 border-t border-gray-200 dark:border-[#30363D] ${collapsed ? 'flex justify-center' : ''}`}>
           {!collapsed ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5 min-w-0">
@@ -97,10 +97,10 @@ export default function Layout() {
                   {initials}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-slate-200 dark:text-slate-200 text-slate-800 truncate max-w-[110px]">
+                  <p className="text-xs font-semibold text-gray-800 dark:text-slate-200 truncate max-w-[110px]">
                     {user?.email}
                   </p>
-                  <p className="text-[10px] text-slate-500 capitalize">{user?.role}</p>
+                  <p className="text-[10px] text-gray-500 dark:text-slate-500 capitalize">{user?.role}</p>
                 </div>
               </div>
               <button
@@ -125,7 +125,7 @@ export default function Layout() {
         {/* Collapse Toggle */}
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className="absolute -right-3 top-[72px] z-40 w-6 h-6 rounded-full border border-slate-600 bg-surface-800 dark:bg-surface-800 bg-white flex items-center justify-center text-slate-400 hover:text-cyan-400 transition shadow-md"
+          className="absolute -right-3 top-[72px] z-40 w-6 h-6 rounded-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-[#161B22] flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-cyan-500 dark:hover:text-cyan-400 transition shadow-md"
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
@@ -133,30 +133,30 @@ export default function Layout() {
       </aside>
 
       {/* ─── Main Area ─── */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${mainMargin}`}>
+      <div className={`flex-1 flex flex-col min-w-0 bg-gray-100 dark:bg-[#0D1117] transition-all duration-300 ease-in-out ${mainMargin}`}>
         {/* Topbar */}
-        <header className="h-14 flex items-center gap-4 px-6 border-b border-slate-700/40 bg-surface-800/80 dark:bg-surface-800/80 bg-white/90 backdrop-blur-sm sticky top-0 z-20">
+        <header className="h-14 flex items-center gap-4 px-6 border-b border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#161B22] sticky top-0 z-20">
           {/* Search */}
           <div className="relative flex-1 max-w-sm hidden md:block">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="search"
               placeholder="Quick search…"
-              className="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg bg-slate-900/60 dark:bg-slate-900/60 bg-slate-100 border border-slate-700/40 dark:border-slate-700/40 border-slate-200 text-slate-300 dark:text-slate-300 text-slate-700 placeholder-slate-600 dark:placeholder-slate-600 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition"
+              className="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-slate-900/60 border border-gray-200 dark:border-slate-700/40 text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition"
             />
           </div>
 
           <div className="ml-auto flex items-center gap-2">
             {/* Bell */}
-            <button className="relative p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/40 transition">
+            <button className="relative p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700/40 transition">
               <Bell size={17} />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-cyan-400 ring-1 ring-surface-800" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-cyan-400 ring-1 ring-white dark:ring-[#161B22]" />
             </button>
 
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/40 transition"
+              className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700/40 transition"
               title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDark ? <Sun size={17} /> : <Moon size={17} />}
@@ -170,8 +170,8 @@ export default function Layout() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6 lg:p-8">
-          <div className="animate-fade-in">
+        <main className="flex-1 overflow-auto min-h-screen bg-gray-100 dark:bg-[#0D1117]">
+          <div className="animate-fade-in min-h-screen">
             <Outlet />
           </div>
         </main>
