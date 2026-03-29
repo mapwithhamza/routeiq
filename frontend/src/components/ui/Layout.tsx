@@ -372,7 +372,7 @@ export default function Layout() {
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto min-h-screen bg-gray-100 dark:bg-[#0D1117]">
-          <div className="animate-fade-in min-h-screen">
+          <div className="animate-fade-in">
             <Outlet />
           </div>
         </main>

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { X } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -8,11 +9,8 @@ interface ModalProps {
 }
 
 export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
-  // Close on Escape key
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
+    const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     if (isOpen) window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isOpen, onClose]);
@@ -21,20 +19,18 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div 
-        className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 shadow-2xl overflow-hidden"
+      <div
+        className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-slate-700/60 bg-white dark:bg-[#1C2128] shadow-2xl overflow-hidden"
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex items-center justify-between border-b border-gray-800 px-6 py-4">
-          <h2 className="text-lg font-semibold text-white">{title}</h2>
+        <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-700/60 px-6 py-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{title}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition"
+            className="p-1 text-gray-400 hover:text-gray-700 dark:text-slate-500 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X size={18} />
           </button>
         </div>
         <div className="p-6">

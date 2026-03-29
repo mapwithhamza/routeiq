@@ -75,7 +75,7 @@ export default function AddressAutocomplete({
 
   return (
     <div className="relative" ref={wrapperRef}>
-      <label className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{label}</label>
       <div className="relative flex items-center">
         <input
           type="text"
@@ -88,9 +88,9 @@ export default function AddressAutocomplete({
           }}
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
-          className={`w-full rounded-lg bg-gray-800 border ${
-            error ? 'border-red-500' : 'border-gray-700'
-          } px-3 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500 pr-10`}
+          className={`w-full rounded-lg bg-white dark:bg-slate-900/60 border ${
+            error ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-slate-700/60'
+          } px-3 py-2 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition pr-10`}
           autoComplete="off"
         />
         {resolved && (
@@ -139,11 +139,11 @@ export default function AddressAutocomplete({
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
 
       {isOpen && results.length > 0 && !resolved && (
-        <ul className="absolute z-50 mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+        <ul className="absolute z-50 mt-1 w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto">
           {results.map((r, i) => (
             <li
               key={i}
-              className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-sm text-gray-200 border-b border-gray-700/50 last:border-0"
+              className="px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer text-sm text-gray-800 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700/50 last:border-0"
               onClick={() => {
                 setQuery(r.display_name);
                 setIsOpen(false);
@@ -157,7 +157,7 @@ export default function AddressAutocomplete({
         </ul>
       )}
       {isOpen && !isLoading && debouncedQuery.length > 2 && results.length === 0 && !resolved && (
-        <div className="absolute z-50 mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 text-sm text-gray-400 text-center">
+        <div className="absolute z-50 mt-1 w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-xl p-3 text-sm text-gray-500 dark:text-gray-400 text-center">
           No results found for "{debouncedQuery}"
         </div>
       )}
