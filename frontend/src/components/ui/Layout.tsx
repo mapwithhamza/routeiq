@@ -37,6 +37,7 @@ export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
 
   const sidebarW = collapsed ? 'w-[68px]' : 'w-64';
+  const mainMargin = collapsed ? 'ml-[68px]' : 'ml-64';
 
   const initials = user?.email
     ? user.email.substring(0, 2).toUpperCase()
@@ -47,7 +48,7 @@ export default function Layout() {
       {/* ─── Sidebar ─── */}
       <aside
         className={`
-          relative flex flex-col border-r border-slate-700/50 bg-surface-800 dark:bg-surface-800 bg-white
+          fixed inset-y-0 left-0 flex flex-col border-r border-slate-700/50 bg-surface-800 dark:bg-surface-800 bg-white
           transition-all duration-300 ease-in-out z-30 shrink-0
           ${sidebarW}
         `}
@@ -132,7 +133,7 @@ export default function Layout() {
       </aside>
 
       {/* ─── Main Area ─── */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${mainMargin}`}>
         {/* Topbar */}
         <header className="h-14 flex items-center gap-4 px-6 border-b border-slate-700/40 bg-surface-800/80 dark:bg-surface-800/80 bg-white/90 backdrop-blur-sm sticky top-0 z-20">
           {/* Search */}
