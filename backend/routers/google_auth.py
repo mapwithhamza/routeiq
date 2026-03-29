@@ -107,15 +107,6 @@ async def callback_google(code: str, db: AsyncSession = Depends(get_db)):
         expires_delta=timedelta(hours=settings.JWT_EXPIRE_HOURS),
     )
     
-    # 5. Redirect and drop cookie
-    redirect_res = RedirectResponse(url="https://routeiq-eight.vercel.app/dashboard")
-    redirect_res.set_cookie(
-        key="access_token",
-        value=token,
-        httponly=True,
-        secure=True,
-        samesite="none",
-        max_age=86400
-    )
-    
-    return redirect_res
+    # 5. Redirect with token as URL param instead of cookie
+    frontend_url = f"{settings.FRONTEND_URL}/auth/callback?token={token}"
+    return RedirectResponse(url=frontend_url)

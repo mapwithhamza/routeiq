@@ -5,6 +5,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AuthCallback from './pages/AuthCallback';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/ui/Layout';
 
@@ -20,6 +21,7 @@ export default function App() {
       {/* Public routes */}
       <Route path="/login"    element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
 
       {/* Protected routes — ProtectedRoute redirects to /login if unauthenticated */}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
