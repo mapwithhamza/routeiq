@@ -150,8 +150,12 @@ export interface AnalyticsSummary {
 }
 
 export interface AlgorithmRunSummary {
+  id: number;
+  route_id: number;
   algorithm_name: string;
-  run_count: number;
-  avg_distance_km: number | null;
-  avg_runtime_ms: number | null;
+  distance_km: number | null;
+  duration_min: number | null;
+  nodes_explored: number | null;
+  runtime_ms: number | null;
+  created_at: string;
 }
