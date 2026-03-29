@@ -186,14 +186,19 @@
 | 11      | 2026-03-29 | UI Redesign complete — lucide-react installed; design-system.ts, ThemeContext, tailwind darkMode:class, font imports, collapsible Layout, all 7 pages rebuilt with cyan/slate DS, filter tabs, progress bars, 70/30 map split. tsc: 0 errors.                                                                                                                                                                                                                           | Phase 12 Done   |
 | 12      | 2026-03-29 | Phase 13 Light Mode Fix — Login/Register: removed invalid bg-surface-900 token, fixed all conflicting dark/light class ordering; Deliveries/Riders/AlgorithmComparison: removed spurious bg-[#F0F2F5] page wrappers; modal forms now have full light+dark variants; Dashboard metric cards: fixed conflicting dark:bg-gradient-to-br using absolute overlay; Layout: active nav now bg-blue-50 text-blue-600 per design spec; tsc --noEmit: 0 errors. Pushed to GitHub. | Phase 13 Done   |
 | 13      | 2026-03-29 | Google OAuth Integration — Setup python-multipart, httpx, and Alembic migrations adding google_id/picture_url to Users. Standalone `/auth/google` router exchanging tokens natively returning HTTP-only JWT. Added dynamic SVGs mapped onto VITE_API_URL redirect targets. Avatar now shows picture_url natively. tsc --noEmit: 0 errors. | OAuth Done   |
-| 14      | 2026-03-29 | Fixed Google OAuth cross-domain cookie issue by redirecting with token as URL param, dropping cookie on frontend AuthCallback route. | OAuth Fix Done |
+| 14      | 2026-03-29 | Google OAuth implemented — backend redirects with token in URL, AuthCallback.tsx stores in sessionStorage, axios interceptor added. Remaining: update get_current_user in backend/auth.py to accept Bearer token header | Google OAuth fix |
 ---
 
 ## Known Issues / Blockers
 
 <!-- Add issues here as they come up -->
 
-None yet.
+Google OAuth cross-domain cookie issue:
+- Backend redirects to /auth/callback?token={JWT} after Google login
+- AuthCallback.tsx reads token, stores in sessionStorage, sets axios Authorization header
+- axios.ts has interceptor to attach Bearer token from sessionStorage
+- backend/auth.py get_current_user still only reads cookie — needs to also check Authorization header
+- This is the ONLY remaining fix needed for Google OAuth to work
 
 ---
 
