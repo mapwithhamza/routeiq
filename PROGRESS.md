@@ -107,7 +107,7 @@
 - [x] Deliveries Page (`/pages/Deliveries.tsx`) — table, add/edit modal, Zod form
 - [x] Riders Page (`/pages/Riders.tsx`) — rider list, assign delivery, mini map
 
-### Phase 8 — Map & Route Optimization
+### Phase 8 — Map & Route Optimization ✅
 
 - [x] MapLibre GL map component (`/components/map/MainMap.tsx`)
 - [x] Delivery markers with color-coded priority
@@ -128,7 +128,7 @@
 - [x] Benchmark mode (10/50/200 nodes — client-side filter on full backend run)
 - [x] Algorithm Comparison Page complete (`/pages/AlgorithmComparison.tsx`)
 
-### Phase 10 — Deployment
+### Phase 10 — Deployment ✅
 
 - [x] `.gitignore` verified (no .env files committed)
 - [x] Frontend deployed to Vercel
