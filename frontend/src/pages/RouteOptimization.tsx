@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -18,6 +18,7 @@ export default function RouteOptimization() {
   
   const [optResponse, setOptResponse] = useState<OptimizeResponse | null>(null);
   const [selectedAlgoName, setSelectedAlgoName] = useState<string>('');
+  const [osrmRoute, setOsrmRoute] = useState<[number, number][] | null>(null);
 
   // Data fetch
   const { data: deliveries, isLoading: deliveriesLoading } = useQuery({
@@ -111,10 +112,56 @@ export default function RouteOptimization() {
 
   const selectedAlgoResult: AlgorithmResult | undefined = optResponse?.results.find(r => r.algorithm === selectedAlgoName);
 
-  // Compute polyline coordinates based on the selected algorithm's node path
   const routeWaypoints = selectedAlgoResult && optResponse 
     ? selectedAlgoResult.route.map(idx => optResponse.waypoints[idx])
     : [];
+
+  useEffect(() => {
+    if (routeWaypoints.length < 2) {
+      setOsrmRoute(null);
+      return;
+    }
+
+    let isMounted = true;
+    const fetchOsrm = async () => {
+      try {
+        const promises = [];
+        for (let i = 0; i < routeWaypoints.length - 1; i++) {
+          const wp1 = routeWaypoints[i];
+          const wp2 = routeWaypoints[i + 1];
+          const url = `https://router.project-osrm.org/route/v1/driving/${wp1.lon},${wp1.lat};${wp2.lon},${wp2.lat}?overview=full&geometries=geojson`;
+          promises.push(
+            fetch(url).then(res => {
+              if (!res.ok) throw new Error('OSRM mapping failed');
+              return res.json();
+            })
+          );
+        }
+
+        const results = await Promise.all(promises);
+        const combinedCoords: [number, number][] = [];
+        
+        for (const res of results) {
+          if (res.routes && res.routes.length > 0) {
+            const coords = res.routes[0].geometry.coordinates as [number, number][];
+            combinedCoords.push(...coords);
+          }
+        }
+
+        if (isMounted && combinedCoords.length > 0) {
+          setOsrmRoute(combinedCoords);
+        } else if (isMounted) {
+          setOsrmRoute(null);
+        }
+      } catch (err) {
+        console.error('OSRM fetch error:', err);
+        if (isMounted) setOsrmRoute(null);
+      }
+    };
+
+    fetchOsrm();
+    return () => { isMounted = false; };
+  }, [selectedAlgoName, optResponse]);
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col h-[calc(100vh-8rem)]">
@@ -147,6 +194,7 @@ export default function RouteOptimization() {
             deliveries={activeDeliveries}
             rider={activeRider}
             routeWaypoints={routeWaypoints}
+            osrmCoordinates={osrmRoute || undefined}
             isAddMode={isAddMode}
             isBlockedRoadMode={isBlockedMode}
             onMapClick={handleMapClick}

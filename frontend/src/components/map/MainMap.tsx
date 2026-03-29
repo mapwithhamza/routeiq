@@ -10,6 +10,7 @@ interface MainMapProps {
   isAddMode: boolean;
   onMapClick: (lat: number, lon: number) => void;
   isBlockedRoadMode?: boolean;
+  osrmCoordinates?: [number, number][];
 }
 
 export default function MainMap({
@@ -18,7 +19,8 @@ export default function MainMap({
   routeWaypoints,
   isAddMode,
   onMapClick,
-  isBlockedRoadMode
+  isBlockedRoadMode,
+  osrmCoordinates
 }: MainMapProps) {
   const [popupInfo, setPopupInfo] = useState<Delivery | null>(null);
   const [dashOffset, setDashOffset] = useState(0);
@@ -47,10 +49,12 @@ export default function MainMap({
       properties: {},
       geometry: {
         type: 'LineString' as const,
-        coordinates: routeWaypoints.map(w => [w.lon, w.lat]),
+        coordinates: osrmCoordinates && osrmCoordinates.length > 0 
+          ? osrmCoordinates 
+          : routeWaypoints.map(w => [w.lon, w.lat]),
       },
     };
-  }, [routeWaypoints]);
+  }, [routeWaypoints, osrmCoordinates]);
 
   const getPriorityColor = (prio: string) => {
     switch (prio) {
