@@ -66,6 +66,7 @@ export default function RouteOptimization() {
       const pendingCount = (deliveries?.filter(d => d.status === 'pending').length || 0) + 1;
       createDeliveryMut.mutate({
         title: `Map Drop-off #${pendingCount}`,
+        address: `${lat.toFixed(5)}, ${lon.toFixed(5)}`,
         lat,
         lon,
         priority: 'normal',
