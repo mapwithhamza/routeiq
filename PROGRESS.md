@@ -188,6 +188,7 @@
 | 13      | 2026-03-29 | Google OAuth Integration — Setup python-multipart, httpx, and Alembic migrations adding google_id/picture_url to Users. Standalone `/auth/google` router exchanging tokens natively returning HTTP-only JWT. Added dynamic SVGs mapped onto VITE_API_URL redirect targets. Avatar now shows picture_url natively. tsc --noEmit: 0 errors.                                                                                                                               | OAuth Done       |
 | 14      | 2026-03-29 | Google OAuth implemented — backend redirects with token in URL, AuthCallback.tsx stores in sessionStorage, axios interceptor added. Remaining: update get_current_user in backend/auth.py to accept Bearer token header                                                                                                                                                                                                                                                 | Google OAuth fix |
 | 15      | 2026-03-29 | Fixed get_current_user to accept Bearer token header for Google OAuth cross-domain fix. | Google OAuth fix |
+| 16      | 2026-03-30 | UI update for Button component — replaced frontend/src/components/ui/Button.tsx per user specification, updated primary, secondary, danger, ghost variants. Ran npx tsc --noEmit with 0 errors. Pushed to Github. | Button UI update |
 
 ---
 
