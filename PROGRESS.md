@@ -165,6 +165,19 @@
 - [x] `tsc --noEmit` — ✅ zero errors
 - [x] Pushed to GitHub
 
+### Phase 13 ✅
+
+- [x] Modal.tsx — React Portal added, renders on document.body, z-[200]
+- [x] AddressAutocomplete.tsx — full light/dark mode support
+- [x] Button.tsx — all variants fixed for light mode
+- [x] Layout.tsx — removed redundant min-h-screen from inner div
+- [x] Toast position changed to top-center
+- [x] RouteOptimization.tsx — Add Delivery map click fixed (address field added)
+- [x] Block Road replaced with Clear Route button
+- [x] Google OAuth — get_current_user accepts Bearer token header
+- [x] AuthCallback.tsx — stores token in sessionStorage
+- [x] axios.ts — interceptor attaches Bearer token from sessionStorage
+
 ---
 
 ## Session Log
@@ -189,6 +202,7 @@
 | 14      | 2026-03-29 | Google OAuth implemented — backend redirects with token in URL, AuthCallback.tsx stores in sessionStorage, axios interceptor added. Remaining: update get_current_user in backend/auth.py to accept Bearer token header                                                                                                                                                                                                                                                 | Google OAuth fix |
 | 15      | 2026-03-29 | Fixed get_current_user to accept Bearer token header for Google OAuth cross-domain fix. | Google OAuth fix |
 | 16      | 2026-03-30 | UI update for Button component — replaced frontend/src/components/ui/Button.tsx per user specification, updated primary, secondary, danger, ghost variants. Ran npx tsc --noEmit with 0 errors. Pushed to Github. | Button UI update |
+| 17 | 2026-03-30 | Google OAuth fix — get_current_user updated to accept Bearer token header; axios.ts interceptor added; AuthCallback.tsx stores token in sessionStorage. Toast position changed to top-center. Modal.tsx — light mode fix + React Portal (z-[200]). AddressAutocomplete.tsx — full light mode fix. Button.tsx — light mode fix for all variants. Layout.tsx — removed double min-h-screen. RouteOptimization.tsx — Add Delivery map click fixed (missing address field). Block Road replaced with Clear Route button. | Session 15 Done |
 
 ---
 
