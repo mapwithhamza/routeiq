@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Map as MapIcon, Zap, Plus, X, ChevronDown, Activity, Navigation, Flag } from 'lucide-react';
+import { Map as MapIcon, Zap, Plus, X, ChevronDown, Activity, Navigation, Flag, Flame } from 'lucide-react';
 
 import MainMap from '../components/map/MainMap';
 import AlgorithmRace from '../components/AlgorithmRace';
@@ -20,6 +20,7 @@ export default function RouteOptimization() {
 
   const [isAddMode, setIsAddMode] = useState(false);
   const [isBlockedMode, setIsBlockedMode] = useState(false);
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const [isRaceOpen, setIsRaceOpen] = useState(false);
 
   const handleClearRoute = () => {
@@ -253,6 +254,13 @@ export default function RouteOptimization() {
             Clear Route
           </Button>
           <Button
+            variant={showHeatmap ? 'primary' : 'secondary'}
+            onClick={() => setShowHeatmap(h => !h)}
+          >
+            <Flame size={14} className="mr-1.5" />
+            {showHeatmap ? 'Hide Heatmap' : 'Heatmap'}
+          </Button>
+          <Button
             variant={isAddMode ? 'primary' : 'secondary'}
             onClick={() => { setIsAddMode(!isAddMode); setIsBlockedMode(false); }}
           >
@@ -283,6 +291,7 @@ export default function RouteOptimization() {
             isAddMode={isAddMode}
             isBlockedRoadMode={isBlockedMode}
             onMapClick={handleMapClick}
+            showHeatmap={showHeatmap}
           />
           {(optimizeMut.isPending || isOsrmLoading) && (
             <div className="absolute inset-0 bg-slate-950/70 flex flex-col items-center justify-center z-50 backdrop-blur-sm">

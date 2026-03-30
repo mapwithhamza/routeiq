@@ -8,9 +8,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import Map, { Marker } from 'react-map-gl/maplibre';
+import Map, { Marker, Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { Plus, Bike, Car, Truck, Trash2, X, MapPin, Users } from 'lucide-react';
+import { Plus, Bike, Car, Truck, Trash2, X, MapPin, Users, Flame } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
 import { ridersApi, deliveriesApi } from '../lib/api';
@@ -34,6 +34,7 @@ const STATUS_STYLES: Record<string, string> = {
 export default function Riders() {
   const queryClient = useQueryClient();
   const [selectedRider, setSelectedRider] = useState<number | null>(null);
+  const [showRiderHeatmap, setShowRiderHeatmap] = useState(false);
   const [assignDeliveryId, setAssignDeliveryId] = useState<number | ''>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addressSearch, setAddressSearch] = useState('');
@@ -268,6 +269,17 @@ export default function Riders() {
               <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">Live Fleet Map</h2>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowRiderHeatmap(h => !h)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition border ${
+                  showRiderHeatmap
+                    ? 'bg-orange-500/15 border-orange-500/40 text-orange-400'
+                    : 'bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
+                }`}
+              >
+                <Flame size={11} />
+                {showRiderHeatmap ? 'Hide Heatmap' : 'Heatmap'}
+              </button>
               {activeRider && (
                 <span className="text-xs text-cyan-700 dark:text-cyan-400 font-medium">
                   Viewing: {activeRider.name}
@@ -287,6 +299,46 @@ export default function Riders() {
               }}
               mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
             >
+              {/* Rider Heatmap Layer */}
+              {showRiderHeatmap && riders && riders.filter(r => r.current_lat && r.current_lon).length > 0 && (
+                <Source
+                  id="rider-heatmap-source"
+                  type="geojson"
+                  data={{
+                    type: 'FeatureCollection',
+                    features: riders
+                      .filter(r => r.current_lat && r.current_lon)
+                      .map(r => ({
+                        type: 'Feature',
+                        properties: {
+                          weight: r.status === 'on_route' ? 1 : r.status === 'available' ? 0.7 : 0.3,
+                        },
+                        geometry: { type: 'Point', coordinates: [r.current_lon!, r.current_lat!] },
+                      })),
+                  }}
+                >
+                  <Layer
+                    id="rider-heatmap"
+                    type="heatmap"
+                    paint={{
+                      'heatmap-weight': ['get', 'weight'],
+                      'heatmap-intensity': 1.5,
+                      'heatmap-radius': 40,
+                      'heatmap-opacity': 0.75,
+                      'heatmap-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['heatmap-density'],
+                        0, 'rgba(0,0,0,0)',
+                        0.2, 'rgba(16,185,129,0.4)',
+                        0.5, 'rgba(6,182,212,0.7)',
+                        0.8, 'rgba(99,102,241,0.85)',
+                        1, 'rgba(139,92,246,1)',
+                      ],
+                    }}
+                  />
+                </Source>
+              )}
               {riders?.map(rider => {
                 if (rider.current_lat && rider.current_lon) {
                   const isSelected = selectedRider === rider.id;

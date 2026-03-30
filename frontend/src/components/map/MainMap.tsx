@@ -11,6 +11,7 @@ interface MainMapProps {
   onMapClick: (lat: number, lon: number) => void;
   isBlockedRoadMode?: boolean;
   osrmCoordinates?: [number, number][];
+  showHeatmap?: boolean;
 }
 
 export default function MainMap({
@@ -20,7 +21,8 @@ export default function MainMap({
   isAddMode,
   onMapClick,
   isBlockedRoadMode,
-  osrmCoordinates
+  osrmCoordinates,
+  showHeatmap = false,
 }: MainMapProps) {
   const [popupInfo, setPopupInfo] = useState<Delivery | null>(null);
   const [dashOffset, setDashOffset] = useState(0);
@@ -41,6 +43,17 @@ export default function MainMap({
     animate();
     return () => cancelAnimationFrame(animationId);
   }, [routeWaypoints.length]);
+
+  const heatmapGeoJSON = useMemo(() => ({
+    type: 'FeatureCollection' as const,
+    features: deliveries.map(d => ({
+      type: 'Feature' as const,
+      properties: {
+        weight: d.priority === 'urgent' ? 1 : d.priority === 'high' ? 0.8 : d.priority === 'normal' ? 0.6 : 0.4,
+      },
+      geometry: { type: 'Point' as const, coordinates: [d.lon, d.lat] },
+    })),
+  }), [deliveries]);
 
   const geojsonRoute = useMemo(() => {
     if (routeWaypoints.length < 2) return null;
@@ -91,6 +104,32 @@ export default function MainMap({
         interactiveLayerIds={geojsonRoute ? ['route-line-base'] : []}
       >
         <NavigationControl position="bottom-right" />
+
+        {/* Delivery Heatmap Layer */}
+        {showHeatmap && heatmapGeoJSON.features.length > 0 && (
+          <Source id="heatmap-source" type="geojson" data={heatmapGeoJSON}>
+            <Layer
+              id="delivery-heatmap"
+              type="heatmap"
+              paint={{
+                'heatmap-weight': ['get', 'weight'],
+                'heatmap-intensity': 1.5,
+                'heatmap-radius': 35,
+                'heatmap-opacity': 0.75,
+                'heatmap-color': [
+                  'interpolate',
+                  ['linear'],
+                  ['heatmap-density'],
+                  0, 'rgba(0,0,0,0)',
+                  0.2, 'rgba(6,182,212,0.4)',
+                  0.5, 'rgba(99,102,241,0.7)',
+                  0.8, 'rgba(239,68,68,0.85)',
+                  1, 'rgba(255,100,50,1)',
+                ],
+              }}
+            />
+          </Source>
+        )}
 
         {/* Route Polyline base and animated dashed overlay */}
         {geojsonRoute && (

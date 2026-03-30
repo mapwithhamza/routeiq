@@ -206,6 +206,7 @@
 | 18 | 2026-03-30 | Algorithm Race Mode v3 — deduplicated OSRM calls (unique segments only), toggleable algorithm filter cards, colored active borders, improved runtime text visibility | Race Mode v3 Done |
 | 19 | 2026-03-30 | Algorithm Race Mode v4 — fixed OSRM 429 rate limiting by switching from parallel to sequential segment fetching with 300ms delay | Race Mode v4 Done |
 | 20 | 2026-03-30 | Algorithm Complexity Visualizer added to AlgorithmComparison page — Big-O theoretical curves (O(n), O(n log n), O(n²), O(2ⁿ)) with actual benchmark data plotted on top, per-algorithm toggle buttons | Complexity Visualizer Done |
+| 21 | 2026-03-30 | Heatmap Layer added — delivery density heatmap on Route Optimization page (priority-weighted, cyan→indigo→red), rider density heatmap on Riders page (status-weighted, green→cyan→violet), toggle buttons on both pages | Heatmap Done |
 
 ---
 
