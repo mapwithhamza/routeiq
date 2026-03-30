@@ -72,14 +72,17 @@ async function fetchAllSegmentsDeduped(
     }
   });
 
-  // Fetch all unique segments in parallel
+  // Fetch segments sequentially with delay to avoid OSRM 429 rate limiting
   const segmentCache = new Map<string, [number, number][]>();
-  await Promise.all(
-    Array.from(uniqueSegments.entries()).map(async ([key, { wp1, wp2 }]) => {
-      const coords = await fetchSegment(wp1, wp2);
-      segmentCache.set(key, coords);
-    })
-  );
+  const segmentEntries = Array.from(uniqueSegments.entries());
+  for (let i = 0; i < segmentEntries.length; i++) {
+    const [key, { wp1, wp2 }] = segmentEntries[i];
+    const coords = await fetchSegment(wp1, wp2);
+    segmentCache.set(key, coords);
+    if (i < segmentEntries.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+  }
 
   // Assemble full route per algorithm from cached segments
   const routeCoords: Record<string, [number, number][]> = {};
