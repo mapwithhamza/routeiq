@@ -6,9 +6,10 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Map as MapIcon, Zap, Plus, X, ChevronDown, Activity, Navigation } from 'lucide-react';
+import { Map as MapIcon, Zap, Plus, X, ChevronDown, Activity, Navigation, Flag } from 'lucide-react';
 
 import MainMap from '../components/map/MainMap';
+import AlgorithmRace from '../components/AlgorithmRace';
 import { deliveriesApi, ridersApi, routesApi } from '../lib/api';
 import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
@@ -19,6 +20,7 @@ export default function RouteOptimization() {
 
   const [isAddMode, setIsAddMode] = useState(false);
   const [isBlockedMode, setIsBlockedMode] = useState(false);
+  const [isRaceOpen, setIsRaceOpen] = useState(false);
 
   const handleClearRoute = () => {
     setOptResponse(null);
@@ -361,9 +363,18 @@ export default function RouteOptimization() {
                   <Activity size={14} className="text-cyan-600 dark:text-cyan-400" />
                   <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">Results</h2>
                 </div>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                  Complete
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsRaceOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 text-xs font-semibold hover:bg-amber-500/25 transition"
+                  >
+                    <Flag size={11} />
+                    Race Mode
+                  </button>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                    Complete
+                  </span>
+                </div>
               </div>
 
               <div className="mb-4">
@@ -421,6 +432,14 @@ export default function RouteOptimization() {
           )}
         </div>
       </div>
+
+      {optResponse && (
+        <AlgorithmRace
+          isOpen={isRaceOpen}
+          onClose={() => setIsRaceOpen(false)}
+          optResponse={optResponse}
+        />
+      )}
     </div>
   );
 }
