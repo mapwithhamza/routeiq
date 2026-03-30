@@ -189,6 +189,7 @@
 | 14      | 2026-03-29 | Google OAuth implemented — backend redirects with token in URL, AuthCallback.tsx stores in sessionStorage, axios interceptor added. Remaining: update get_current_user in backend/auth.py to accept Bearer token header                                                                                                                                                                                                                                                 | Google OAuth fix |
 | 15      | 2026-03-29 | Fixed get_current_user to accept Bearer token header for Google OAuth cross-domain fix. | Google OAuth fix |
 | 16      | 2026-03-30 | UI update for Button component — replaced frontend/src/components/ui/Button.tsx per user specification, updated primary, secondary, danger, ghost variants. Ran npx tsc --noEmit with 0 errors. Pushed to Github. | Button UI update |
+| 17      | 2026-03-30 | UI update for Modal and Riders — added React Portals via createPortal to render modals directly on document.body, fixing z-index constraints. Updated z-index to 200. Ran npx tsc --noEmit with 0 errors. Pushed to Github. | Portal implementation |
 
 ---
 

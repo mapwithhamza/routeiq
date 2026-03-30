@@ -4,6 +4,7 @@
  * All API calls, hooks, Zod schemas, form handlers preserved.
  */
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -325,8 +326,8 @@ export default function Riders() {
       </div>
 
       {/* Add Rider Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      {isModalOpen && createPortal(
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="w-full max-w-md rounded-xl border border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-800 p-6 shadow-2xl animate-scale-in">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2">
@@ -424,7 +425,8 @@ export default function Riders() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
