@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Map as MapIcon, Zap, Plus, Lock, ChevronDown, Activity, Navigation } from 'lucide-react';
+import { Map as MapIcon, Zap, Plus, X, ChevronDown, Activity, Navigation } from 'lucide-react';
 
 import MainMap from '../components/map/MainMap';
 import { deliveriesApi, ridersApi, routesApi } from '../lib/api';
@@ -19,6 +19,12 @@ export default function RouteOptimization() {
 
   const [isAddMode, setIsAddMode] = useState(false);
   const [isBlockedMode, setIsBlockedMode] = useState(false);
+
+  const handleClearRoute = () => {
+    setOptResponse(null);
+    setOsrmRoute(null);
+    setSelectedAlgoName('');
+  };
   const [selectedRiderId, setSelectedRiderId] = useState<number | ''>('');
 
   const [optResponse, setOptResponse] = useState<OptimizeResponse | null>(null);
@@ -237,11 +243,12 @@ export default function RouteOptimization() {
 
         <div className="flex gap-2">
           <Button
-            variant={isBlockedMode ? 'danger' : 'secondary'}
-            onClick={() => { setIsBlockedMode(!isBlockedMode); setIsAddMode(false); }}
+            variant="secondary"
+            onClick={handleClearRoute}
+            disabled={!optResponse}
           >
-            <Lock size={14} className="mr-1.5" />
-            {isBlockedMode ? 'Cancel' : 'Block Road'}
+            <X size={14} className="mr-1.5" />
+            Clear Route
           </Button>
           <Button
             variant={isAddMode ? 'primary' : 'secondary'}
@@ -264,11 +271,7 @@ export default function RouteOptimization() {
                 <Plus size={12} /> Click map to add delivery
               </div>
             )}
-            {isBlockedMode && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500 text-white text-xs font-semibold shadow-lg animate-pulse">
-                <Lock size={12} /> Click road to block
-              </div>
-            )}
+
           </div>
           <MainMap
             deliveries={activeDeliveries}
