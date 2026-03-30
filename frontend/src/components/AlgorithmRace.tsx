@@ -1,11 +1,11 @@
 /**
  * AlgorithmRace.tsx — Algorithm Race Mode with real MapLibre map
- * Fetches OSRM road geometry per algorithm, animates simultaneously.
+ * Deduplicates OSRM calls, toggleable algorithm filter, improved cards.
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Trophy, SkipForward, Flag } from 'lucide-react';
-import Map, { Source, Layer } from 'react-map-gl/maplibre';
+import MapGL, { Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { OptimizeResponse, AlgorithmResult, Waypoint } from '../types';
 
@@ -36,33 +36,69 @@ interface RacerState {
   finishOrder: number;
 }
 
-async function fetchOsrmForRoute(
-  waypoints: Waypoint[],
-  routeIndices: number[]
-): Promise<[number, number][]> {
-  if (routeIndices.length < 2) return [];
-  const ordered = routeIndices.map(i => waypoints[i]).filter(Boolean);
-  if (ordered.length < 2) return [];
+function segmentKey(wp1: Waypoint, wp2: Waypoint): string {
+  return `${wp1.lon.toFixed(5)},${wp1.lat.toFixed(5)}->${wp2.lon.toFixed(5)},${wp2.lat.toFixed(5)}`;
+}
 
-  const allCoords: [number, number][] = [];
-  for (let i = 0; i < ordered.length - 1; i++) {
-    const wp1 = ordered[i];
-    const wp2 = ordered[i + 1];
-    const url = `https://router.project-osrm.org/route/v1/driving/${wp1.lon},${wp1.lat};${wp2.lon},${wp2.lat}?overview=full&geometries=geojson`;
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('OSRM failed');
-      const data = await res.json();
-      const coords = data.routes?.[0]?.geometry?.coordinates as [number, number][] || [];
-      if (i > 0 && coords.length > 0) coords.shift();
-      allCoords.push(...coords);
-    } catch {
-      // fallback: straight line
-      if (i === 0) allCoords.push([wp1.lon, wp1.lat]);
-      allCoords.push([wp2.lon, wp2.lat]);
-    }
+async function fetchSegment(wp1: Waypoint, wp2: Waypoint): Promise<[number, number][]> {
+  const url = `https://router.project-osrm.org/route/v1/driving/${wp1.lon},${wp1.lat};${wp2.lon},${wp2.lat}?overview=full&geometries=geojson`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('OSRM failed');
+    const data = await res.json();
+    return data.routes?.[0]?.geometry?.coordinates as [number, number][] || [
+      [wp1.lon, wp1.lat], [wp2.lon, wp2.lat]
+    ];
+  } catch {
+    return [[wp1.lon, wp1.lat], [wp2.lon, wp2.lat]];
   }
-  return allCoords;
+}
+
+async function fetchAllSegmentsDeduped(
+  waypoints: Waypoint[],
+  results: AlgorithmResult[]
+): Promise<Record<string, [number, number][]>> {
+  // Collect all unique segment pairs across all algorithms
+  const uniqueSegments = new Map<string, { wp1: Waypoint; wp2: Waypoint }>();
+  results.forEach(r => {
+    for (let i = 0; i < r.route.length - 1; i++) {
+      const wp1 = waypoints[r.route[i]];
+      const wp2 = waypoints[r.route[i + 1]];
+      if (!wp1 || !wp2) continue;
+      const key = segmentKey(wp1, wp2);
+      if (!uniqueSegments.has(key)) {
+        uniqueSegments.set(key, { wp1, wp2 });
+      }
+    }
+  });
+
+  // Fetch all unique segments in parallel
+  const segmentCache = new Map<string, [number, number][]>();
+  await Promise.all(
+    Array.from(uniqueSegments.entries()).map(async ([key, { wp1, wp2 }]) => {
+      const coords = await fetchSegment(wp1, wp2);
+      segmentCache.set(key, coords);
+    })
+  );
+
+  // Assemble full route per algorithm from cached segments
+  const routeCoords: Record<string, [number, number][]> = {};
+  results.forEach(r => {
+    const full: [number, number][] = [];
+    for (let i = 0; i < r.route.length - 1; i++) {
+      const wp1 = waypoints[r.route[i]];
+      const wp2 = waypoints[r.route[i + 1]];
+      if (!wp1 || !wp2) continue;
+      const key = segmentKey(wp1, wp2);
+      const seg = segmentCache.get(key) || [[wp1.lon, wp1.lat], [wp2.lon, wp2.lat]];
+      const segCopy = [...seg] as [number, number][];
+      if (full.length > 0 && segCopy.length > 0) segCopy.shift();
+      full.push(...segCopy);
+    }
+    routeCoords[r.algorithm] = full;
+  });
+
+  return routeCoords;
 }
 
 function getMapCenter(waypoints: Waypoint[]): [number, number] {
@@ -79,13 +115,15 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
   const [racers, setRacers] = useState<RacerState[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [osrmRoutes, setOsrmRoutes] = useState<Record<string, [number, number][]>>({});
+  const [, setOsrmRoutes] = useState<Record<string, [number, number][]>>({});
   const [drawnRoutes, setDrawnRoutes] = useState<Record<string, [number, number][]>>({});
   const [isLoadingOsrm, setIsLoadingOsrm] = useState(false);
+  const [activeAlgos, setActiveAlgos] = useState<Set<string>>(new Set());
   const animFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const finishCountRef = useRef(0);
   const racersRef = useRef<RacerState[]>([]);
+  const osrmRoutesRef = useRef<Record<string, [number, number][]>>({});
 
   const mapCenter = getMapCenter(optResponse.waypoints);
 
@@ -101,7 +139,6 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
       finishOrder: 0,
     })), [optResponse.results]);
 
-  // Fetch OSRM routes for all algorithms when modal opens
   useEffect(() => {
     if (!isOpen) return;
     const initial = initRacers();
@@ -110,21 +147,15 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
     setIsRunning(false);
     setIsFinished(false);
     setDrawnRoutes({});
+    setActiveAlgos(new Set(optResponse.results.map(r => r.algorithm)));
     finishCountRef.current = 0;
 
     setIsLoadingOsrm(true);
-    const fetchAll = async () => {
-      const results: Record<string, [number, number][]> = {};
-      await Promise.all(
-        optResponse.results.map(async (r: AlgorithmResult) => {
-          const coords = await fetchOsrmForRoute(optResponse.waypoints, r.route);
-          results[r.algorithm] = coords;
-        })
-      );
-      setOsrmRoutes(results);
+    fetchAllSegmentsDeduped(optResponse.waypoints, optResponse.results).then(routes => {
+      setOsrmRoutes(routes);
+      osrmRoutesRef.current = routes;
       setIsLoadingOsrm(false);
-    };
-    fetchAll();
+    });
 
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
@@ -139,6 +170,7 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
     setIsRunning(true);
     setIsFinished(false);
     setDrawnRoutes({});
+    setActiveAlgos(new Set(optResponse.results.map(r => r.algorithm)));
     finishCountRef.current = 0;
     startTimeRef.current = null;
 
@@ -166,10 +198,9 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
       racersRef.current = updatedRacers;
       setRacers([...updatedRacers]);
 
-      // Update drawn routes based on progress
       const newDrawn: Record<string, [number, number][]> = {};
       updatedRacers.forEach(r => {
-        const full = osrmRoutes[r.algorithm] || [];
+        const full = osrmRoutesRef.current[r.algorithm] || [];
         if (full.length === 0) return;
         const count = Math.floor(full.length * r.progress);
         newDrawn[r.algorithm] = full.slice(0, Math.max(count, 2));
@@ -179,10 +210,9 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
       if (allDone) {
         setIsFinished(true);
         setIsRunning(false);
-        // Show full routes
         const finalDrawn: Record<string, [number, number][]> = {};
         updatedRacers.forEach(r => {
-          finalDrawn[r.algorithm] = osrmRoutes[r.algorithm] || [];
+          finalDrawn[r.algorithm] = osrmRoutesRef.current[r.algorithm] || [];
         });
         setDrawnRoutes(finalDrawn);
         return;
@@ -192,7 +222,7 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
     };
 
     animFrameRef.current = requestAnimationFrame(animate);
-  }, [initRacers, optResponse.results, osrmRoutes]);
+  }, [initRacers, optResponse.results]);
 
   const skipAnimation = useCallback(() => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
@@ -207,13 +237,26 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
     setRacers(skippedRacers);
     const finalDrawn: Record<string, [number, number][]> = {};
     skippedRacers.forEach(r => {
-      finalDrawn[r.algorithm] = osrmRoutes[r.algorithm] || [];
+      finalDrawn[r.algorithm] = osrmRoutesRef.current[r.algorithm] || [];
     });
     setDrawnRoutes(finalDrawn);
     setIsFinished(true);
     setIsRunning(false);
     finishCountRef.current = optResponse.results.length;
-  }, [optResponse.results, osrmRoutes]);
+  }, [optResponse.results]);
+
+  const toggleAlgo = (algorithm: string) => {
+    setActiveAlgos(prev => {
+      const next = new Set(prev);
+      if (next.has(algorithm)) {
+        if (next.size === 1) return prev; // keep at least one active
+        next.delete(algorithm);
+      } else {
+        next.add(algorithm);
+      }
+      return next;
+    });
+  };
 
   const winner = racers.find(r => r.finishOrder === 1);
 
@@ -242,9 +285,9 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
       </div>
 
       {/* Map Area */}
-      <div className="flex-1 flex flex-col min-h-0 p-4 gap-4">
+      <div className="flex-1 flex flex-col min-h-0 p-4 gap-3">
         <div className="flex-1 rounded-2xl overflow-hidden border border-slate-700/60 min-h-0">
-          <Map
+          <MapGL
             initialViewState={{
               longitude: mapCenter[0],
               latitude: mapCenter[1],
@@ -253,18 +296,15 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
             style={{ width: '100%', height: '100%' }}
             mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
           >
-            {/* Draw each algorithm's route */}
             {optResponse.results.map((r: AlgorithmResult) => {
               const coords = drawnRoutes[r.algorithm];
               if (!coords || coords.length < 2) return null;
+              if (!activeAlgos.has(r.algorithm)) return null;
               const color = ALGO_COLORS[r.algorithm] || '#94a3b8';
               const geojson = {
                 type: 'Feature' as const,
                 properties: {},
-                geometry: {
-                  type: 'LineString' as const,
-                  coordinates: coords,
-                },
+                geometry: { type: 'LineString' as const, coordinates: coords },
               };
               return (
                 <Source key={r.algorithm} id={`race-src-${r.algorithm}`} type="geojson" data={geojson}>
@@ -276,16 +316,12 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
                       'line-width': 3,
                       'line-opacity': 0.85,
                     }}
-                    layout={{
-                      'line-join': 'round',
-                      'line-cap': 'round',
-                    }}
+                    layout={{ 'line-join': 'round', 'line-cap': 'round' }}
                   />
                 </Source>
               );
             })}
 
-            {/* Waypoint markers */}
             {optResponse.waypoints.map((wp, i) => (
               <Source
                 key={`wp-${i}`}
@@ -293,7 +329,7 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
                 type="geojson"
                 data={{
                   type: 'Feature',
-                  properties: { label: i === 0 ? 'START' : `${i}` },
+                  properties: {},
                   geometry: { type: 'Point', coordinates: [wp.lon, wp.lat] },
                 }}
               >
@@ -309,37 +345,47 @@ export default function AlgorithmRace({ isOpen, onClose, optResponse }: Algorith
                 />
               </Source>
             ))}
-          </Map>
+          </MapGL>
         </div>
 
-        {/* Leaderboard */}
+        {/* Leaderboard Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 shrink-0">
           {[...racers]
             .sort((a, b) => (a.finishOrder || 99) - (b.finishOrder || 99))
-            .map(racer => (
-              <div
-                key={racer.algorithm}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#161B22] border border-slate-700/40"
-              >
-                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: racer.color }} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-slate-200 truncate">{racer.algorithm}</span>
-                    {racer.finishOrder === 1 && <Trophy size={11} className="text-amber-400 shrink-0" />}
-                    {racer.finished && racer.finishOrder > 1 && (
-                      <span className="text-[10px] text-slate-500">#{racer.finishOrder}</span>
-                    )}
+            .map(racer => {
+              const isActive = activeAlgos.has(racer.algorithm);
+              return (
+                <div
+                  key={racer.algorithm}
+                  onClick={() => toggleAlgo(racer.algorithm)}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#161B22] cursor-pointer transition-all duration-150"
+                  style={{
+                    border: isActive
+                      ? `1.5px solid ${racer.color}`
+                      : '1.5px solid rgba(51,65,85,0.4)',
+                    opacity: isActive ? 1 : 0.4,
+                  }}
+                >
+                  <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: racer.color }} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-slate-200 truncate">{racer.algorithm}</span>
+                      {racer.finishOrder === 1 && <Trophy size={11} className="text-amber-400 shrink-0" />}
+                      {racer.finished && racer.finishOrder > 1 && (
+                        <span className="text-[10px] text-slate-500">#{racer.finishOrder}</span>
+                      )}
+                    </div>
+                    <div className="w-full bg-slate-800 rounded-full h-1 mt-1">
+                      <div
+                        className="h-1 rounded-full transition-all duration-100"
+                        style={{ width: `${racer.progress * 100}%`, backgroundColor: racer.color }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-slate-800 rounded-full h-1 mt-1">
-                    <div
-                      className="h-1 rounded-full transition-all duration-100"
-                      style={{ width: `${racer.progress * 100}%`, backgroundColor: racer.color }}
-                    />
-                  </div>
+                  <span className="text-xs text-slate-300 font-mono shrink-0">{racer.runtime_ms.toFixed(2)}ms</span>
                 </div>
-                <span className="text-[10px] text-slate-500 font-mono shrink-0">{racer.runtime_ms.toFixed(2)}ms</span>
-              </div>
-            ))}
+              );
+            })}
         </div>
       </div>
 
