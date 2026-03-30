@@ -366,7 +366,7 @@ export default function RouteOptimization() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsRaceOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 text-xs font-semibold hover:bg-amber-500/25 transition"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/15 border border-orange-500/40 text-orange-400 text-xs font-semibold hover:bg-orange-500/25 transition"
                   >
                     <Flag size={11} />
                     Race Mode
