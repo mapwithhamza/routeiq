@@ -205,6 +205,7 @@
 | 17 | 2026-03-30 | Google OAuth fix — get_current_user updated to accept Bearer token header; axios.ts interceptor added; AuthCallback.tsx stores token in sessionStorage. Toast position changed to top-center. Modal.tsx — light mode fix + React Portal (z-[200]). AddressAutocomplete.tsx — full light mode fix. Button.tsx — light mode fix for all variants. Layout.tsx — removed double min-h-screen. RouteOptimization.tsx — Add Delivery map click fixed (missing address field). Block Road replaced with Clear Route button. | Session 15 Done |
 | 18 | 2026-03-30 | Algorithm Race Mode v3 — deduplicated OSRM calls (unique segments only), toggleable algorithm filter cards, colored active borders, improved runtime text visibility | Race Mode v3 Done |
 | 19 | 2026-03-30 | Algorithm Race Mode v4 — fixed OSRM 429 rate limiting by switching from parallel to sequential segment fetching with 300ms delay | Race Mode v4 Done |
+| 20 | 2026-03-30 | Algorithm Complexity Visualizer added to AlgorithmComparison page — Big-O theoretical curves (O(n), O(n log n), O(n²), O(2ⁿ)) with actual benchmark data plotted on top, per-algorithm toggle buttons | Complexity Visualizer Done |
 
 ---
 

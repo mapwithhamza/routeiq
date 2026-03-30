@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import ReactECharts from 'echarts-for-react';
-import { Play, Trophy, BarChart3, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Play, Trophy, BarChart3, Clock, AlertCircle, CheckCircle2, TrendingUp } from 'lucide-react';
 
 import { routesApi } from '../lib/api';
 import type { BenchmarkResult } from '../types';
@@ -35,6 +35,36 @@ export default function AlgorithmComparison() {
   const [nodeSize, setNodeSize] = useState<NodeSize>(10);
   const [results, setResults] = useState<BenchmarkResult[] | null>(null);
   const [selectedAlgo, setSelectedAlgo] = useState<string | null>(null);
+
+  const [visibleAlgos, setVisibleAlgos] = useState<Set<string>>(new Set(ALL_ALGOS));
+
+  const toggleVisibleAlgo = (algo: string) => {
+    setVisibleAlgos(prev => {
+      const next = new Set(prev);
+      if (next.has(algo)) {
+        if (next.size === 1) return prev;
+        next.delete(algo);
+      } else {
+        next.add(algo);
+      }
+      return next;
+    });
+  };
+
+  // Big-O theoretical curves — values at n=10, 50, 200
+  const BIG_O_N = [10, 50, 200];
+  const bigOCurves: Record<string, number[]> = {
+    'O(n)':       BIG_O_N.map(n => n * 0.001),
+    'O(n log n)': BIG_O_N.map(n => n * Math.log2(n) * 0.001),
+    'O(n²)':      BIG_O_N.map(n => n * n * 0.0001),
+    'O(2ⁿ)':      BIG_O_N.map(n => Math.min(Math.pow(2, n) * 0.000001, 50)),
+  };
+  const BIG_O_COLORS: Record<string, string> = {
+    'O(n)':       '#94a3b8',
+    'O(n log n)': '#67e8f9',
+    'O(n²)':      '#fbbf24',
+    'O(2ⁿ)':      '#f87171',
+  };
 
   const benchmarkMut = useMutation({
     mutationFn: routesApi.benchmark,
@@ -125,6 +155,80 @@ export default function AlgorithmComparison() {
         }),
         emphasis: { itemStyle: { shadowBlur: 12, shadowColor: 'rgba(245,158,11,0.5)' } },
       },
+    ],
+  };
+
+  // Complexity Visualizer chart
+  const complexityChartOptions = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: any[]) => {
+        const n = params[0]?.axisValue;
+        let html = `<div style="font-weight:600;margin-bottom:4px">n = ${n} nodes</div>`;
+        params.forEach((p: any) => {
+          if (p.value != null) {
+            html += `<div style="display:flex;align-items:center;gap:6px">
+              <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color}"></span>
+              <span>${p.seriesName}:</span>
+              <span style="font-weight:600">${typeof p.value === 'number' ? p.value.toFixed(4) : p.value} ms</span>
+            </div>`;
+          }
+        });
+        return html;
+      },
+    },
+    legend: {
+      show: false,
+    },
+    grid: { top: 20, bottom: 50, left: 65, right: 20 },
+    xAxis: {
+      type: 'category' as const,
+      data: ['10', '50', '200'],
+      name: 'nodes (n)',
+      nameLocation: 'middle' as const,
+      nameGap: 30,
+      nameTextStyle: { color: '#64748b' },
+      axisLabel: { color: '#64748b' },
+      axisLine: { lineStyle: { color: '#334155' } },
+    },
+    yAxis: {
+      type: 'value' as const,
+      name: 'runtime (ms)',
+      nameTextStyle: { color: '#475569' },
+      axisLabel: { color: '#64748b' },
+      splitLine: { lineStyle: { color: '#1e293b' } },
+    },
+    series: [
+      // Theoretical Big-O lines
+      ...Object.entries(bigOCurves).map(([name, values]) => ({
+        name,
+        type: 'line' as const,
+        data: values,
+        smooth: true,
+        lineStyle: { color: BIG_O_COLORS[name], width: 1.5, type: 'dashed' as const },
+        itemStyle: { color: BIG_O_COLORS[name] },
+        symbol: 'none',
+        emphasis: { disabled: true },
+      })),
+      // Actual benchmark data per algorithm
+      ...ALL_ALGOS.filter(algo => visibleAlgos.has(algo)).map(algo => {
+        const points = [10, 50, 200].map(n => {
+          const row = (results ?? []).find(r => r.nodes === n && r.algorithm === algo && !r.algorithm.includes('_vs_'));
+          return row?.runtime_ms ?? null;
+        });
+        return {
+          name: algo,
+          type: 'line' as const,
+          data: points,
+          smooth: false,
+          lineStyle: { color: ALGO_COLORS[algo], width: 2.5 },
+          itemStyle: { color: ALGO_COLORS[algo] },
+          symbol: 'circle',
+          symbolSize: 8,
+          connectNulls: false,
+        };
+      }),
     ],
   };
 
@@ -386,6 +490,68 @@ export default function AlgorithmComparison() {
               </div>
             );
           })()}
+
+          {/* Algorithm Complexity Visualizer */}
+          <div className="rounded-xl shadow-md dark:shadow-none border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] p-5 mt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <TrendingUp size={14} className="text-violet-500 dark:text-violet-400" />
+                <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">
+                  Complexity Visualizer
+                  <span className="ml-1.5 text-gray-500 dark:text-slate-500 font-normal text-xs">theoretical vs actual runtime</span>
+                </h2>
+              </div>
+              {/* Algorithm toggles */}
+              <div className="flex flex-wrap gap-1.5">
+                {ALL_ALGOS.map(algo => {
+                  const active = visibleAlgos.has(algo);
+                  return (
+                    <button
+                      key={algo}
+                      onClick={() => toggleVisibleAlgo(algo)}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-150 border"
+                      style={{
+                        backgroundColor: active ? `${ALGO_COLORS[algo]}20` : 'transparent',
+                        borderColor: active ? ALGO_COLORS[algo] : '#334155',
+                        color: active ? ALGO_COLORS[algo] : '#64748b',
+                        opacity: active ? 1 : 0.5,
+                      }}
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: active ? ALGO_COLORS[algo] : '#475569' }}
+                      />
+                      {algo}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Big-O legend */}
+            <div className="flex flex-wrap gap-3 mb-3">
+              {Object.entries(BIG_O_COLORS).map(([name, color]) => (
+                <div key={name} className="flex items-center gap-1.5">
+                  <svg width="20" height="8"><line x1="0" y1="4" x2="20" y2="4" stroke={color} strokeWidth="1.5" strokeDasharray="4 2"/></svg>
+                  <span className="text-xs text-gray-500 dark:text-slate-400 font-mono">{name}</span>
+                </div>
+              ))}
+              <div className="flex items-center gap-1.5">
+                <svg width="20" height="8"><line x1="0" y1="4" x2="20" y2="4" stroke="#6366f1" strokeWidth="2.5"/><circle cx="10" cy="4" r="3" fill="#6366f1"/></svg>
+                <span className="text-xs text-gray-500 dark:text-slate-400">actual data</span>
+              </div>
+            </div>
+
+            <ReactECharts
+              option={complexityChartOptions}
+              style={{ height: 300 }}
+              theme={document.documentElement.classList.contains('dark') ? 'dark' : undefined}
+            />
+
+            <p className="text-xs text-gray-400 dark:text-slate-600 mt-3 text-center">
+              Dashed lines = theoretical Big-O curves · Solid lines = your actual benchmark measurements · Click algorithm buttons to toggle visibility
+            </p>
+          </div>
         </>
       )}
 
