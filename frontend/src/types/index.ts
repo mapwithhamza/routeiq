@@ -121,6 +121,16 @@ export interface OptimizeResponse {
   results: AlgorithmResult[];
 }
 
+export interface SavedRoute {
+  id: number;
+  name: string;
+  rider_id: number | null;
+  status: string;
+  created_at: string;
+  waypoints_json: string | null;
+  algorithm_results_json: string | null;
+}
+
 export interface BenchmarkResult {
   algorithm: string;
   nodes: number;

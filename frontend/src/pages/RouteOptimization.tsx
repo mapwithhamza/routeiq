@@ -10,6 +10,8 @@ import { Map as MapIcon, Zap, Plus, X, ChevronDown, Activity, Navigation, Flag, 
 
 import MainMap from '../components/map/MainMap';
 import AlgorithmRace from '../components/AlgorithmRace';
+import SavedRoutes from '../components/SavedRoutes';
+import ExportPDF from '../components/ExportPDF';
 import { deliveriesApi, ridersApi, routesApi } from '../lib/api';
 import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
@@ -27,6 +29,15 @@ export default function RouteOptimization() {
     setOptResponse(null);
     setOsrmRoute(null);
     setSelectedAlgoName('');
+  };
+
+  const handleRestoreRoute = (response: OptimizeResponse) => {
+    setOptResponse(response);
+    if (response.results && response.results.length > 0) {
+      const p = response.results.find(r => r.algorithm === 'TSP-DP') || response.results[0];
+      setSelectedAlgoName(p.algorithm);
+    }
+    setOsrmRoute(null);
   };
   const [selectedRiderId, setSelectedRiderId] = useState<number | ''>('');
 
@@ -424,8 +435,18 @@ export default function RouteOptimization() {
                   Select an algorithm to view metrics.
                 </p>
               )}
+
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-700/50">
+                <ExportPDF
+                  optResponse={optResponse}
+                  riderName={activeRider?.name}
+                />
+              </div>
             </div>
           )}
+
+          {/* Saved Routes */}
+          <SavedRoutes onRestore={handleRestoreRoute} />
 
           {/* Empty State */}
           {!optResponse && (

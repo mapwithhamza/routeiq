@@ -208,6 +208,7 @@
 | 20 | 2026-03-30 | Algorithm Complexity Visualizer added to AlgorithmComparison page — Big-O theoretical curves (O(n), O(n log n), O(n²), O(2ⁿ)) with actual benchmark data plotted on top, per-algorithm toggle buttons | Complexity Visualizer Done |
 | 21 | 2026-03-30 | Heatmap Layer added — delivery density heatmap on Route Optimization page (priority-weighted, cyan→indigo→red), rider density heatmap on Riders page (status-weighted, green→cyan→violet), toggle buttons on both pages | Heatmap Done |
 | 22 | 2026-03-30 | Saved Routes backend — added waypoints_json and algorithm_results_json to Route model, GET /routes endpoint, POST /routes/optimize now persists full waypoints and results, Alembic migration run | Saved Routes Backend Done |
+| 23 | 2026-03-30 | Saved Routes + PDF Export frontend — SavedRoutes collapsible panel with restore button, ExportPDF component with jsPDF + autotable generating professional report with header, algorithm table, waypoint list, footer | Saved Routes + PDF Done |
 
 ---
 

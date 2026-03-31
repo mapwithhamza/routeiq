@@ -19,6 +19,7 @@ import type {
   AnalyticsSummary,
   AlgorithmRunSummary,
   Route,
+  SavedRoute,
 } from '../types';
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -72,7 +73,7 @@ export const ridersApi = {
 // ── Routes / Optimization ────────────────────────────────────────────────────
 
 export const routesApi = {
-  list: () =>
+  list: (): Promise<SavedRoute[]> =>
     api.get('/routes').then(r => r.data),
 
   optimize: (data: OptimizeRequest) =>
