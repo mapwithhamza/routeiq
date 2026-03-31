@@ -33,6 +33,9 @@ class Delivery(Base):
     priority: Mapped[DeliveryPriority] = mapped_column(SAEnum(DeliveryPriority), nullable=False, default=DeliveryPriority.medium)
     status: Mapped[DeliveryStatus] = mapped_column(SAEnum(DeliveryStatus), nullable=False, default=DeliveryStatus.pending)
     rider_id: Mapped[Optional[int]] = mapped_column(ForeignKey("riders.id", ondelete="SET NULL"), nullable=True, index=True)
+    delivery_fee: Mapped[float] = mapped_column(Float, nullable=False, default=500.0)
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     rider = relationship("Rider", backref="deliveries", lazy="selectin")

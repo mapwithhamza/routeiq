@@ -170,3 +170,24 @@ export interface AlgorithmRunSummary {
   runtime_ms: number | null;
   created_at: string;
 }
+
+// ── Transactions ─────────────────────────────────────────────────────────────
+
+export interface Transaction {
+  id: number;
+  delivery_id: number;
+  rider_id: number | null;
+  amount: number;
+  status: 'completed' | 'pending' | 'failed';
+  description: string | null;
+  created_at: string;
+}
+
+export interface RevenueAnalytics {
+  total_revenue: number;
+  today_revenue: number;
+  this_week_revenue: number;
+  this_month_revenue: number;
+  total_transactions: number;
+  completed_transactions: number;
+}

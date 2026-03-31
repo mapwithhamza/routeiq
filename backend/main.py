@@ -32,6 +32,7 @@ from routers import deliveries as deliveries_router
 from routers import riders as riders_router
 from routers import analytics as analytics_router
 from routers import routes as routes_router
+from routers import transactions as transactions_router
 
 app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
 app.include_router(google_auth_router.router, prefix="/auth", tags=["auth"])
@@ -39,4 +40,5 @@ app.include_router(deliveries_router.router, prefix="/deliveries", tags=["delive
 app.include_router(riders_router.router, prefix="/riders", tags=["riders"])
 app.include_router(analytics_router.router, prefix="/analytics", tags=["analytics"])
 app.include_router(routes_router.router, prefix="/routes", tags=["routes"])
+app.include_router(transactions_router.router, prefix="/transactions", tags=["transactions"])
 

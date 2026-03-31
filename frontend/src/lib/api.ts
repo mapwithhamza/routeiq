@@ -95,3 +95,10 @@ export const analyticsApi = {
   algorithms: () =>
     api.get<AlgorithmRunSummary[]>('/analytics/algorithms').then((r) => r.data),
 };
+
+// ── Transactions ─────────────────────────────────────────────────────────────
+
+export const transactionsApi = {
+  list: () => api.get('/transactions').then(r => r.data),
+  revenue: () => api.get('/transactions/revenue').then(r => r.data),
+};

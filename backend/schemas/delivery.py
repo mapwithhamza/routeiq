@@ -9,8 +9,10 @@ class DeliveryCreate(BaseModel):
     address: str
     lat: float
     lon: float
-    priority: DeliveryPriority = DeliveryPriority.medium
+    priority: DeliveryPriority = DeliveryPriority.normal
     rider_id: Optional[int] = None
+    delivery_fee: float = 500.0
+    notes: Optional[str] = None
 
 
 class DeliveryUpdate(BaseModel):
@@ -21,6 +23,8 @@ class DeliveryUpdate(BaseModel):
     priority: Optional[DeliveryPriority] = None
     status: Optional[DeliveryStatus] = None
     rider_id: Optional[int] = None
+    delivery_fee: Optional[float] = None
+    notes: Optional[str] = None
 
 
 class DeliveryRead(BaseModel):
@@ -32,6 +36,8 @@ class DeliveryRead(BaseModel):
     priority: DeliveryPriority
     status: DeliveryStatus
     rider_id: Optional[int]
+    delivery_fee: float
+    notes: Optional[str]
     created_at: datetime
 
     model_config = {"from_attributes": True}
