@@ -72,6 +72,9 @@ export const ridersApi = {
 // ── Routes / Optimization ────────────────────────────────────────────────────
 
 export const routesApi = {
+  list: () =>
+    api.get('/routes').then(r => r.data),
+
   optimize: (data: OptimizeRequest) =>
     api.post<OptimizeResponse>('/routes/optimize', data).then((r) => r.data),
 

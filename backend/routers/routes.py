@@ -6,6 +6,7 @@ GET  /routes/{id}      — fetch a stored route with its stops + algorithm runs
 POST /routes/benchmark — run the benchmark suite and return raw results
 """
 
+import json
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -17,7 +18,7 @@ from database import get_db
 from models.route import Route, RouteStatus
 from models.algorithm_run import AlgorithmRun
 from models.user import User
-from schemas.route import RouteRead
+from schemas.route import RouteRead, RouteSummary
 
 from dsa.graph import build_from_coords
 from dsa.bfs import bfs
@@ -136,6 +137,22 @@ async def optimize_route(
 
         algo_results.append(AlgorithmResult(**res))
 
+    # Save waypoints and results as JSON
+    route_obj.waypoints_json = json.dumps([
+        {"lat": wp.lat, "lon": wp.lon, "label": wp.label}
+        for wp in payload.waypoints
+    ])
+    route_obj.algorithm_results_json = json.dumps([
+        {
+            "algorithm": r.algorithm,
+            "route": r.route,
+            "distance": r.distance,
+            "time": r.time,
+            "nodes_explored": r.nodes_explored,
+            "runtime_ms": r.runtime_ms,
+        }
+        for r in algo_results
+    ])
     await db.flush()
 
     return OptimizeResponse(
@@ -144,6 +161,18 @@ async def optimize_route(
         waypoints=payload.waypoints,
         results=algo_results,
     )
+
+
+# ── GET /routes ───────────────────────────────────────────────────────────────
+@router.get("", response_model=list[RouteSummary])
+async def list_routes(
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    """Return all saved routes, newest first."""
+    result = await db.execute(select(Route).order_by(Route.created_at.desc()))
+    routes = result.scalars().all()
+    return routes
 
 
 # ── GET /routes/{id} ──────────────────────────────────────────────────────────
