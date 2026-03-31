@@ -54,6 +54,7 @@ export type DeliveryUpdateForm = z.infer<typeof deliveryUpdateSchema>;
 export const riderCreateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(255),
   phone: z.string().max(20).optional().nullable(),
+  email: z.string().email('Invalid email').optional().nullable().or(z.literal('')),
   vehicle_type: z.string().max(100).optional().nullable(),
   current_lat: z.number().min(-90).max(90).optional().nullable(),
   current_lon: z.number().min(-180).max(180).optional().nullable(),

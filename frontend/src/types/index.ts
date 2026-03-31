@@ -29,6 +29,7 @@ export interface Rider {
   id: number;
   name: string;
   phone: string | null;
+  email: string | null;
   vehicle_type: string | null;
   status: 'available' | 'on_route' | 'offline';
   current_lat: number | null;
@@ -39,6 +40,7 @@ export interface Rider {
 export interface RiderCreate {
   name: string;
   phone?: string | null;
+  email?: string | null;
   vehicle_type?: string | null;
   current_lat?: number | null;
   current_lon?: number | null;

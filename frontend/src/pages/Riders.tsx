@@ -191,6 +191,8 @@ export default function Riders() {
                             {rider.name}
                           </h3>
                           <p className="text-xs text-gray-500 dark:text-[#8B949E] capitalize">{rider.vehicle_type || 'Unknown'}</p>
+                          {rider.phone && <p className="text-xs text-gray-400 dark:text-slate-500">{rider.phone}</p>}
+                          {rider.email && <p className="text-xs text-gray-400 dark:text-slate-500 truncate max-w-[120px]">{rider.email}</p>}
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -411,6 +413,30 @@ export default function Riders() {
                   } px-3 py-2 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition`}
                 />
                 {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name.message}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Phone</label>
+                  <input
+                    {...register('phone')}
+                    type="tel"
+                    placeholder="e.g. 0300-1234567"
+                    className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Email</label>
+                  <input
+                    {...register('email')}
+                    type="email"
+                    placeholder="e.g. ali@example.com"
+                    className={`w-full rounded-lg bg-white dark:bg-slate-900/60 border ${
+                      errors.email ? 'border-red-500/60' : 'border-gray-300 dark:border-slate-700/60'
+                    } px-3 py-2 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition`}
+                  />
+                  {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email.message}</p>}
+                </div>
               </div>
 
               <div>
