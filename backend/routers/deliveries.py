@@ -5,6 +5,7 @@ POST   /deliveries          — create a delivery
 PUT    /deliveries/{id}     — update a delivery (auto-creates transaction on delivered)
 DELETE /deliveries/{id}     — delete a delivery
 """
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -57,6 +58,7 @@ async def update_delivery(
     update_data = payload.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(delivery, field, value)
+    delivery.updated_at = datetime.now(timezone.utc)
 
     # Auto-create transaction when delivery is marked as delivered
     if (

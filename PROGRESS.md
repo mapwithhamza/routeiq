@@ -211,6 +211,7 @@
 | 23 | 2026-03-30 | Saved Routes + PDF Export frontend — SavedRoutes collapsible panel with restore button, ExportPDF component with jsPDF + autotable generating professional report with header, algorithm table, waypoint list, footer | Saved Routes + PDF Done |
 | 24 | 2026-03-31 | Transactions backend — Transaction model, auto-created on delivery status→delivered, GET /transactions, GET /transactions/revenue, delivery_fee field on Delivery, Alembic migration | Transactions Backend Done |
 | 25 | 2026-03-31 | Transactions frontend — Transactions page with revenue cards, transaction history table, sidebar nav item, Dashboard revenue card | Transactions Frontend Done |
+| 26 | 2026-03-31 | Fixed delivery update 500 error — removed onupdate from updated_at, set manually in update endpoint. Fixed CORS for transactions by redeploying Render. | Bug Fix Done |
 
 ---
 
