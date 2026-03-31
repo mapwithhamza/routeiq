@@ -14,6 +14,7 @@ import Deliveries from './pages/Deliveries';
 import Riders from './pages/Riders';
 import RouteOptimization from './pages/RouteOptimization';
 import AlgorithmComparison from './pages/AlgorithmComparison';
+import Transactions from './pages/Transactions';
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/riders"     element={<Riders />} />
         <Route path="/routes"     element={<RouteOptimization />} />
         <Route path="/algorithms" element={<AlgorithmComparison />} />
+        <Route path="/transactions" element={<Transactions />} />
       </Route>
 
       {/* Root: redirect to dashboard (ProtectedRoute will then redirect to /login if needed) */}

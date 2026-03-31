@@ -5,8 +5,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import ReactECharts from 'echarts-for-react';
-import { Package, Users, Route, TrendingUp, ArrowUpRight } from 'lucide-react';
-import { analyticsApi } from '../lib/api';
+import { Package, Users, Route, TrendingUp, ArrowUpRight, DollarSign } from 'lucide-react';
+import { analyticsApi, transactionsApi } from '../lib/api';
 import Spinner from '../components/ui/Spinner';
 
 // Fixed ordered labels for the 7 algorithms used in RouteIQ
@@ -39,6 +39,11 @@ export default function Dashboard() {
   const algoQuery = useQuery({
     queryKey: ['analytics', 'algorithms'],
     queryFn: analyticsApi.algorithms,
+  });
+
+  const { data: revenue } = useQuery({
+    queryKey: ['revenue'],
+    queryFn: transactionsApi.revenue,
   });
 
   if (sumQuery.isLoading || algoQuery.isLoading) {
@@ -78,6 +83,15 @@ export default function Dashboard() {
   };
 
   const metricCards = [
+    {
+      label: 'Total Revenue',
+      value: `Rs. ${(revenue?.total_revenue || 0).toLocaleString()}`,
+      sub: `${revenue?.completed_transactions || 0} transactions`,
+      Icon: DollarSign,
+      gradient: 'dark:from-emerald-500/20 dark:to-teal-500/10',
+      iconColor: 'text-emerald-500 dark:text-emerald-400',
+      ring: 'dark:ring-emerald-500/20 ring-gray-100',
+    },
     {
       label: 'Total Deliveries',
       value: totalDeliveries,
@@ -138,7 +152,7 @@ export default function Dashboard() {
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {metricCards.map(({ label, value, sub, Icon, gradient, iconColor, ring }) => (
           <div
             key={label}

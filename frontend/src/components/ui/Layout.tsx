@@ -49,6 +49,7 @@ import {
   Moon,
   Search,
   Truck,
+  DollarSign,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../context/ThemeContext';
@@ -59,6 +60,7 @@ const navItems = [
   { to: '/riders', label: 'Riders', Icon: Users },
   { to: '/routes', label: 'Optimization', Icon: Map },
   { to: '/algorithms', label: 'Algorithms', Icon: BarChart3 },
+  { to: '/transactions', label: 'Transactions', Icon: DollarSign },
 ];
 
 export default function Layout() {
