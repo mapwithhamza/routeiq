@@ -6,6 +6,7 @@ from models.route import Route
 from models.route_stop import RouteStop
 from models.road_condition import RoadCondition
 from models.algorithm_run import AlgorithmRun
+from models.transaction import Transaction
 
 __all__ = [
     "User",
@@ -15,4 +16,5 @@ __all__ = [
     "RouteStop",
     "RoadCondition",
     "AlgorithmRun",
+    "Transaction",
 ]
