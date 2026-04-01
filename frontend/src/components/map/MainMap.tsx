@@ -213,13 +213,25 @@ export default function MainMap({
             anchor="center"
           >
             <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-cyan-500 border-3 border-white shadow-xl flex items-center justify-center animate-pulse">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
+              <div className="w-12 h-12 rounded-full bg-cyan-500 border-2 border-white shadow-xl flex items-center justify-center">
+                {(!rider?.vehicle_type || rider.vehicle_type === 'bike') && (
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                )}
+                {rider?.vehicle_type === 'car' && (
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7-7-7 7M5 9v11a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V9" />
+                  </svg>
+                )}
+                {(rider?.vehicle_type === 'truck' || rider?.vehicle_type === 'van') && (
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                )}
               </div>
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-cyan-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
-                LIVE
+                {rider?.name || 'LIVE'}
               </div>
             </div>
           </Marker>
