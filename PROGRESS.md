@@ -218,6 +218,7 @@
 | 30 | 2026-04-01 | Dashboard: Fixed implicit any error in transactions map by adding explicit :any type. Verified with tsc --noEmit and pushed. | Dashboard Map Typo Fix |
 | 31 | 2026-04-01 | Real-time delivery tracking simulation — rider marker animates along OSRM route, speed control (slow/normal/fast), stop button, completion toast | Simulation Done |
 | 32 | 2026-04-01 | Simulation marker improved — vehicle icon matches rider type (bike/car/truck/van), shows rider name instead of LIVE | Simulation v2 Done |
+| 33 | 2026-04-01 | Simulation marker v3 — proper vehicle SVG icons (bike/car/truck/van) without circle background, Uber-style moving marker | Simulation v3 Done |
 
 ---
 
