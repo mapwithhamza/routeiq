@@ -3,10 +3,10 @@
  * 70/30 split, full viewport height map, route colored by priority.
  * All API calls, hooks, OSRM logic preserved untouched.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Map as MapIcon, Zap, Plus, X, ChevronDown, Activity, Navigation, Flag, Flame } from 'lucide-react';
+import { Map as MapIcon, Zap, Plus, X, ChevronDown, Activity, Navigation, Flag, Flame, Truck, StopCircle } from 'lucide-react';
 
 import MainMap from '../components/map/MainMap';
 import AlgorithmRace from '../components/AlgorithmRace';
@@ -31,6 +31,43 @@ export default function RouteOptimization() {
     setSelectedAlgoName('');
   };
 
+  const handleStartSimulation = () => {
+    if (!osrmRoute || osrmRoute.length < 2) return;
+    if (simFrameRef.current) cancelAnimationFrame(simFrameRef.current);
+    simIndexRef.current = 0;
+    setIsSimulating(true);
+    setSimulationPosition(osrmRoute[0]);
+
+    const speedMap = { slow: 30, normal: 15, fast: 5 };
+    const stepEvery = speedMap[simSpeed];
+    let lastTime = 0;
+
+    const animate = (timestamp: number) => {
+      if (timestamp - lastTime < stepEvery) {
+        simFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastTime = timestamp;
+      simIndexRef.current += 1;
+      if (simIndexRef.current >= osrmRoute!.length) {
+        setIsSimulating(false);
+        setSimulationPosition(null);
+        toast.success('Delivery simulation complete!');
+        return;
+      }
+      setSimulationPosition(osrmRoute![simIndexRef.current]);
+      simFrameRef.current = requestAnimationFrame(animate);
+    };
+    simFrameRef.current = requestAnimationFrame(animate);
+  };
+
+  const handleStopSimulation = () => {
+    if (simFrameRef.current) cancelAnimationFrame(simFrameRef.current);
+    setIsSimulating(false);
+    setSimulationPosition(null);
+    simIndexRef.current = 0;
+  };
+
   const handleRestoreRoute = (response: OptimizeResponse) => {
     setOptResponse(response);
     if (response.results && response.results.length > 0) {
@@ -45,6 +82,11 @@ export default function RouteOptimization() {
   const [selectedAlgoName, setSelectedAlgoName] = useState<string>('');
   const [osrmRoute, setOsrmRoute] = useState<[number, number][] | null>(null);
   const [isOsrmLoading, setIsOsrmLoading] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simulationPosition, setSimulationPosition] = useState<[number, number] | null>(null);
+  const [simSpeed, setSimSpeed] = useState<'slow' | 'normal' | 'fast'>('normal');
+  const simFrameRef = useRef<number | null>(null);
+  const simIndexRef = useRef(0);
 
   // Data fetch
   const { data: deliveries, isLoading: deliveriesLoading } = useQuery({
@@ -303,6 +345,7 @@ export default function RouteOptimization() {
             isBlockedRoadMode={isBlockedMode}
             onMapClick={handleMapClick}
             showHeatmap={showHeatmap}
+            simulationPosition={simulationPosition}
           />
           {(optimizeMut.isPending || isOsrmLoading) && (
             <div className="absolute inset-0 bg-slate-950/70 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
@@ -436,7 +479,39 @@ export default function RouteOptimization() {
                 </p>
               )}
 
-              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-700/50">
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-700/50 space-y-2">
+                {osrmRoute && osrmRoute.length > 0 && (
+                  <div className="space-y-2">
+                    {!isSimulating ? (
+                      <div className="flex gap-2">
+                        <select
+                          value={simSpeed}
+                          onChange={e => setSimSpeed(e.target.value as 'slow' | 'normal' | 'fast')}
+                          className="flex-1 rounded-lg bg-white dark:bg-slate-900/60 border border-gray-200 dark:border-slate-700/60 px-2 py-1.5 text-xs text-gray-700 dark:text-slate-300 outline-none"
+                        >
+                          <option value="slow">Slow</option>
+                          <option value="normal">Normal</option>
+                          <option value="fast">Fast</option>
+                        </select>
+                        <button
+                          onClick={handleStartSimulation}
+                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 text-xs font-semibold hover:bg-cyan-500/25 transition"
+                        >
+                          <Truck size={12} />
+                          Simulate
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleStopSimulation}
+                        className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/15 border border-red-500/30 text-red-500 dark:text-red-400 text-xs font-semibold hover:bg-red-500/25 transition animate-pulse"
+                      >
+                        <StopCircle size={12} />
+                        Stop Simulation
+                      </button>
+                    )}
+                  </div>
+                )}
                 <ExportPDF
                   optResponse={optResponse}
                   riderName={activeRider?.name}

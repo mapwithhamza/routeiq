@@ -12,6 +12,7 @@ interface MainMapProps {
   isBlockedRoadMode?: boolean;
   osrmCoordinates?: [number, number][];
   showHeatmap?: boolean;
+  simulationPosition?: [number, number] | null;
 }
 
 export default function MainMap({
@@ -23,6 +24,7 @@ export default function MainMap({
   isBlockedRoadMode,
   osrmCoordinates,
   showHeatmap = false,
+  simulationPosition = null,
 }: MainMapProps) {
   const [popupInfo, setPopupInfo] = useState<Delivery | null>(null);
   const [dashOffset, setDashOffset] = useState(0);
@@ -202,6 +204,26 @@ export default function MainMap({
              </Marker>
           );
         })}
+
+        {/* Simulation Rider Marker */}
+        {simulationPosition && (
+          <Marker
+            longitude={simulationPosition[0]}
+            latitude={simulationPosition[1]}
+            anchor="center"
+          >
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full bg-cyan-500 border-3 border-white shadow-xl flex items-center justify-center animate-pulse">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </div>
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-cyan-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                LIVE
+              </div>
+            </div>
+          </Marker>
+        )}
 
         {/* Popup */}
         {popupInfo && (
