@@ -5,8 +5,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import ReactECharts from 'echarts-for-react';
-import { Package, Users, Route, TrendingUp, ArrowUpRight, DollarSign } from 'lucide-react';
-import { analyticsApi, transactionsApi } from '../lib/api';
+import { Package, Users, Route, TrendingUp, ArrowUpRight, DollarSign, Clock, CheckCircle2, XCircle, Activity } from 'lucide-react';
+import { analyticsApi, transactionsApi, deliveriesApi } from '../lib/api';
 import Spinner from '../components/ui/Spinner';
 
 // Fixed ordered labels for the 7 algorithms used in RouteIQ
@@ -46,6 +46,16 @@ export default function Dashboard() {
     queryFn: transactionsApi.revenue,
   });
 
+  const { data: recentDeliveries } = useQuery({
+    queryKey: ['deliveries'],
+    queryFn: deliveriesApi.list,
+  });
+
+  const { data: recentTransactions } = useQuery({
+    queryKey: ['transactions'],
+    queryFn: transactionsApi.list,
+  });
+
   if (sumQuery.isLoading || algoQuery.isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -71,6 +81,25 @@ export default function Dashboard() {
   const hasAlgoData = avgRuntimes.some((v) => v !== null);
 
   const totalDeliveries = sum?.total_deliveries || 0;
+
+  const deliveredToday = (recentDeliveries || []).filter(d => {
+    const date = new Date(d.created_at);
+    const today = new Date();
+    return d.status === 'delivered' &&
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth();
+  }).length;
+
+  const failedToday = (recentDeliveries || []).filter(d => {
+    const date = new Date(d.created_at);
+    const today = new Date();
+    return d.status === 'failed' &&
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth();
+  }).length;
+
+  const last5Deliveries = (recentDeliveries || []).slice(0, 5);
+  const last5Transactions = (recentTransactions || []).slice(0, 5);
 
   const statusValues: Record<string, number> = {
     pending:    sum?.pending || 0,
@@ -274,6 +303,88 @@ export default function Dashboard() {
               />
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Quick Stats Strip */}
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { label: 'Pending Now', value: statusValues['pending'] || 0, color: 'text-amber-500 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', icon: Clock },
+          { label: 'Delivered Today', value: deliveredToday, color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', icon: CheckCircle2 },
+          { label: 'Failed Today', value: failedToday, color: 'text-red-500 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-500/10', icon: XCircle },
+        ].map(({ label, value, color, bg, icon: Icon }) => (
+          <div key={label} className="rounded-xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] shadow-md dark:shadow-none p-4 flex items-center gap-4">
+            <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+              <Icon size={18} className={color} />
+            </div>
+            <div>
+              <p className={`text-2xl font-bold font-mono ${color}`}>{value}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom Row — Recent Activity + Recent Transactions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Deliveries */}
+        <div className="rounded-xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] shadow-md dark:shadow-none overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-gray-200 dark:border-[#30363D] bg-gray-50 dark:bg-[#161B22] flex items-center gap-2">
+            <Activity size={14} className="text-gray-500 dark:text-[#8B949E]" />
+            <h2 className="text-sm font-semibold text-gray-800 dark:text-[#E6EDF3]">Recent Deliveries</h2>
+          </div>
+          <div className="divide-y divide-gray-100 dark:divide-[#30363D]">
+            {last5Deliveries.length === 0 ? (
+              <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">No deliveries yet.</p>
+            ) : (
+              last5Deliveries.map(d => (
+                <div key={d.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 dark:hover:bg-[#262D36] transition">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-[#E6EDF3] truncate">{d.title}</p>
+                    <p className="text-xs text-gray-400 dark:text-slate-500 truncate">{d.address || 'No address'}</p>
+                  </div>
+                  <span className={`ml-3 shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+                    d.status === 'delivered' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' :
+                    d.status === 'pending' ? 'bg-amber-500/15 text-amber-400 border-amber-500/30' :
+                    d.status === 'failed' ? 'bg-red-500/15 text-red-400 border-red-500/30' :
+                    d.status === 'in_transit' ? 'bg-blue-500/15 text-blue-400 border-blue-500/30' :
+                    'bg-violet-500/15 text-violet-400 border-violet-500/30'
+                  }`}>
+                    {d.status.replace('_', ' ')}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Recent Transactions */}
+        <div className="rounded-xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] shadow-md dark:shadow-none overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-gray-200 dark:border-[#30363D] bg-gray-50 dark:bg-[#161B22] flex items-center gap-2">
+            <DollarSign size={14} className="text-gray-500 dark:text-[#8B949E]" />
+            <h2 className="text-sm font-semibold text-gray-800 dark:text-[#E6EDF3]">Recent Transactions</h2>
+          </div>
+          <div className="divide-y divide-gray-100 dark:divide-[#30363D]">
+            {last5Transactions.length === 0 ? (
+              <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">No transactions yet.</p>
+            ) : (
+              last5Transactions.map(tx => (
+                <div key={tx.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 dark:hover:bg-[#262D36] transition">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-[#E6EDF3] truncate">
+                      {tx.description || `Delivery #${tx.delivery_id}`}
+                    </p>
+                    <p className="text-xs text-gray-400 dark:text-slate-500">
+                      {new Date(tx.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <span className="ml-3 shrink-0 text-sm font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                    Rs. {tx.amount.toLocaleString()}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>

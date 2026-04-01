@@ -214,6 +214,7 @@
 | 26 | 2026-03-31 | Fixed delivery update 500 error — removed onupdate from updated_at, set manually in update endpoint. Fixed CORS for transactions by redeploying Render. | Bug Fix Done |
 | 27 | 2026-03-31 | Transaction model properly registered in models/__init__.py, migration generated and applied to create transactions table, verified tsc --noEmit: 0 errors | Transactions Migration Done |
 | 28 | 2026-03-31 | Rider contact info — added email field to Rider model, schemas, Zod schema, Add Rider form now has phone + email fields, rider cards show contact info | Rider Contact Info Done |
+| 29 | 2026-03-31 | Dashboard improvements — added recent deliveries table, recent transactions table, quick stats strip (pending/delivered today/failed today) | Dashboard v2 Done |
 
 ---
 
