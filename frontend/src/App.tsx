@@ -15,6 +15,7 @@ import Riders from './pages/Riders';
 import RouteOptimization from './pages/RouteOptimization';
 import AlgorithmComparison from './pages/AlgorithmComparison';
 import Transactions from './pages/Transactions';
+import Profile from './pages/Profile';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/routes"     element={<RouteOptimization />} />
         <Route path="/algorithms" element={<AlgorithmComparison />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
 
       {/* Root: redirect to dashboard (ProtectedRoute will then redirect to /login if needed) */}

@@ -50,6 +50,7 @@ import {
   Search,
   Truck,
   DollarSign,
+  User,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../context/ThemeContext';
@@ -79,6 +80,9 @@ export default function Layout() {
   // Notifications State
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
+  const [isAvatarOpen, setIsAvatarOpen] = useState(false);
+  useOnClickOutside(avatarRef, () => setIsAvatarOpen(false));
   useOnClickOutside(notifRef, () => setIsNotifOpen(false));
   const [readNotifs, setReadNotifs] = useState<number[]>(() => {
     const saved = localStorage.getItem('routeiq_read_notifs');
@@ -362,13 +366,37 @@ export default function Layout() {
             </button>
 
             {/* Avatar */}
-            {user?.picture_url ? (
-              <img src={user.picture_url} alt="Avatar" className="w-8 h-8 rounded-full ml-1 cursor-pointer ring-2 ring-cyan-500/20 hover:ring-cyan-500/50 transition object-cover" />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ml-1 cursor-pointer ring-2 ring-cyan-500/20 hover:ring-cyan-500/50 transition">
-                {initials}
-              </div>
-            )}
+            <div className="relative" ref={avatarRef}>
+              <button onClick={() => setIsAvatarOpen(p => !p)}>
+                {user?.picture_url ? (
+                  <img src={user.picture_url} alt="Avatar" className="w-8 h-8 rounded-full ml-1 cursor-pointer ring-2 ring-cyan-500/20 hover:ring-cyan-500/50 transition object-cover" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ml-1 cursor-pointer ring-2 ring-cyan-500/20 hover:ring-cyan-500/50 transition">
+                    {initials}
+                  </div>
+                )}
+              </button>
+              {isAvatarOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#1C2128] border border-gray-200 dark:border-[#30363D] shadow-lg rounded-xl overflow-hidden z-50 animate-fade-in">
+                  <NavLink
+                    to="/profile"
+                    onClick={() => setIsAvatarOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700/40 transition"
+                  >
+                    <User size={14} />
+                    Profile
+                  </NavLink>
+                  <div className="border-t border-gray-200 dark:border-[#30363D]" />
+                  <button
+                    onClick={() => { logout(); setIsAvatarOpen(false); }}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition"
+                  >
+                    <LogOut size={14} />
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

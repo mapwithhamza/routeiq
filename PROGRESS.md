@@ -218,6 +218,7 @@
 | 30 | 2026-04-01 | Dashboard: Fixed implicit any error in transactions map by adding explicit :any type. Verified with tsc --noEmit and pushed. | Dashboard Map Typo Fix |
 | 31 | 2026-04-01 | Real-time delivery tracking simulation — rider marker animates along OSRM route, speed control (slow/normal/fast), stop button, completion toast | Simulation Done |
 | 33 | 2026-04-01 | Profile page backend — display_name field, PATCH /auth/profile, POST /auth/change-password, DELETE /auth/account, Alembic migration | Profile Backend Done |
+| 34 | 2026-04-01 | Profile page frontend — display name, change password, account info, danger zone delete, avatar dropdown with profile link | Profile Frontend Done |
 
 ---
 
