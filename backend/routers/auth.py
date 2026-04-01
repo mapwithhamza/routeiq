@@ -20,7 +20,7 @@ from auth import (
 from config import settings
 from database import get_db
 from models.user import User
-from schemas.user import UserCreate, UserLogin, UserRead
+from schemas.user import UserCreate, UserLogin, UserRead, ProfileUpdate, ChangePassword
 
 router = APIRouter()
 
@@ -84,3 +84,49 @@ async def logout(response: Response):
 @router.get("/me", response_model=UserRead)
 async def me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+# ── PATCH /auth/profile ───────────────────────────────────────────────────────
+@router.patch("/profile", response_model=UserRead)
+async def update_profile(
+    payload: ProfileUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if payload.display_name is not None:
+        current_user.display_name = payload.display_name
+    await db.flush()
+    await db.refresh(current_user)
+    return current_user
+
+
+# ── POST /auth/change-password ────────────────────────────────────────────────
+@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+async def change_password(
+    payload: ChangePassword,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if not current_user.hashed_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot change password for Google OAuth accounts"
+        )
+    if not verify_password(payload.current_password, current_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current password is incorrect"
+        )
+    current_user.hashed_password = hash_password(payload.new_password)
+    await db.flush()
+
+
+# ── DELETE /auth/account ──────────────────────────────────────────────────────
+@router.delete("/account", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_account(
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    await db.delete(current_user)
+    response.delete_cookie(key=_COOKIE_NAME, samesite="none", secure=True)

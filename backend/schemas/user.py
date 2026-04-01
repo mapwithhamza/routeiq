@@ -1,5 +1,6 @@
+from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from models.user import UserRole
 
 
@@ -21,5 +22,15 @@ class UserRead(BaseModel):
     is_active: bool
     created_at: datetime
     picture_url: str | None = None
+    display_name: Optional[str] = None
 
     model_config = {"from_attributes": True}
+
+
+class ProfileUpdate(BaseModel):
+    display_name: Optional[str] = None
+
+
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=8)

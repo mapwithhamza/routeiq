@@ -11,6 +11,7 @@ export interface User {
   is_active: boolean;
   created_at: string;
   picture_url?: string | null;
+  display_name?: string | null;
 }
 
 export interface LoginRequest {

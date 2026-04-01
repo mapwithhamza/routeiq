@@ -38,6 +38,15 @@ export const authApi = {
     api.get<User>('/auth/me').then((r) => r.data),
 };
 
+export const profileApi = {
+  update: (data: { display_name: string }) =>
+    api.patch<User>('/auth/profile', data).then(r => r.data),
+  changePassword: (data: { current_password: string; new_password: string }) =>
+    api.post('/auth/change-password', data).then(r => r.data),
+  deleteAccount: () =>
+    api.delete('/auth/account').then(r => r.data),
+};
+
 // ── Deliveries ───────────────────────────────────────────────────────────────
 
 export const deliveriesApi = {

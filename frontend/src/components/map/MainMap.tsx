@@ -212,40 +212,15 @@ export default function MainMap({
             latitude={simulationPosition[1]}
             anchor="center"
           >
-            <div className="relative flex flex-col items-center">
-              <div className="whitespace-nowrap bg-cyan-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow mb-1">
-                {rider?.name || 'LIVE'}
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full bg-cyan-500 border-3 border-white shadow-xl flex items-center justify-center animate-pulse">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
               </div>
-              {(!rider?.vehicle_type || rider.vehicle_type === 'bike') && (
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="#06b6d4" xmlns="http://www.w3.org/2000/svg" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}}>
-                  <circle cx="6" cy="17" r="3" stroke="white" strokeWidth="1.5" fill="#06b6d4"/>
-                  <circle cx="18" cy="17" r="3" stroke="white" strokeWidth="1.5" fill="#06b6d4"/>
-                  <path d="M6 17l3-6h5l2 3h2" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M9 11l1-4h2l3 4" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="13" cy="7" r="1.5" fill="white"/>
-                </svg>
-              )}
-              {rider?.vehicle_type === 'car' && (
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="#06b6d4" xmlns="http://www.w3.org/2000/svg" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}}>
-                  <rect x="2" y="11" width="20" height="7" rx="2" fill="#06b6d4" stroke="white" strokeWidth="1.5"/>
-                  <path d="M4 11l2-5h12l2 5" fill="#0891b2" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
-                  <circle cx="7" cy="18" r="2" fill="white"/>
-                  <circle cx="17" cy="18" r="2" fill="white"/>
-                  <rect x="6" y="7" width="4" height="3" rx="0.5" fill="white" opacity="0.6"/>
-                  <rect x="14" y="7" width="4" height="3" rx="0.5" fill="white" opacity="0.6"/>
-                </svg>
-              )}
-              {(rider?.vehicle_type === 'truck' || rider?.vehicle_type === 'van') && (
-                <svg width="40" height="36" viewBox="0 0 32 24" fill="#06b6d4" xmlns="http://www.w3.org/2000/svg" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}}>
-                  <rect x="1" y="8" width="22" height="10" rx="1.5" fill="#06b6d4" stroke="white" strokeWidth="1.5"/>
-                  <rect x="23" y="11" width="8" height="7" rx="1.5" fill="#0891b2" stroke="white" strokeWidth="1.5"/>
-                  <path d="M23 12h5l1 3h-6z" fill="white" opacity="0.3"/>
-                  <circle cx="7" cy="19" r="2.5" fill="white"/>
-                  <circle cx="18" cy="19" r="2.5" fill="white"/>
-                  <circle cx="27" cy="19" r="2.5" fill="white"/>
-                  <rect x="3" y="10" width="8" height="5" rx="0.5" fill="white" opacity="0.2"/>
-                </svg>
-              )}
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-cyan-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                LIVE
+              </div>
             </div>
           </Marker>
         )}
