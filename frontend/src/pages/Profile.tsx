@@ -25,6 +25,7 @@ export default function Profile() {
   const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [showNewPw, setShowNewPw] = useState(false);
   const [isChangingPw, setIsChangingPw] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
 
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
@@ -135,14 +136,14 @@ export default function Profile() {
         {/* Account Details */}
         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-slate-700/50">
           {[
-            { label: 'Email', value: user.email },
-            { label: 'Role', value: user.role },
-            { label: 'Account Status', value: user.is_active ? 'Active' : 'Inactive' },
-            { label: 'Member Since', value: new Date(user.created_at).toLocaleDateString() },
-          ].map(({ label, value }) => (
+            { label: 'Email', value: user.email.toLowerCase(), noCapitalize: true },
+            { label: 'Role', value: user.role, noCapitalize: false },
+            { label: 'Account Status', value: user.is_active ? 'Active' : 'Inactive', noCapitalize: false },
+            { label: 'Member Since', value: new Date(user.created_at).toLocaleDateString(), noCapitalize: true },
+          ].map(({ label, value, noCapitalize }) => (
             <div key={label}>
               <p className="text-xs text-gray-400 dark:text-slate-500 mb-0.5">{label}</p>
-              <p className="text-sm font-medium text-gray-800 dark:text-slate-200 capitalize">{value}</p>
+              <p className={`text-sm font-medium text-gray-800 dark:text-slate-200 ${noCapitalize ? '' : 'capitalize'}`}>{value}</p>
             </div>
           ))}
         </div>
@@ -173,47 +174,62 @@ export default function Profile() {
       {/* Change Password */}
       {!isGoogleUser && (
         <div className="rounded-xl border border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#1C2128] p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Key size={16} className="text-amber-500 dark:text-amber-400" />
-            <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">Change Password</h2>
-          </div>
-          <div className="space-y-3">
-            <div className="relative">
-              <input
-                type={showCurrentPw ? 'text' : 'password'}
-                value={currentPassword}
-                onChange={e => setCurrentPassword(e.target.value)}
-                placeholder="Current password"
-                className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 pr-10 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition text-sm"
-              />
-              <button onClick={() => setShowCurrentPw(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                {showCurrentPw ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Key size={16} className="text-amber-500 dark:text-amber-400" />
+              <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">Change Password</h2>
             </div>
-            <div className="relative">
-              <input
-                type={showNewPw ? 'text' : 'password'}
-                value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
-                placeholder="New password (min 8 characters)"
-                className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 pr-10 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition text-sm"
-              />
-              <button onClick={() => setShowNewPw(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                {showNewPw ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
-            </div>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-              className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition text-sm"
-            />
-            <Button onClick={handleChangePassword} isLoading={isChangingPw} variant="secondary">
-              <Key size={14} className="mr-1.5" />
-              Change Password
-            </Button>
+            {!showPasswordForm && (
+              <Button variant="secondary" onClick={() => setShowPasswordForm(true)}>
+                <Key size={14} className="mr-1.5" />
+                Change Password
+              </Button>
+            )}
           </div>
+          {showPasswordForm && (
+            <div className="space-y-3">
+              <div className="relative">
+                <input
+                  type={showCurrentPw ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={e => setCurrentPassword(e.target.value)}
+                  placeholder="Current password"
+                  className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 pr-10 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition text-sm"
+                />
+                <button onClick={() => setShowCurrentPw(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  {showCurrentPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type={showNewPw ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  placeholder="New password (min 8 characters)"
+                  className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 pr-10 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition text-sm"
+                />
+                <button onClick={() => setShowNewPw(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  {showNewPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
+              </div>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                placeholder="Confirm new password"
+                className="w-full rounded-lg bg-white dark:bg-slate-900/60 border border-gray-300 dark:border-slate-700/60 px-3 py-2 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-600 outline-none focus:ring-2 focus:ring-cyan-500/50 transition text-sm"
+              />
+              <div className="flex gap-2">
+                <Button onClick={handleChangePassword} isLoading={isChangingPw}>
+                  <Key size={14} className="mr-1.5" />
+                  Update Password
+                </Button>
+                <Button variant="ghost" onClick={() => { setShowPasswordForm(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); }}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -234,7 +250,7 @@ export default function Profile() {
       <div className="rounded-xl border border-red-200 dark:border-red-500/30 bg-white dark:bg-[#1C2128] p-6">
         <div className="flex items-center gap-2 mb-4">
           <Trash2 size={16} className="text-red-500" />
-          <h2 className="text-sm font-semibold text-red-600 dark:text-red-400">Danger Zone</h2>
+          <h2 className="text-sm font-semibold text-red-600 dark:text-red-400">Delete Account</h2>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-3">
           Permanently delete your account. This cannot be undone. Type <span className="font-mono font-bold text-red-500">DELETE</span> to confirm.

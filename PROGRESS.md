@@ -219,6 +219,7 @@
 | 31 | 2026-04-01 | Real-time delivery tracking simulation — rider marker animates along OSRM route, speed control (slow/normal/fast), stop button, completion toast | Simulation Done |
 | 33 | 2026-04-01 | Profile page backend — display_name field, PATCH /auth/profile, POST /auth/change-password, DELETE /auth/account, Alembic migration | Profile Backend Done |
 | 34 | 2026-04-01 | Profile page frontend — display name, change password, account info, danger zone delete, avatar dropdown with profile link | Profile Frontend Done |
+| 35 | 2026-04-01 | Profile page polish — change password collapsible, Delete Account rename, email lowercase fix, display name in sidebar + dashboard welcome, sidebar footer popup menu | Profile v2 Done |
 
 ---
 

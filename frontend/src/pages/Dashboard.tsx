@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import ReactECharts from 'echarts-for-react';
 import { Package, Users, Route, TrendingUp, ArrowUpRight, DollarSign, Clock, CheckCircle2, XCircle, Activity } from 'lucide-react';
 import { analyticsApi, transactionsApi, deliveriesApi } from '../lib/api';
+import { useAuth } from '../hooks/useAuth';
 import Spinner from '../components/ui/Spinner';
 
 // Fixed ordered labels for the 7 algorithms used in RouteIQ
@@ -31,6 +32,7 @@ const STATUS_CONFIG = [
 ] as const;
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const sumQuery = useQuery({
     queryKey: ['analytics', 'summary'],
     queryFn: analyticsApi.summary,
@@ -168,7 +170,7 @@ export default function Dashboard() {
             Route Intelligence
           </p>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-[#E6EDF3] tracking-tight">
-            Dashboard Overview
+            {user?.display_name ? `Welcome, ${user.display_name}` : 'Dashboard Overview'}
           </h1>
           <p className="mt-1 text-gray-500 dark:text-[#8B949E] text-sm">
             High-level insights across all deliveries and riders.

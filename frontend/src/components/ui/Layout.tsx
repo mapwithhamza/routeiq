@@ -68,6 +68,7 @@ export default function Layout() {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
+  const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   // Search State
@@ -181,40 +182,61 @@ export default function Layout() {
         </nav>
 
         {/* User Footer */}
-        <div className={`p-3 border-t border-gray-200 dark:border-[#30363D] ${collapsed ? 'flex justify-center' : ''}`}>
+        <div className={`p-3 border-t border-gray-200 dark:border-[#30363D] relative ${collapsed ? 'flex justify-center' : ''}`}>
           {!collapsed ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5 min-w-0">
-                {user?.picture_url ? (
-                  <img src={user.picture_url} alt="Avatar" className="w-8 h-8 rounded-full shrink-0 object-cover" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
-                    {initials}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-gray-800 dark:text-slate-200 truncate max-w-[110px]">
-                    {user?.email}
-                  </p>
-                  <p className="text-[10px] text-gray-500 dark:text-slate-500 capitalize">{user?.role}</p>
+            <button
+              onClick={() => setIsSidebarMenuOpen(p => !p)}
+              className="w-full flex items-center gap-2.5 min-w-0 hover:bg-gray-100 dark:hover:bg-slate-700/40 rounded-lg p-1.5 transition"
+            >
+              {user?.picture_url ? (
+                <img src={user.picture_url} alt="Avatar" className="w-8 h-8 rounded-full shrink-0 object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                  {initials}
                 </div>
+              )}
+              <div className="min-w-0 text-left">
+                <p className="text-xs font-semibold text-gray-800 dark:text-slate-200 truncate max-w-[110px]">
+                  {user?.display_name || user?.email}
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-slate-500 capitalize">{user?.role}</p>
               </div>
-              <button
-                onClick={() => logout()}
-                className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
-                title="Sign out"
-              >
-                <LogOut size={15} />
-              </button>
-            </div>
+            </button>
           ) : (
             <button
-              onClick={() => logout()}
-              className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
-              title="Sign out"
+              onClick={() => setIsSidebarMenuOpen(p => !p)}
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-slate-700/40 rounded-lg transition"
             >
-              <LogOut size={16} />
+              {user?.picture_url ? (
+                <img src={user.picture_url} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white">
+                  {initials}
+                </div>
+              )}
             </button>
+          )}
+
+          {/* Sidebar User Menu Popup */}
+          {isSidebarMenuOpen && (
+            <div className="absolute bottom-full left-3 right-3 mb-1 bg-white dark:bg-[#1C2128] border border-gray-200 dark:border-[#30363D] shadow-lg rounded-xl overflow-hidden z-50 animate-fade-in">
+              <NavLink
+                to="/profile"
+                onClick={() => setIsSidebarMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700/40 transition"
+              >
+                <User size={14} />
+                Profile
+              </NavLink>
+              <div className="border-t border-gray-200 dark:border-[#30363D]" />
+              <button
+                onClick={() => { logout(); setIsSidebarMenuOpen(false); }}
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition"
+              >
+                <LogOut size={14} />
+                Sign Out
+              </button>
+            </div>
           )}
         </div>
 
