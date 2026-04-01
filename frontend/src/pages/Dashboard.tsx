@@ -368,7 +368,7 @@ export default function Dashboard() {
             {last5Transactions.length === 0 ? (
               <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">No transactions yet.</p>
             ) : (
-              last5Transactions.map(tx => (
+              last5Transactions.map((tx: any) => (
                 <div key={tx.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 dark:hover:bg-[#262D36] transition">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-gray-900 dark:text-[#E6EDF3] truncate">
