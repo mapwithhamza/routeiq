@@ -8,16 +8,47 @@ import { ArrowRight } from 'lucide-react';
 import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-// Islamabad waypoints for hero map animation
+// Real Islamabad road-following coordinates (F-7 → Blue Area → G-6 → G-9 → F-10 → F-7)
 const HERO_WAYPOINTS: [number, number][] = [
-  [73.0433, 33.7215],
-  [73.0607, 33.7180],
-  [73.0750, 33.7050],
-  [73.0850, 33.6750],
-  [73.0651, 33.6938],
-  [73.0286, 33.6944],
-  [73.0180, 33.7080],
-  [73.0433, 33.7215],
+  [73.0433, 33.7215], // F-7 Markaz
+  [73.0480, 33.7190], // F-7 road east
+  [73.0520, 33.7180], // Constitution Ave
+  [73.0560, 33.7170], // Constitution Ave cont
+  [73.0600, 33.7160], // Jinnah Ave junction
+  [73.0630, 33.7140], // Blue Area west
+  [73.0660, 33.7120], // Blue Area center
+  [73.0690, 33.7100], // Blue Area east
+  [73.0720, 33.7080], // Civic Center area
+  [73.0750, 33.7050], // G-5 area
+  [73.0760, 33.7020], // G-6/1
+  [73.0750, 33.6990], // G-6/2
+  [73.0730, 33.6960], // G-6/3
+  [73.0700, 33.6940], // G-6/4
+  [73.0670, 33.6930], // G-7
+  [73.0640, 33.6925], // G-7 west
+  [73.0600, 33.6930], // G-8 area
+  [73.0560, 33.6935], // G-8/1
+  [73.0520, 33.6938], // G-8/2
+  [73.0480, 33.6940], // G-9 east
+  [73.0440, 33.6942], // G-9 center
+  [73.0400, 33.6944], // G-9/1
+  [73.0360, 33.6944], // G-9/2
+  [73.0320, 33.6944], // G-9/3
+  [73.0290, 33.6944], // G-9/4
+  [73.0260, 33.6950], // G-10
+  [73.0240, 33.6970], // G-10/1
+  [73.0220, 33.7000], // G-10/2
+  [73.0210, 33.7030], // G-11
+  [73.0200, 33.7060], // G-11/1
+  [73.0200, 33.7090], // F-11 area
+  [73.0210, 33.7120], // F-11/1
+  [73.0230, 33.7150], // F-10/4
+  [73.0260, 33.7170], // F-10/3
+  [73.0300, 33.7185], // F-10/2
+  [73.0340, 33.7200], // F-10/1
+  [73.0380, 33.7210], // F-9 area
+  [73.0410, 33.7215], // F-8
+  [73.0433, 33.7215], // Back to F-7
 ];
 
 const TECH_ITEMS = [
@@ -111,9 +142,12 @@ export default function Landing() {
       {/* ── Navbar ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-white/5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/>
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+              <path d="M12 9V5M12 19v-4M9 12H5M19 12h-4"/>
+              <path d="M6.34 6.34l2.12 2.12M15.54 15.54l2.12 2.12M6.34 17.66l2.12-2.12M15.54 8.46l2.12-2.12"/>
             </svg>
           </div>
           <span className="text-base font-bold tracking-tight">
@@ -235,10 +269,11 @@ export default function Landing() {
       {/* ── Tech Slider ── */}
       <section className="py-16 border-y border-white/5 overflow-hidden">
         <div className="relative flex">
-          <div className="flex animate-[slide_25s_linear_infinite] gap-12 whitespace-nowrap">
+          <div className="flex animate-[slide_30s_linear_infinite] gap-16 whitespace-nowrap">
             {[...TECH_ITEMS, ...TECH_ITEMS].map((item, i) => (
-              <span key={i} className="text-sm font-medium text-white/20 hover:text-white/50 transition shrink-0">
+              <span key={i} className="flex items-center gap-16 text-sm font-semibold text-white/50 hover:text-white/80 transition shrink-0 tracking-wide uppercase">
                 {item}
+                <span className="text-cyan-500/50">·</span>
               </span>
             ))}
           </div>
@@ -278,10 +313,12 @@ export default function Landing() {
       {/* ── Bottom CTA ── */}
       <section className="py-32 border-t border-white/5">
         <div className="max-w-[1400px] mx-auto px-8">
-          <h2 className="text-6xl sm:text-7xl lg:text-8xl font-bold text-white/10 leading-none tracking-tight mb-16">
-            Any Route. Any Rider.
+          <h2 className="text-6xl sm:text-7xl lg:text-8xl font-bold leading-none tracking-tight mb-16">
+            <span className="text-white/25">Any Route.</span>
             <br />
-            <span className="text-white/20">Delivered.</span>
+            <span className="text-white/25">Any Rider.</span>
+            <br />
+            <span className="text-cyan-400/60">Delivered.</span>
           </h2>
           <button
             onClick={() => navigate('/login')}
@@ -298,9 +335,10 @@ export default function Landing() {
         <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start justify-between gap-8">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/>
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
                 </svg>
               </div>
               <span className="text-sm font-bold">Route<span className="text-cyan-400">IQ</span></span>
@@ -318,6 +356,10 @@ export default function Landing() {
             <a href="mailto:mhamzakhan.contact@gmail.com"
               className="text-xs text-white/25 hover:text-white/60 transition">
               Email
+            </a>
+            <a href="https://www.linkedin.com/in/mhamzakhan007" target="_blank" rel="noopener noreferrer"
+              className="text-xs text-white/25 hover:text-white/60 transition">
+              LinkedIn
             </a>
             <p className="text-xs text-white/15">© 2026 RouteIQ</p>
           </div>
