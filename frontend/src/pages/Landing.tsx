@@ -3,7 +3,7 @@
  * Hero section with RouteIQ branding, tagline, CTA buttons.
  */
 import { useNavigate } from 'react-router-dom';
-import { Truck, Zap, Map, BarChart3, ArrowRight } from 'lucide-react';
+import { Truck, ArrowRight } from 'lucide-react';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -46,11 +46,7 @@ export default function Landing() {
         <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs font-semibold mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-            CS-250 DSA Project · NUST IGIS 2024
-          </div>
+
 
           {/* Main heading */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white tracking-tight mb-6 leading-tight">
@@ -61,44 +57,19 @@ export default function Landing() {
           </h1>
 
           {/* Subheading */}
-          <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            A full-stack GIS-based delivery route optimization dashboard powered by 7 DSA algorithms — BFS, DFS, Dijkstra, A*, Greedy-NN, TSP-DP, and MergeSort — running on real Islamabad road networks.
+          <p className="text-lg sm:text-xl text-slate-400 max-w-xl mx-auto mb-10 leading-relaxed">
+            The Smarter Way to Deliver.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          {/* CTA Button */}
+          <div className="flex items-center justify-center">
             <button
               onClick={() => navigate('/login')}
-              className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-base transition shadow-lg shadow-cyan-500/25 w-full sm:w-auto justify-center"
+              className="flex items-center gap-2 px-10 py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-base transition shadow-lg shadow-cyan-500/25"
             >
               Get Started
               <ArrowRight size={18} />
             </button>
-            <button
-              onClick={() => navigate('/login')}
-              className="flex items-center gap-2 px-8 py-3.5 rounded-xl border border-white/20 hover:border-cyan-500/50 hover:bg-white/5 text-white font-semibold text-base transition w-full sm:w-auto justify-center"
-            >
-              <Zap size={18} className="text-cyan-400" />
-              Live Demo
-            </button>
-          </div>
-
-          {/* Feature Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {[
-              { icon: Map, label: 'Real Road Routing' },
-              { icon: BarChart3, label: '7 DSA Algorithms' },
-              { icon: Zap, label: 'Algorithm Race Mode' },
-              { icon: Truck, label: 'Live Tracking Sim' },
-            ].map(({ icon: Icon, label }) => (
-              <div
-                key={label}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-slate-300 text-sm"
-              >
-                <Icon size={14} className="text-cyan-400" />
-                {label}
-              </div>
-            ))}
           </div>
         </div>
       </div>
@@ -106,7 +77,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="px-8 py-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-xs text-slate-500">
-          © 2026 RouteIQ · Muhammad Hamza Khan · NUST IGIS-2024 · CMS 5081939
+          © 2026 RouteIQ · Muhammad Hamza Khan · NUST IGIS-2024 · CMS 508193
         </p>
         <div className="flex items-center gap-4">
           <a

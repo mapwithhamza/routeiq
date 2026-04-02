@@ -221,6 +221,7 @@
 | 34 | 2026-04-01 | Profile page frontend — display name, change password, account info, danger zone delete, avatar dropdown with profile link | Profile Frontend Done |
 | 35 | 2026-04-01 | Profile page polish — change password collapsible, Delete Account rename, email lowercase fix, display name in sidebar + dashboard welcome, sidebar footer popup menu | Profile v2 Done |
 | 36 | 2026-04-01 | Landing page — hero section with tagline, Get Started + Live Demo CTAs, feature pills, navbar with GitHub link, footer, public route at / | Landing Page Done |
+| 37 | 2026-04-01 | Landing page polish — removed badge, updated tagline to "The Smarter Way to Deliver", single CTA button, removed feature pills, fixed CMS to 508193 | Landing v2 Done |
 
 ---
 
