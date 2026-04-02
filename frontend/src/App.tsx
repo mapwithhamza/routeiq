@@ -16,11 +16,13 @@ import RouteOptimization from './pages/RouteOptimization';
 import AlgorithmComparison from './pages/AlgorithmComparison';
 import Transactions from './pages/Transactions';
 import Profile from './pages/Profile';
+import Landing from './pages/Landing';
 
 export default function App() {
   return (
     <Routes>
       {/* Public routes */}
+      <Route path="/" element={<Landing />} />
       <Route path="/login"    element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
@@ -36,8 +38,6 @@ export default function App() {
         <Route path="/profile" element={<Profile />} />
       </Route>
 
-      {/* Root: redirect to dashboard (ProtectedRoute will then redirect to /login if needed) */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

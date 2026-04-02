@@ -220,6 +220,7 @@
 | 33 | 2026-04-01 | Profile page backend — display_name field, PATCH /auth/profile, POST /auth/change-password, DELETE /auth/account, Alembic migration | Profile Backend Done |
 | 34 | 2026-04-01 | Profile page frontend — display name, change password, account info, danger zone delete, avatar dropdown with profile link | Profile Frontend Done |
 | 35 | 2026-04-01 | Profile page polish — change password collapsible, Delete Account rename, email lowercase fix, display name in sidebar + dashboard welcome, sidebar footer popup menu | Profile v2 Done |
+| 36 | 2026-04-01 | Landing page — hero section with tagline, Get Started + Live Demo CTAs, feature pills, navbar with GitHub link, footer, public route at / | Landing Page Done |
 
 ---
 
