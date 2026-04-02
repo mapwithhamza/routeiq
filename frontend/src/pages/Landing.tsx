@@ -9,28 +9,28 @@ import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 const HERO_WAYPOINTS: [number, number][] = [
-  [73.0800, 33.7100],
-  [73.0750, 33.7150],
-  [73.0650, 33.7180],
-  [73.0550, 33.7160],
-  [73.0480, 33.7100],
-  [73.0450, 33.7020],
-  [73.0480, 33.6940],
-  [73.0550, 33.6900],
-  [73.0650, 33.6880],
-  [73.0750, 33.6920],
-  [73.0800, 33.7000],
-  [73.0780, 33.7060],
-  [73.0700, 33.7080],
-  [73.0600, 33.7060],
-  [73.0520, 33.7000],
-  [73.0500, 33.6940],
-  [73.0540, 33.6900],
-  [73.0620, 33.6890],
-  [73.0700, 33.6920],
-  [73.0760, 33.6980],
-  [73.0800, 33.7060],
-  [73.0800, 33.7100],
+  [73.0300, 33.6950],
+  [73.0250, 33.6980],
+  [73.0200, 33.7020],
+  [73.0220, 33.7070],
+  [73.0270, 33.7100],
+  [73.0340, 33.7110],
+  [73.0410, 33.7090],
+  [73.0460, 33.7050],
+  [73.0480, 33.7000],
+  [73.0460, 33.6950],
+  [73.0420, 33.6920],
+  [73.0500, 33.6900],
+  [73.0580, 33.6920],
+  [73.0640, 33.6960],
+  [73.0660, 33.7010],
+  [73.0640, 33.7060],
+  [73.0580, 33.7090],
+  [73.0510, 33.7080],
+  [73.0460, 33.7050],
+  [73.0410, 33.7090],
+  [73.0340, 33.7110],
+  [73.0300, 33.6950],
 ];
 
 const TECH_ITEMS = [
@@ -42,12 +42,20 @@ const TECH_ITEMS = [
 function useIntersectionObserver(ref: React.RefObject<Element>, options?: IntersectionObserverInit) {
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    // Check if already visible on mount
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) {
+      setIsVisible(true);
+      return;
+    }
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) setIsVisible(true);
-    }, options);
-    if (ref.current) observer.observe(ref.current);
+    }, { threshold: 0.1, ...options });
+    observer.observe(el);
     return () => observer.disconnect();
-  }, [ref, options]);
+  }, []);
   return isVisible;
 }
 
@@ -246,10 +254,9 @@ export default function Landing() {
                 />
               </Source>
             </Map>
-            {/* Seamless edge blending */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A] via-transparent to-[#0A0A0A]/60" />
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-[#0A0A0A] via-transparent to-[#0A0A0A]" />
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-l from-[#0A0A0A]/80 via-transparent to-transparent" />
+            {/* Subtle edge blending */}
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A]/60 via-transparent to-transparent" />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-l from-transparent via-transparent to-[#0A0A0A]/70" style={{width: '20%'}} />
           </div>
         </div>
       </section>
