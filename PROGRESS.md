@@ -222,6 +222,7 @@
 | 35 | 2026-04-01 | Profile page polish — change password collapsible, Delete Account rename, email lowercase fix, display name in sidebar + dashboard welcome, sidebar footer popup menu | Profile v2 Done |
 | 36 | 2026-04-01 | Landing page — hero section with tagline, Get Started + Live Demo CTAs, feature pills, navbar with GitHub link, footer, public route at / | Landing Page Done |
 | 37 | 2026-04-01 | Landing page polish — removed badge, updated tagline to "The Smarter Way to Deliver", single CTA button, removed feature pills, fixed CMS to 508193 | Landing v2 Done |
+| 38 | 2026-04-02 | Landing page v3 — Bringg-inspired bold typography, live MapLibre animated route, tech slider, scroll fade-in features, bottom CTA, clean footer | Landing v3 Done |
 
 ---
 
