@@ -8,39 +8,29 @@ import { ArrowRight } from 'lucide-react';
 import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-// Aesthetic delivery circuit — F-7 → F-6 → G-5 → G-6 → G-8 → G-9 → F-10 → F-8 → F-7
 const HERO_WAYPOINTS: [number, number][] = [
-  [73.0433, 33.7215], // F-7 START
-  [73.0460, 33.7220], // F-7 east
-  [73.0500, 33.7230], // F-6 west
-  [73.0540, 33.7240], // F-6 center
-  [73.0580, 33.7230], // F-6 east
-  [73.0620, 33.7210], // Jinnah Ave
-  [73.0660, 33.7180], // Blue Area
-  [73.0700, 33.7150], // G-5
-  [73.0740, 33.7100], // G-5/1
-  [73.0760, 33.7050], // G-6
-  [73.0750, 33.7000], // G-6/2
-  [73.0720, 33.6960], // G-7
-  [73.0680, 33.6940], // G-7/1
-  [73.0640, 33.6930], // G-8
-  [73.0590, 33.6928], // G-8/2
-  [73.0540, 33.6930], // G-8/3
-  [73.0490, 33.6935], // G-9
-  [73.0440, 33.6940], // G-9/1
-  [73.0390, 33.6940], // G-9/2
-  [73.0340, 33.6942], // G-9/3
-  [73.0290, 33.6950], // G-10
-  [73.0260, 33.6980], // G-10/1
-  [73.0240, 33.7020], // G-11
-  [73.0230, 33.7060], // F-11
-  [73.0240, 33.7100], // F-11/1
-  [73.0260, 33.7140], // F-10
-  [73.0300, 33.7170], // F-10/1
-  [73.0340, 33.7190], // F-9
-  [73.0380, 33.7205], // F-8/2
-  [73.0410, 33.7212], // F-8
-  [73.0433, 33.7215], // Back to F-7
+  [73.0800, 33.7100],
+  [73.0750, 33.7150],
+  [73.0650, 33.7180],
+  [73.0550, 33.7160],
+  [73.0480, 33.7100],
+  [73.0450, 33.7020],
+  [73.0480, 33.6940],
+  [73.0550, 33.6900],
+  [73.0650, 33.6880],
+  [73.0750, 33.6920],
+  [73.0800, 33.7000],
+  [73.0780, 33.7060],
+  [73.0700, 33.7080],
+  [73.0600, 33.7060],
+  [73.0520, 33.7000],
+  [73.0500, 33.6940],
+  [73.0540, 33.6900],
+  [73.0620, 33.6890],
+  [73.0700, 33.6920],
+  [73.0760, 33.6980],
+  [73.0800, 33.7060],
+  [73.0800, 33.7100],
 ];
 
 const TECH_ITEMS = [
@@ -192,7 +182,7 @@ export default function Landing() {
           </div>
 
           {/* Right — Live Map View with MapLibre */}
-          <div className="relative h-[500px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50">
+          <div className="relative h-[500px] overflow-hidden">
             <Map
               initialViewState={{ longitude: 73.0479, latitude: 33.6844, zoom: 11.5 }}
               style={{ width: '100%', height: '100%' }}
@@ -213,8 +203,12 @@ export default function Landing() {
 
               {/* Animated route */}
               <Source id="anim-route" type="geojson" data={routeGeoJSON}>
+                <Layer id="anim-route-glow" type="line"
+                  paint={{ 'line-color': '#06b6d4', 'line-width': 8, 'line-opacity': 0.15 }}
+                  layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+                />
                 <Layer id="anim-route-line" type="line"
-                  paint={{ 'line-color': '#06b6d4', 'line-width': 4, 'line-opacity': 0.9 }}
+                  paint={{ 'line-color': '#06b6d4', 'line-width': 2.5, 'line-opacity': 0.9 }}
                   layout={{ 'line-join': 'round', 'line-cap': 'round' }}
                 />
               </Source>
@@ -252,8 +246,10 @@ export default function Landing() {
                 />
               </Source>
             </Map>
-            {/* Map overlay gradient */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A]/60 via-transparent to-transparent" />
+            {/* Seamless edge blending */}
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A] via-transparent to-[#0A0A0A]/60" />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-[#0A0A0A] via-transparent to-[#0A0A0A]" />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-l from-[#0A0A0A]/80 via-transparent to-transparent" />
           </div>
         </div>
       </section>
