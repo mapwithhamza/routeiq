@@ -225,6 +225,7 @@
 | 38 | 2026-04-02 | Landing page v3 — Bringg-inspired bold typography, live MapLibre animated route, tech slider, scroll fade-in features, bottom CTA, clean footer | Landing v3 Done |
 | 39 | 2026-04-02 | Landing page v4 — improved RouteIQ icon, real Islamabad road coordinates for map animation, prominent tech slider, cyan accent on CTA text, LinkedIn added to footer | Landing v4 Done |
 | 40 | 2026-04-02 | Landing page v5 — increased text opacity throughout, cyan accent on Delivered, bigger footer with brand/project/connect sections, API docs link | Landing v5 Done |
+| 41 | 2026-04-02 | Landing page v6 — brighter footer text, new map animation route (F-7→Blue Area→G-9→F-10→F-7 circuit) | Landing v6 Done |
 
 ---
 

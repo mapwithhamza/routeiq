@@ -5,8 +5,43 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import Map from 'react-map-gl/maplibre';
+import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
+
+// Aesthetic delivery circuit — F-7 → F-6 → G-5 → G-6 → G-8 → G-9 → F-10 → F-8 → F-7
+const HERO_WAYPOINTS: [number, number][] = [
+  [73.0433, 33.7215], // F-7 START
+  [73.0460, 33.7220], // F-7 east
+  [73.0500, 33.7230], // F-6 west
+  [73.0540, 33.7240], // F-6 center
+  [73.0580, 33.7230], // F-6 east
+  [73.0620, 33.7210], // Jinnah Ave
+  [73.0660, 33.7180], // Blue Area
+  [73.0700, 33.7150], // G-5
+  [73.0740, 33.7100], // G-5/1
+  [73.0760, 33.7050], // G-6
+  [73.0750, 33.7000], // G-6/2
+  [73.0720, 33.6960], // G-7
+  [73.0680, 33.6940], // G-7/1
+  [73.0640, 33.6930], // G-8
+  [73.0590, 33.6928], // G-8/2
+  [73.0540, 33.6930], // G-8/3
+  [73.0490, 33.6935], // G-9
+  [73.0440, 33.6940], // G-9/1
+  [73.0390, 33.6940], // G-9/2
+  [73.0340, 33.6942], // G-9/3
+  [73.0290, 33.6950], // G-10
+  [73.0260, 33.6980], // G-10/1
+  [73.0240, 33.7020], // G-11
+  [73.0230, 33.7060], // F-11
+  [73.0240, 33.7100], // F-11/1
+  [73.0260, 33.7140], // F-10
+  [73.0300, 33.7170], // F-10/1
+  [73.0340, 33.7190], // F-9
+  [73.0380, 33.7205], // F-8/2
+  [73.0410, 33.7212], // F-8
+  [73.0433, 33.7215], // Back to F-7
+];
 
 const TECH_ITEMS = [
   'React 18', 'FastAPI', 'PostgreSQL', 'MapLibre GL',
@@ -48,6 +83,51 @@ function FeatureCard({ number, title, desc, delay }: { number: string; title: st
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [animProgress, setAnimProgress] = useState(0);
+  const animRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  const ANIM_DURATION = 10000;
+
+  // Animate route on hero map
+  useEffect(() => {
+    const animate = (timestamp: number) => {
+      if (!startTimeRef.current) startTimeRef.current = timestamp;
+      const elapsed = timestamp - startTimeRef.current;
+      const progress = (elapsed % ANIM_DURATION) / ANIM_DURATION;
+      setAnimProgress(progress);
+      animRef.current = requestAnimationFrame(animate);
+    };
+    animRef.current = requestAnimationFrame(animate);
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+  }, []);
+
+  // Build animated route coordinates
+  const totalPoints = HERO_WAYPOINTS.length - 1;
+  const currentSegment = Math.floor(animProgress * totalPoints);
+  const segmentProgress = (animProgress * totalPoints) - currentSegment;
+  const animatedCoords: [number, number][] = [
+    ...HERO_WAYPOINTS.slice(0, currentSegment + 1),
+  ];
+  if (currentSegment < totalPoints) {
+    const from = HERO_WAYPOINTS[currentSegment];
+    const to = HERO_WAYPOINTS[currentSegment + 1];
+    animatedCoords.push([
+      from[0] + (to[0] - from[0]) * segmentProgress,
+      from[1] + (to[1] - from[1]) * segmentProgress,
+    ]);
+  }
+
+  const routeGeoJSON = {
+    type: 'Feature' as const,
+    properties: {},
+    geometry: { type: 'LineString' as const, coordinates: animatedCoords },
+  };
+
+  const dotGeoJSON = animatedCoords.length > 0 ? {
+    type: 'Feature' as const,
+    properties: {},
+    geometry: { type: 'Point' as const, coordinates: animatedCoords[animatedCoords.length - 1] },
+  } : null;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
@@ -111,75 +191,67 @@ export default function Landing() {
             </button>
           </div>
 
-          {/* Right — Live Map View with SVG Overlay */}
+          {/* Right — Live Map View with MapLibre */}
           <div className="relative h-[500px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50">
             <Map
-              initialViewState={{ longitude: 73.0479, latitude: 33.6844, zoom: 12.5 }}
+              initialViewState={{ longitude: 73.0479, latitude: 33.6844, zoom: 11.5 }}
               style={{ width: '100%', height: '100%' }}
               mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
               interactive={false}
-            />
-            
-            {/* SVG Bezier Animation Overlay */}
-            <svg 
-              className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-2xl" 
-              viewBox="0 0 800 600" 
-              preserveAspectRatio="xMidYMid slice"
             >
-              <defs>
-                <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#06b6d4" />
-                  <stop offset="100%" stopColor="#4f46e5" />
-                </linearGradient>
-                <filter id="glowRoute">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-                  <feMerge>
-                    <feMergeNode in="coloredBlur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
+              {/* Full route (faint) */}
+              <Source id="full-route" type="geojson" data={{
+                type: 'Feature',
+                properties: {},
+                geometry: { type: 'LineString', coordinates: HERO_WAYPOINTS },
+              }}>
+                <Layer id="full-route-line" type="line"
+                  paint={{ 'line-color': '#ffffff', 'line-width': 2, 'line-opacity': 0.15 }}
+                  layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+                />
+              </Source>
 
-              {/* Faint background path */}
-              <path
-                id="hero-path"
-                d="M 150 150 Q 250 50, 400 200 T 600 150 Q 750 250, 650 400 T 350 450 Q 200 500, 150 350 Q 50 200, 150 150"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeOpacity="0.1"
-                strokeLinecap="round"
-              />
+              {/* Animated route */}
+              <Source id="anim-route" type="geojson" data={routeGeoJSON}>
+                <Layer id="anim-route-line" type="line"
+                  paint={{ 'line-color': '#06b6d4', 'line-width': 4, 'line-opacity': 0.9 }}
+                  layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+                />
+              </Source>
 
-              {/* Animated drawn path */}
-              <path
-                d="M 150 150 Q 250 50, 400 200 T 600 150 Q 750 250, 650 400 T 350 450 Q 200 500, 150 350 Q 50 200, 150 150"
-                fill="none"
-                stroke="url(#routeGradient)"
-                strokeWidth="4"
-                strokeLinecap="round"
-                filter="url(#glowRoute)"
-                className="animate-draw-route"
-              />
+              {/* Moving dot */}
+              {dotGeoJSON && (
+                <Source id="dot" type="geojson" data={dotGeoJSON}>
+                  <Layer id="dot-layer" type="circle"
+                    paint={{
+                      'circle-radius': 8,
+                      'circle-color': '#06b6d4',
+                      'circle-stroke-width': 3,
+                      'circle-stroke-color': '#ffffff',
+                      'circle-opacity': 1,
+                    }}
+                  />
+                </Source>
+              )}
 
               {/* Waypoint dots */}
-              <circle cx="150" cy="150" r="5" fill="white" opacity="0.3" />
-              <circle cx="400" cy="200" r="5" fill="white" opacity="0.3" />
-              <circle cx="600" cy="150" r="5" fill="white" opacity="0.3" />
-              <circle cx="650" cy="400" r="5" fill="white" opacity="0.3" />
-              <circle cx="350" cy="450" r="5" fill="white" opacity="0.3" />
-              <circle cx="150" cy="350" r="5" fill="white" opacity="0.3" />
-
-              {/* Moving rider dot */}
-              <circle r="8" fill="#06b6d4" filter="url(#glowRoute)">
-                <animateMotion 
-                  dur="8s" 
-                  repeatCount="indefinite" 
-                  path="M 150 150 Q 250 50, 400 200 T 600 150 Q 750 250, 650 400 T 350 450 Q 200 500, 150 350 Q 50 200, 150 150"
+              <Source id="waypoints" type="geojson" data={{
+                type: 'FeatureCollection',
+                features: HERO_WAYPOINTS.map(coord => ({
+                  type: 'Feature',
+                  properties: {},
+                  geometry: { type: 'Point', coordinates: coord },
+                })),
+              }}>
+                <Layer id="waypoint-dots" type="circle"
+                  paint={{
+                    'circle-radius': 4,
+                    'circle-color': '#ffffff',
+                    'circle-opacity': 0.4,
+                  }}
                 />
-              </circle>
-            </svg>
-            
+              </Source>
+            </Map>
             {/* Map overlay gradient */}
             <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A]/60 via-transparent to-transparent" />
           </div>
@@ -266,10 +338,10 @@ export default function Landing() {
                 </div>
                 <span className="text-base font-bold">Route<span className="text-cyan-400">IQ</span></span>
               </div>
-              <p className="text-sm text-white/50 leading-relaxed mb-3">
+              <p className="text-sm text-white/70 leading-relaxed mb-3">
                 A full-stack GIS-based delivery route optimization dashboard. Built for CS-250 DSA at NUST IGIS.
               </p>
-              <p className="text-xs text-white/30">
+              <p className="text-xs text-white/50">
                 Muhammad Hamza Khan · CMS 508193
               </p>
             </div>
@@ -277,31 +349,31 @@ export default function Landing() {
             {/* Links */}
             <div className="grid grid-cols-2 gap-12">
               <div>
-                <p className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">Project</p>
+                <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-4">Project</p>
                 <div className="space-y-3">
                   <a href="https://github.com/mapwithhamza/routeiq" target="_blank" rel="noopener noreferrer"
-                    className="block text-sm text-white/50 hover:text-white transition">
+                    className="block text-sm text-white/70 hover:text-white transition">
                     GitHub Repository
                   </a>
                   <a href="https://routeiq-eight.vercel.app/login"
-                    className="block text-sm text-white/50 hover:text-white transition">
+                    className="block text-sm text-white/70 hover:text-white transition">
                     Live Demo
                   </a>
                   <a href="https://routeiq-backend-lkz1.onrender.com/docs" target="_blank" rel="noopener noreferrer"
-                    className="block text-sm text-white/50 hover:text-white transition">
+                    className="block text-sm text-white/70 hover:text-white transition">
                     API Docs
                   </a>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">Connect</p>
+                <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-4">Connect</p>
                 <div className="space-y-3">
                   <a href="https://www.linkedin.com/in/mhamzakhan007" target="_blank" rel="noopener noreferrer"
-                    className="block text-sm text-white/50 hover:text-white transition">
+                    className="block text-sm text-white/70 hover:text-white transition">
                     LinkedIn
                   </a>
                   <a href="mailto:mhamzakhan.contact@gmail.com"
-                    className="block text-sm text-white/50 hover:text-white transition">
+                    className="block text-sm text-white/70 hover:text-white transition">
                     mhamzakhan.contact@gmail.com
                   </a>
                   <p className="text-sm text-white/30">NUST IGIS-2024</p>
@@ -327,13 +399,6 @@ export default function Landing() {
         @keyframes slide {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
-        }
-        @keyframes draw-route {
-          0% { stroke-dasharray: 0, 2000; }
-          100% { stroke-dasharray: 2000, 0; }
-        }
-        .animate-draw-route {
-          animation: draw-route 8s linear infinite;
         }
       `}</style>
     </div>
