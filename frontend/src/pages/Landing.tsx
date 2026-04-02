@@ -5,51 +5,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import Map, { Source, Layer } from 'react-map-gl/maplibre';
+import Map from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-
-// Real Islamabad road-following coordinates (F-7 → Blue Area → G-6 → G-9 → F-10 → F-7)
-const HERO_WAYPOINTS: [number, number][] = [
-  [73.0433, 33.7215], // F-7 Markaz
-  [73.0480, 33.7190], // F-7 road east
-  [73.0520, 33.7180], // Constitution Ave
-  [73.0560, 33.7170], // Constitution Ave cont
-  [73.0600, 33.7160], // Jinnah Ave junction
-  [73.0630, 33.7140], // Blue Area west
-  [73.0660, 33.7120], // Blue Area center
-  [73.0690, 33.7100], // Blue Area east
-  [73.0720, 33.7080], // Civic Center area
-  [73.0750, 33.7050], // G-5 area
-  [73.0760, 33.7020], // G-6/1
-  [73.0750, 33.6990], // G-6/2
-  [73.0730, 33.6960], // G-6/3
-  [73.0700, 33.6940], // G-6/4
-  [73.0670, 33.6930], // G-7
-  [73.0640, 33.6925], // G-7 west
-  [73.0600, 33.6930], // G-8 area
-  [73.0560, 33.6935], // G-8/1
-  [73.0520, 33.6938], // G-8/2
-  [73.0480, 33.6940], // G-9 east
-  [73.0440, 33.6942], // G-9 center
-  [73.0400, 33.6944], // G-9/1
-  [73.0360, 33.6944], // G-9/2
-  [73.0320, 33.6944], // G-9/3
-  [73.0290, 33.6944], // G-9/4
-  [73.0260, 33.6950], // G-10
-  [73.0240, 33.6970], // G-10/1
-  [73.0220, 33.7000], // G-10/2
-  [73.0210, 33.7030], // G-11
-  [73.0200, 33.7060], // G-11/1
-  [73.0200, 33.7090], // F-11 area
-  [73.0210, 33.7120], // F-11/1
-  [73.0230, 33.7150], // F-10/4
-  [73.0260, 33.7170], // F-10/3
-  [73.0300, 33.7185], // F-10/2
-  [73.0340, 33.7200], // F-10/1
-  [73.0380, 33.7210], // F-9 area
-  [73.0410, 33.7215], // F-8
-  [73.0433, 33.7215], // Back to F-7
-];
 
 const TECH_ITEMS = [
   'React 18', 'FastAPI', 'PostgreSQL', 'MapLibre GL',
@@ -84,58 +41,13 @@ function FeatureCard({ number, title, desc, delay }: { number: string; title: st
     >
       <p className="text-5xl font-bold text-white mb-3 font-mono">{number}</p>
       <p className="text-lg font-semibold text-white mb-2">{title}</p>
-      <p className="text-sm text-white/40 leading-relaxed">{desc}</p>
+      <p className="text-sm text-white/60 leading-relaxed">{desc}</p>
     </div>
   );
 }
 
 export default function Landing() {
   const navigate = useNavigate();
-  const [animProgress, setAnimProgress] = useState(0);
-  const animRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number | null>(null);
-  const ANIM_DURATION = 6000;
-
-  // Animate route on hero map
-  useEffect(() => {
-    const animate = (timestamp: number) => {
-      if (!startTimeRef.current) startTimeRef.current = timestamp;
-      const elapsed = timestamp - startTimeRef.current;
-      const progress = (elapsed % ANIM_DURATION) / ANIM_DURATION;
-      setAnimProgress(progress);
-      animRef.current = requestAnimationFrame(animate);
-    };
-    animRef.current = requestAnimationFrame(animate);
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
-  }, []);
-
-  // Build animated route coordinates
-  const totalPoints = HERO_WAYPOINTS.length - 1;
-  const currentSegment = Math.floor(animProgress * totalPoints);
-  const segmentProgress = (animProgress * totalPoints) - currentSegment;
-  const animatedCoords: [number, number][] = [
-    ...HERO_WAYPOINTS.slice(0, currentSegment + 1),
-  ];
-  if (currentSegment < totalPoints) {
-    const from = HERO_WAYPOINTS[currentSegment];
-    const to = HERO_WAYPOINTS[currentSegment + 1];
-    animatedCoords.push([
-      from[0] + (to[0] - from[0]) * segmentProgress,
-      from[1] + (to[1] - from[1]) * segmentProgress,
-    ]);
-  }
-
-  const routeGeoJSON = {
-    type: 'Feature' as const,
-    properties: {},
-    geometry: { type: 'LineString' as const, coordinates: animatedCoords },
-  };
-
-  const dotGeoJSON = animatedCoords.length > 0 ? {
-    type: 'Feature' as const,
-    properties: {},
-    geometry: { type: 'Point' as const, coordinates: animatedCoords[animatedCoords.length - 1] },
-  } : null;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
@@ -177,17 +89,17 @@ export default function Landing() {
         <div className="w-full max-w-[1400px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left — Typography */}
           <div>
-            <p className="text-sm font-medium text-white/30 tracking-widest uppercase mb-8">
+            <p className="text-sm font-medium text-white/50 tracking-widest uppercase mb-8">
               RouteIQ · Last-Mile Solutions
             </p>
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold leading-none tracking-tight mb-8">
               <span className="text-white">The Smarter</span>
               <br />
-              <span className="text-white/20">Way to</span>
+              <span className="text-white/40">Way to</span>
               <br />
               <span className="text-white">Deliver.</span>
             </h1>
-            <p className="text-white/35 text-lg mb-10 max-w-md leading-relaxed">
+            <p className="text-white/60 text-lg mb-10 max-w-md leading-relaxed">
               Intelligent delivery route optimization powered by 7 DSA algorithms running on real road networks.
             </p>
             <button
@@ -199,69 +111,77 @@ export default function Landing() {
             </button>
           </div>
 
-          {/* Right — Live Map */}
+          {/* Right — Live Map View with SVG Overlay */}
           <div className="relative h-[500px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50">
             <Map
-              initialViewState={{ longitude: 73.0479, latitude: 33.6844, zoom: 11 }}
+              initialViewState={{ longitude: 73.0479, latitude: 33.6844, zoom: 12.5 }}
               style={{ width: '100%', height: '100%' }}
               mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
               interactive={false}
+            />
+            
+            {/* SVG Bezier Animation Overlay */}
+            <svg 
+              className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-2xl" 
+              viewBox="0 0 800 600" 
+              preserveAspectRatio="xMidYMid slice"
             >
-              {/* Full route (faint) */}
-              <Source id="full-route" type="geojson" data={{
-                type: 'Feature',
-                properties: {},
-                geometry: { type: 'LineString', coordinates: HERO_WAYPOINTS },
-              }}>
-                <Layer id="full-route-line" type="line"
-                  paint={{ 'line-color': '#ffffff', 'line-width': 1.5, 'line-opacity': 0.1 }}
-                  layout={{ 'line-join': 'round', 'line-cap': 'round' }}
-                />
-              </Source>
+              <defs>
+                <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#06b6d4" />
+                  <stop offset="100%" stopColor="#4f46e5" />
+                </linearGradient>
+                <filter id="glowRoute">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
 
-              {/* Animated route */}
-              <Source id="anim-route" type="geojson" data={routeGeoJSON}>
-                <Layer id="anim-route-line" type="line"
-                  paint={{ 'line-color': '#06b6d4', 'line-width': 3, 'line-opacity': 0.9 }}
-                  layout={{ 'line-join': 'round', 'line-cap': 'round' }}
-                />
-              </Source>
+              {/* Faint background path */}
+              <path
+                id="hero-path"
+                d="M 150 150 Q 250 50, 400 200 T 600 150 Q 750 250, 650 400 T 350 450 Q 200 500, 150 350 Q 50 200, 150 150"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeOpacity="0.1"
+                strokeLinecap="round"
+              />
 
-              {/* Moving dot */}
-              {dotGeoJSON && (
-                <Source id="dot" type="geojson" data={dotGeoJSON}>
-                  <Layer id="dot-layer" type="circle"
-                    paint={{
-                      'circle-radius': 7,
-                      'circle-color': '#06b6d4',
-                      'circle-stroke-width': 3,
-                      'circle-stroke-color': '#ffffff',
-                      'circle-opacity': 1,
-                    }}
-                  />
-                </Source>
-              )}
+              {/* Animated drawn path */}
+              <path
+                d="M 150 150 Q 250 50, 400 200 T 600 150 Q 750 250, 650 400 T 350 450 Q 200 500, 150 350 Q 50 200, 150 150"
+                fill="none"
+                stroke="url(#routeGradient)"
+                strokeWidth="4"
+                strokeLinecap="round"
+                filter="url(#glowRoute)"
+                className="animate-draw-route"
+              />
 
               {/* Waypoint dots */}
-              <Source id="waypoints" type="geojson" data={{
-                type: 'FeatureCollection',
-                features: HERO_WAYPOINTS.map(coord => ({
-                  type: 'Feature',
-                  properties: {},
-                  geometry: { type: 'Point', coordinates: coord },
-                })),
-              }}>
-                <Layer id="waypoint-dots" type="circle"
-                  paint={{
-                    'circle-radius': 4,
-                    'circle-color': '#ffffff',
-                    'circle-opacity': 0.3,
-                  }}
+              <circle cx="150" cy="150" r="5" fill="white" opacity="0.3" />
+              <circle cx="400" cy="200" r="5" fill="white" opacity="0.3" />
+              <circle cx="600" cy="150" r="5" fill="white" opacity="0.3" />
+              <circle cx="650" cy="400" r="5" fill="white" opacity="0.3" />
+              <circle cx="350" cy="450" r="5" fill="white" opacity="0.3" />
+              <circle cx="150" cy="350" r="5" fill="white" opacity="0.3" />
+
+              {/* Moving rider dot */}
+              <circle r="8" fill="#06b6d4" filter="url(#glowRoute)">
+                <animateMotion 
+                  dur="8s" 
+                  repeatCount="indefinite" 
+                  path="M 150 150 Q 250 50, 400 200 T 600 150 Q 750 250, 650 400 T 350 450 Q 200 500, 150 350 Q 50 200, 150 150"
                 />
-              </Source>
-            </Map>
+              </circle>
+            </svg>
+            
             {/* Map overlay gradient */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A]/40 to-transparent" />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A]/60 via-transparent to-transparent" />
           </div>
         </div>
       </section>
@@ -283,7 +203,7 @@ export default function Landing() {
       {/* ── Features ── */}
       <section className="py-32 max-w-[1400px] mx-auto px-8">
         <div className="mb-20">
-          <p className="text-sm text-white/30 uppercase tracking-widest mb-4">What RouteIQ Does</p>
+          <p className="text-sm text-white/50 uppercase tracking-widest mb-4">What RouteIQ Does</p>
           <h2 className="text-4xl sm:text-5xl font-bold text-white max-w-xl leading-tight">
             Built for the last mile.
           </h2>
@@ -314,11 +234,11 @@ export default function Landing() {
       <section className="py-32 border-t border-white/5">
         <div className="max-w-[1400px] mx-auto px-8">
           <h2 className="text-6xl sm:text-7xl lg:text-8xl font-bold leading-none tracking-tight mb-16">
-            <span className="text-white/25">Any Route.</span>
+            <span className="text-white/50">Any Route.</span>
             <br />
-            <span className="text-white/25">Any Rider.</span>
+            <span className="text-white/50">Any Rider.</span>
             <br />
-            <span className="text-cyan-400/60">Delivered.</span>
+            <span className="text-cyan-400">Delivered.</span>
           </h2>
           <button
             onClick={() => navigate('/login')}
@@ -331,37 +251,73 @@ export default function Landing() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/5 px-8 py-12">
-        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start justify-between gap-8">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="3"/>
-                  <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
-                </svg>
+      <footer className="border-t border-white/10 px-8 pt-20 pb-12">
+        <div className="max-w-[1400px] mx-auto">
+          {/* Top footer */}
+          <div className="flex flex-col lg:flex-row items-start justify-between gap-12 mb-16">
+            {/* Brand */}
+            <div className="max-w-xs">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                  </svg>
+                </div>
+                <span className="text-base font-bold">Route<span className="text-cyan-400">IQ</span></span>
               </div>
-              <span className="text-sm font-bold">Route<span className="text-cyan-400">IQ</span></span>
+              <p className="text-sm text-white/50 leading-relaxed mb-3">
+                A full-stack GIS-based delivery route optimization dashboard. Built for CS-250 DSA at NUST IGIS.
+              </p>
+              <p className="text-xs text-white/30">
+                Muhammad Hamza Khan · CMS 508193
+              </p>
             </div>
-            <p className="text-xs text-white/25">
-              Muhammad Hamza Khan · NUST IGIS-2024 · CMS 508193
-            </p>
-            <p className="text-xs text-white/20 mt-1">CS-250 Data Structures &amp; Algorithms</p>
+
+            {/* Links */}
+            <div className="grid grid-cols-2 gap-12">
+              <div>
+                <p className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">Project</p>
+                <div className="space-y-3">
+                  <a href="https://github.com/mapwithhamza/routeiq" target="_blank" rel="noopener noreferrer"
+                    className="block text-sm text-white/50 hover:text-white transition">
+                    GitHub Repository
+                  </a>
+                  <a href="https://routeiq-eight.vercel.app/login"
+                    className="block text-sm text-white/50 hover:text-white transition">
+                    Live Demo
+                  </a>
+                  <a href="https://routeiq-backend-lkz1.onrender.com/docs" target="_blank" rel="noopener noreferrer"
+                    className="block text-sm text-white/50 hover:text-white transition">
+                    API Docs
+                  </a>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">Connect</p>
+                <div className="space-y-3">
+                  <a href="https://www.linkedin.com/in/mhamzakhan007" target="_blank" rel="noopener noreferrer"
+                    className="block text-sm text-white/50 hover:text-white transition">
+                    LinkedIn
+                  </a>
+                  <a href="mailto:mhamzakhan.contact@gmail.com"
+                    className="block text-sm text-white/50 hover:text-white transition">
+                    mhamzakhan.contact@gmail.com
+                  </a>
+                  <p className="text-sm text-white/30">NUST IGIS-2024</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-6">
-            <a href="https://github.com/mapwithhamza/routeiq" target="_blank" rel="noopener noreferrer"
-              className="text-xs text-white/25 hover:text-white/60 transition">
-              GitHub
-            </a>
-            <a href="mailto:mhamzakhan.contact@gmail.com"
-              className="text-xs text-white/25 hover:text-white/60 transition">
-              Email
-            </a>
-            <a href="https://www.linkedin.com/in/mhamzakhan007" target="_blank" rel="noopener noreferrer"
-              className="text-xs text-white/25 hover:text-white/60 transition">
-              LinkedIn
-            </a>
-            <p className="text-xs text-white/15">© 2026 RouteIQ</p>
+
+          {/* Bottom footer */}
+          <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-white/25">
+              © 2026 RouteIQ · CS-250 Data Structures &amp; Algorithms · NUST IGIS
+            </p>
+            <p className="text-xs text-white/20">
+              Built with React · FastAPI · PostgreSQL · MapLibre GL
+            </p>
           </div>
         </div>
       </footer>
@@ -371,6 +327,13 @@ export default function Landing() {
         @keyframes slide {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
+        }
+        @keyframes draw-route {
+          0% { stroke-dasharray: 0, 2000; }
+          100% { stroke-dasharray: 2000, 0; }
+        }
+        .animate-draw-route {
+          animation: draw-route 8s linear infinite;
         }
       `}</style>
     </div>
