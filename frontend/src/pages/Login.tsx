@@ -1,8 +1,8 @@
 /**
  * src/pages/Login.tsx — Split layout login page
- * Left: form, Right: animated map visual
+ * Left: form, Right: static map with highlighted route
  */
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -11,90 +11,44 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { authApi } from '../lib/api';
 import { AUTH_KEY } from '../hooks/useAuth';
 
-const MAP_WAYPOINTS: [number, number][] = [
-  [73.0300, 33.6950],
-  [73.0250, 33.6980],
-  [73.0200, 33.7020],
-  [73.0220, 33.7070],
-  [73.0270, 33.7100],
-  [73.0340, 33.7110],
-  [73.0410, 33.7090],
-  [73.0460, 33.7050],
-  [73.0480, 33.7000],
-  [73.0460, 33.6950],
-  [73.0420, 33.6920],
-  [73.0500, 33.6900],
-  [73.0580, 33.6920],
-  [73.0640, 33.6960],
-  [73.0660, 33.7010],
-  [73.0640, 33.7060],
-  [73.0580, 33.7090],
-  [73.0510, 33.7080],
-  [73.0460, 33.7050],
-  [73.0410, 33.7090],
-  [73.0340, 33.7110],
-  [73.0300, 33.6950],
+const STATIC_ROUTE: [number, number][] = [
+  [73.0880, 33.6950],
+  [73.0850, 33.6880],
+  [73.0780, 33.6830],
+  [73.0680, 33.6820],
+  [73.0580, 33.6850],
+  [73.0500, 33.6920],
+  [73.0460, 33.7000],
+  [73.0480, 33.7080],
+  [73.0540, 33.7140],
+  [73.0630, 33.7160],
+  [73.0720, 33.7130],
+  [73.0780, 33.7060],
+  [73.0780, 33.6980],
+  [73.0730, 33.6920],
+  [73.0650, 33.6900],
+  [73.0570, 33.6930],
+  [73.0520, 33.6990],
+  [73.0540, 33.7060],
+  [73.0600, 33.7110],
+  [73.0680, 33.7120],
+  [73.0760, 33.7080],
+  [73.0820, 33.7010],
+  [73.0850, 33.6960],
+  [73.0880, 33.6950],
 ];
+
+const routeGeoJSON = {
+  type: 'Feature' as const,
+  properties: {},
+  geometry: { type: 'LineString' as const, coordinates: STATIC_ROUTE },
+};
 
 export default function Login() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [animProgress, setAnimProgress] = useState(0);
-  const [isFading, setIsFading] = useState(false);
-  const animRef = useRef<number | null>(null);
-  const DRAW_DURATION = 5000;
-  const HOLD_DURATION = 800;
-  const FADE_DURATION = 600;
-
-  useEffect(() => {
-    let phase: 'drawing' | 'holding' | 'fading' = 'drawing';
-    let phaseStart: number | null = null;
-
-    const animate = (timestamp: number) => {
-      if (!phaseStart) phaseStart = timestamp;
-      const elapsed = timestamp - phaseStart;
-
-      if (phase === 'drawing') {
-        setAnimProgress(Math.min(elapsed / DRAW_DURATION, 1));
-        setIsFading(false);
-        if (elapsed >= DRAW_DURATION) { phase = 'holding'; phaseStart = timestamp; }
-      } else if (phase === 'holding') {
-        if (elapsed >= HOLD_DURATION) { phase = 'fading'; phaseStart = timestamp; setIsFading(true); }
-      } else if (phase === 'fading') {
-        if (elapsed >= FADE_DURATION) { phase = 'drawing'; phaseStart = timestamp; setAnimProgress(0); setIsFading(false); }
-      }
-      animRef.current = requestAnimationFrame(animate);
-    };
-    animRef.current = requestAnimationFrame(animate);
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
-  }, []);
-
-  const totalPoints = MAP_WAYPOINTS.length - 1;
-  const currentSegment = Math.floor(animProgress * totalPoints);
-  const segmentProgress = (animProgress * totalPoints) - currentSegment;
-  const animatedCoords: [number, number][] = [...MAP_WAYPOINTS.slice(0, currentSegment + 1)];
-  if (currentSegment < totalPoints) {
-    const from = MAP_WAYPOINTS[currentSegment];
-    const to = MAP_WAYPOINTS[currentSegment + 1];
-    animatedCoords.push([
-      from[0] + (to[0] - from[0]) * segmentProgress,
-      from[1] + (to[1] - from[1]) * segmentProgress,
-    ]);
-  }
-
-  const routeGeoJSON = {
-    type: 'Feature' as const,
-    properties: {},
-    geometry: { type: 'LineString' as const, coordinates: animatedCoords.length > 1 ? animatedCoords : [[0,0],[0,0]] },
-  };
-
-  const dotGeoJSON = animatedCoords.length > 1 && !isFading ? {
-    type: 'Feature' as const,
-    properties: {},
-    geometry: { type: 'Point' as const, coordinates: animatedCoords[animatedCoords.length - 1] },
-  } : null;
 
   const loginMut = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
@@ -207,58 +161,38 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Right — Map Visual */}
+      {/* Right — Static Map */}
       <div className="hidden lg:block flex-1 relative overflow-hidden">
         <Map
-          initialViewState={{ longitude: 73.0630, latitude: 33.7030, zoom: 12 }}
+          initialViewState={{ longitude: 73.0670, latitude: 33.6990, zoom: 12 }}
           style={{ width: '100%', height: '100%' }}
           mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
           interactive={false}
         >
-          <Source id="full-route" type="geojson" data={{
-            type: 'Feature',
-            properties: {},
-            geometry: { type: 'LineString', coordinates: MAP_WAYPOINTS },
-          }}>
-            <Layer id="full-route-line" type="line"
-              paint={{ 'line-color': '#ffffff', 'line-width': 1, 'line-opacity': 0.08 }}
+          {/* Glow layer */}
+          <Source id="route-glow" type="geojson" data={routeGeoJSON}>
+            <Layer id="route-glow-layer" type="line"
+              paint={{ 'line-color': '#06b6d4', 'line-width': 12, 'line-opacity': 0.12 }}
               layout={{ 'line-join': 'round', 'line-cap': 'round' }}
             />
           </Source>
-
-          <Source id="anim-route" type="geojson" data={routeGeoJSON}>
-            <Layer id="anim-glow" type="line"
-              paint={{ 'line-color': '#06b6d4', 'line-width': 10, 'line-opacity': isFading ? 0 : 0.12 }}
-              layout={{ 'line-join': 'round', 'line-cap': 'round' }}
-            />
-            <Layer id="anim-line" type="line"
-              paint={{ 'line-color': '#06b6d4', 'line-width': 2, 'line-opacity': isFading ? 0 : 0.8 }}
+          {/* Main route */}
+          <Source id="route-main" type="geojson" data={routeGeoJSON}>
+            <Layer id="route-main-layer" type="line"
+              paint={{ 'line-color': '#06b6d4', 'line-width': 2.5, 'line-opacity': 0.85 }}
               layout={{ 'line-join': 'round', 'line-cap': 'round' }}
             />
           </Source>
-
-          {dotGeoJSON && (
-            <Source id="dot" type="geojson" data={dotGeoJSON}>
-              <Layer id="dot-layer" type="circle"
-                paint={{
-                  'circle-radius': 6,
-                  'circle-color': '#06b6d4',
-                  'circle-stroke-width': 2,
-                  'circle-stroke-color': '#ffffff',
-                }}
-              />
-            </Source>
-          )}
         </Map>
 
-        {/* Blend left edge into form */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-[#0A0A0A] via-transparent to-transparent" style={{ width: '30%' }} />
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A]/50 to-transparent" />
+        {/* Blend left edge */}
+        <div className="absolute inset-y-0 left-0 w-24 pointer-events-none bg-gradient-to-r from-[#0A0A0A] to-transparent" />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A]/40 to-transparent" />
 
-        {/* Floating label */}
+        {/* Label */}
         <div className="absolute bottom-8 right-8 text-right">
-          <p className="text-white/60 text-sm font-semibold">Islamabad</p>
-          <p className="text-white/25 text-xs">Live Route Network</p>
+          <p className="text-white/50 text-sm font-semibold">Islamabad</p>
+          <p className="text-white/20 text-xs">Route Network</p>
         </div>
       </div>
     </div>

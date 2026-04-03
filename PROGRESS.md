@@ -229,7 +229,7 @@
 | 42 | 2026-04-02 | Landing map seamless blending + smoother figure-8 route. Login page split layout — form left, animated map right, Google OAuth button, clean dark theme | Landing v7 + Login v2 Done |
 | 43 | 2026-04-02 | Landing/Login fixes — reverted to figure-8 animation, reduced map blur, fixed IntersectionObserver cards not appearing on first load, sync animation between landing and login | Landing v8 Done |
 | 44 | 2026-04-03 | Landing/Login animation — path drawing animation (draw→hold→fade→repeat), removed scatter dots, cleaner route drawing effect | Animation v2 Done |
-
+| 45 | 2026-04-03 | Landing smooth figure-8 route restored, Login page static route display (no animation) | Animation v3 Done |
 ---
 
 ## Known Issues / Blockers
