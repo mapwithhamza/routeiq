@@ -228,6 +228,7 @@
 | 41 | 2026-04-02 | Landing page v6 — brighter footer text, new map animation route (F-7→Blue Area→G-9→F-10→F-7 circuit) | Landing v6 Done |
 | 42 | 2026-04-02 | Landing map seamless blending + smoother figure-8 route. Login page split layout — form left, animated map right, Google OAuth button, clean dark theme | Landing v7 + Login v2 Done |
 | 43 | 2026-04-02 | Landing/Login fixes — reverted to figure-8 animation, reduced map blur, fixed IntersectionObserver cards not appearing on first load, sync animation between landing and login | Landing v8 Done |
+| 44 | 2026-04-03 | Landing/Login animation — path drawing animation (draw→hold→fade→repeat), removed scatter dots, cleaner route drawing effect | Animation v2 Done |
 
 ---
 

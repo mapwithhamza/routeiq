@@ -42,15 +42,29 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [animProgress, setAnimProgress] = useState(0);
+  const [isFading, setIsFading] = useState(false);
   const animRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number | null>(null);
-  const ANIM_DURATION = 8000;
+  const DRAW_DURATION = 5000;
+  const HOLD_DURATION = 800;
+  const FADE_DURATION = 600;
 
   useEffect(() => {
+    let phase: 'drawing' | 'holding' | 'fading' = 'drawing';
+    let phaseStart: number | null = null;
+
     const animate = (timestamp: number) => {
-      if (!startTimeRef.current) startTimeRef.current = timestamp;
-      const elapsed = timestamp - startTimeRef.current;
-      setAnimProgress((elapsed % ANIM_DURATION) / ANIM_DURATION);
+      if (!phaseStart) phaseStart = timestamp;
+      const elapsed = timestamp - phaseStart;
+
+      if (phase === 'drawing') {
+        setAnimProgress(Math.min(elapsed / DRAW_DURATION, 1));
+        setIsFading(false);
+        if (elapsed >= DRAW_DURATION) { phase = 'holding'; phaseStart = timestamp; }
+      } else if (phase === 'holding') {
+        if (elapsed >= HOLD_DURATION) { phase = 'fading'; phaseStart = timestamp; setIsFading(true); }
+      } else if (phase === 'fading') {
+        if (elapsed >= FADE_DURATION) { phase = 'drawing'; phaseStart = timestamp; setAnimProgress(0); setIsFading(false); }
+      }
       animRef.current = requestAnimationFrame(animate);
     };
     animRef.current = requestAnimationFrame(animate);
@@ -73,10 +87,10 @@ export default function Login() {
   const routeGeoJSON = {
     type: 'Feature' as const,
     properties: {},
-    geometry: { type: 'LineString' as const, coordinates: animatedCoords },
+    geometry: { type: 'LineString' as const, coordinates: animatedCoords.length > 1 ? animatedCoords : [[0,0],[0,0]] },
   };
 
-  const dotGeoJSON = animatedCoords.length > 0 ? {
+  const dotGeoJSON = animatedCoords.length > 1 && !isFading ? {
     type: 'Feature' as const,
     properties: {},
     geometry: { type: 'Point' as const, coordinates: animatedCoords[animatedCoords.length - 1] },
@@ -214,11 +228,11 @@ export default function Login() {
 
           <Source id="anim-route" type="geojson" data={routeGeoJSON}>
             <Layer id="anim-glow" type="line"
-              paint={{ 'line-color': '#06b6d4', 'line-width': 10, 'line-opacity': 0.12 }}
+              paint={{ 'line-color': '#06b6d4', 'line-width': 10, 'line-opacity': isFading ? 0 : 0.12 }}
               layout={{ 'line-join': 'round', 'line-cap': 'round' }}
             />
             <Layer id="anim-line" type="line"
-              paint={{ 'line-color': '#06b6d4', 'line-width': 2, 'line-opacity': 0.8 }}
+              paint={{ 'line-color': '#06b6d4', 'line-width': 2, 'line-opacity': isFading ? 0 : 0.8 }}
               layout={{ 'line-join': 'round', 'line-cap': 'round' }}
             />
           </Source>

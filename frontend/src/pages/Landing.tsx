@@ -82,17 +82,44 @@ function FeatureCard({ number, title, desc, delay }: { number: string; title: st
 export default function Landing() {
   const navigate = useNavigate();
   const [animProgress, setAnimProgress] = useState(0);
+  const [isFading, setIsFading] = useState(false);
   const animRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number | null>(null);
-  const ANIM_DURATION = 10000;
+  const DRAW_DURATION = 4000;
+  const HOLD_DURATION = 800;
+  const FADE_DURATION = 600;
 
   // Animate route on hero map
   useEffect(() => {
+    let phase: 'drawing' | 'holding' | 'fading' = 'drawing';
+    let phaseStart: number | null = null;
+
     const animate = (timestamp: number) => {
-      if (!startTimeRef.current) startTimeRef.current = timestamp;
-      const elapsed = timestamp - startTimeRef.current;
-      const progress = (elapsed % ANIM_DURATION) / ANIM_DURATION;
-      setAnimProgress(progress);
+      if (!phaseStart) phaseStart = timestamp;
+      const elapsed = timestamp - phaseStart;
+
+      if (phase === 'drawing') {
+        const progress = Math.min(elapsed / DRAW_DURATION, 1);
+        setAnimProgress(progress);
+        setIsFading(false);
+        if (progress >= 1) {
+          phase = 'holding';
+          phaseStart = timestamp;
+        }
+      } else if (phase === 'holding') {
+        if (elapsed >= HOLD_DURATION) {
+          phase = 'fading';
+          phaseStart = timestamp;
+          setIsFading(true);
+        }
+      } else if (phase === 'fading') {
+        if (elapsed >= FADE_DURATION) {
+          phase = 'drawing';
+          phaseStart = timestamp;
+          setAnimProgress(0);
+          setIsFading(false);
+        }
+      }
+
       animRef.current = requestAnimationFrame(animate);
     };
     animRef.current = requestAnimationFrame(animate);
@@ -115,13 +142,16 @@ export default function Landing() {
     ]);
   }
 
+  const lineOpacity = isFading ? 0 : animProgress > 0 ? 0.9 : 0;
+  const glowOpacity = isFading ? 0 : animProgress > 0 ? 0.15 : 0;
+
   const routeGeoJSON = {
     type: 'Feature' as const,
     properties: {},
-    geometry: { type: 'LineString' as const, coordinates: animatedCoords },
+    geometry: { type: 'LineString' as const, coordinates: animatedCoords.length > 1 ? animatedCoords : [[0,0],[0,0]] },
   };
 
-  const dotGeoJSON = animatedCoords.length > 0 ? {
+  const dotGeoJSON = animatedCoords.length > 1 && !isFading ? {
     type: 'Feature' as const,
     properties: {},
     geometry: { type: 'Point' as const, coordinates: animatedCoords[animatedCoords.length - 1] },
@@ -212,11 +242,11 @@ export default function Landing() {
               {/* Animated route */}
               <Source id="anim-route" type="geojson" data={routeGeoJSON}>
                 <Layer id="anim-route-glow" type="line"
-                  paint={{ 'line-color': '#06b6d4', 'line-width': 8, 'line-opacity': 0.15 }}
+                  paint={{ 'line-color': '#06b6d4', 'line-width': 10, 'line-opacity': glowOpacity }}
                   layout={{ 'line-join': 'round', 'line-cap': 'round' }}
                 />
                 <Layer id="anim-route-line" type="line"
-                  paint={{ 'line-color': '#06b6d4', 'line-width': 2.5, 'line-opacity': 0.9 }}
+                  paint={{ 'line-color': '#06b6d4', 'line-width': 2.5, 'line-opacity': lineOpacity }}
                   layout={{ 'line-join': 'round', 'line-cap': 'round' }}
                 />
               </Source>
@@ -236,23 +266,6 @@ export default function Landing() {
                 </Source>
               )}
 
-              {/* Waypoint dots */}
-              <Source id="waypoints" type="geojson" data={{
-                type: 'FeatureCollection',
-                features: HERO_WAYPOINTS.map(coord => ({
-                  type: 'Feature',
-                  properties: {},
-                  geometry: { type: 'Point', coordinates: coord },
-                })),
-              }}>
-                <Layer id="waypoint-dots" type="circle"
-                  paint={{
-                    'circle-radius': 4,
-                    'circle-color': '#ffffff',
-                    'circle-opacity': 0.4,
-                  }}
-                />
-              </Source>
             </Map>
             {/* Subtle edge blending */}
             <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#0A0A0A]/60 via-transparent to-transparent" />
