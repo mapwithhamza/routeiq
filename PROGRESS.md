@@ -8,9 +8,9 @@
 
 ## Current Status
 
-**Active Phase:** Phase 10 — Deployment
-**Last Completed Task:** Phase 9 — Algorithm Comparison Panel (benchmark table + ECharts bar charts + winner badge)
-**Next Task:** Phase 10, Step 1 — Deploy frontend to Vercel and backend to Railway
+**Active Phase:** Landing Page Polish
+**Last Completed Task:** Landing hero map animation improved — road-aligned route path, smooth marker interpolation, progressive route animation.
+**Next Task:** Continue final review, testing, or presentation/report polish as needed.
 
 ---
 
@@ -178,6 +178,22 @@
 - [x] AuthCallback.tsx — stores token in sessionStorage
 - [x] axios.ts — interceptor attaches Bearer token from sessionStorage
 
+### Phase 14 — Documentation / Concept Notes
+
+- [x] `concept.md` created at project root
+- [x] Documented all RouteIQ DSA algorithms and where they are used
+- [x] Documented core data structures: graph, adjacency list, queue, stack, heap, set, dictionary, DP table, bitmask, JSON arrays
+- [x] Clarified route optimization flow from frontend waypoints to backend graph algorithms to map visualization
+- [x] Marked stale Google OAuth blocker as resolved in this tracker
+
+### Phase 15 — Landing Hero Map Animation
+
+- [x] Landing hero map route replaced with a road-aligned Islamabad delivery-style polyline
+- [x] Marker animation changed from point-index stepping to cumulative-distance interpolation
+- [x] Progressive route draw/glow preserved with clean fade-and-loop behavior
+- [x] Premium dark MapLibre visual style preserved
+- [x] Login page map left untouched
+
 ---
 
 ## Session Log
@@ -230,19 +246,16 @@
 | 43 | 2026-04-02 | Landing/Login fixes — reverted to figure-8 animation, reduced map blur, fixed IntersectionObserver cards not appearing on first load, sync animation between landing and login | Landing v8 Done |
 | 44 | 2026-04-03 | Landing/Login animation — path drawing animation (draw→hold→fade→repeat), removed scatter dots, cleaner route drawing effect | Animation v2 Done |
 | 45 | 2026-04-03 | Landing smooth figure-8 route restored, Login page static route display (no animation) | Animation v3 Done |
+| 46 | 2026-04-28 | Documentation pass: created `concept.md` explaining algorithms, data structures, concepts, and where they are used in RouteIQ. Updated progress tracker and cleared stale OAuth blocker note. | Concept Docs Done |
+| 47 | 2026-04-28 | Landing hero map animation improved — road-aligned route path, smooth marker interpolation, progressive route animation. Verified `npx.cmd tsc --noEmit` and `npm.cmd run build`. | Landing Hero Animation Done |
 ---
 
 ## Known Issues / Blockers
 
 <!-- Add issues here as they come up -->
 
-Google OAuth cross-domain cookie issue:
-
-- Backend redirects to /auth/callback?token={JWT} after Google login
-- AuthCallback.tsx reads token, stores in sessionStorage, sets axios Authorization header
-- axios.ts has interceptor to attach Bearer token from sessionStorage
-- backend/auth.py get_current_user still only reads cookie — needs to also check Authorization header
-- This is the ONLY remaining fix needed for Google OAuth to work
+- No active blockers recorded.
+- Previous Google OAuth cross-domain issue is resolved: `get_current_user` accepts Bearer token auth, `AuthCallback.tsx` stores the token in sessionStorage, and `axios.ts` attaches it to requests.
 
 ---
 
@@ -257,6 +270,7 @@ Google OAuth cross-domain cookie issue:
 - Design tokens live at `frontend/src/styles/design-system.ts`.
 - Dark mode: `ThemeProvider` wraps app, `dark` class on `<html>`, toggle in topbar.
 - Sidebar: collapsible with lucide-react icons, collapses to 68px icon-only mode.
+- `concept.md` explains the DSA algorithms/data structures and can be used for viva, report writing, or presentation prep.
 - All API calls, hooks, Zod schemas, OSRM logic fully preserved — only UI changed.
 - `tsc --noEmit` ✅ zero errors. Pushed to GitHub main.
 - Reminder: NEVER commit `backend/.env` or `frontend/.env` — both are in `.gitignore`.

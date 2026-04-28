@@ -2,38 +2,144 @@
  * src/pages/Landing.tsx — Public landing page
  * Bringg-inspired bold typography, live MapLibre map, tech slider, scroll animations.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import Map, { Source, Layer } from 'react-map-gl/maplibre';
+import Map, { Marker, Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-const HERO_WAYPOINTS: [number, number][] = [
-  [73.0880, 33.6950],
-  [73.0850, 33.6880],
-  [73.0780, 33.6830],
-  [73.0680, 33.6820],
-  [73.0580, 33.6850],
-  [73.0500, 33.6920],
-  [73.0460, 33.7000],
-  [73.0480, 33.7080],
-  [73.0540, 33.7140],
-  [73.0630, 33.7160],
-  [73.0720, 33.7130],
-  [73.0780, 33.7060],
-  [73.0780, 33.6980],
-  [73.0730, 33.6920],
-  [73.0650, 33.6900],
-  [73.0570, 33.6930],
-  [73.0520, 33.6990],
-  [73.0540, 33.7060],
-  [73.0600, 33.7110],
-  [73.0680, 33.7120],
-  [73.0760, 33.7080],
-  [73.0820, 33.7010],
-  [73.0850, 33.6960],
-  [73.0880, 33.6950],
+const HERO_ROUTE_COORDINATES: [number, number][] = [
+  // Road-aligned Islamabad delivery route: F-10 -> F-9 edge -> Blue Area -> F-6.
+  [73.01175, 33.69345],
+  [73.01520, 33.69418],
+  [73.01895, 33.69498],
+  [73.02315, 33.69588],
+  [73.02720, 33.69672],
+  [73.03135, 33.69756],
+  [73.03555, 33.69842],
+  [73.03960, 33.69926],
+  [73.04365, 33.70010],
+  [73.04770, 33.70094],
+  [73.05170, 33.70180],
+  [73.05570, 33.70266],
+  [73.05970, 33.70350],
+  [73.06370, 33.70434],
+  [73.06765, 33.70518],
+  [73.07155, 33.70602],
+  [73.07535, 33.70684],
+  [73.07895, 33.70756],
+  [73.08140, 33.70610],
+  [73.08305, 33.70375],
+  [73.08468, 33.70132],
+  [73.08630, 33.69892],
+  [73.08795, 33.69646],
+  [73.08962, 33.69402],
+  [73.09128, 33.69156],
+  [73.09288, 33.68918],
+  [73.09040, 33.68822],
+  [73.08685, 33.68745],
+  [73.08320, 33.68668],
+  [73.07955, 33.68590],
+  [73.07585, 33.68514],
+  [73.07225, 33.68438],
+  [73.06865, 33.68362],
+  [73.06510, 33.68284],
+  [73.06160, 33.68206],
+  [73.05810, 33.68130],
+  [73.05465, 33.68054],
+  [73.05122, 33.67978],
+  [73.04785, 33.67902],
+  [73.04448, 33.67828],
+  [73.04118, 33.67754],
+  [73.03870, 33.67895],
+  [73.03695, 33.68110],
+  [73.03525, 33.68325],
+  [73.03355, 33.68542],
+  [73.03185, 33.68758],
+  [73.03015, 33.68972],
+  [73.02842, 33.69190],
+  [73.02670, 33.69405],
+  [73.02505, 33.69618],
+  [73.02880, 33.69705],
+  [73.03260, 33.69788],
+  [73.03640, 33.69870],
+  [73.04022, 33.69952],
+  [73.04405, 33.70032],
+  [73.04790, 33.70115],
+  [73.05175, 33.70198],
+  [73.05565, 33.70278],
+  [73.05955, 33.70358],
 ];
+
+const MAP_CENTER: [number, number] = [73.0523, 33.6933];
+const DRAW_DURATION = 7200;
+const HOLD_DURATION = 900;
+const FADE_DURATION = 800;
+
+function distanceKm(a: [number, number], b: [number, number]) {
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+  const dLat = toRad(b[1] - a[1]);
+  const dLng = toRad(b[0] - a[0]);
+  const lat1 = toRad(a[1]);
+  const lat2 = toRad(b[1]);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+}
+
+function bearingDegrees(a: [number, number], b: [number, number]) {
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const toDeg = (value: number) => (value * 180) / Math.PI;
+  const lat1 = toRad(a[1]);
+  const lat2 = toRad(b[1]);
+  const dLng = toRad(b[0] - a[0]);
+  const y = Math.sin(dLng) * Math.cos(lat2);
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+  return (toDeg(Math.atan2(y, x)) + 360) % 360;
+}
+
+function buildRouteMetrics(coords: [number, number][]) {
+  const cumulative = [0];
+  for (let i = 1; i < coords.length; i += 1) {
+    cumulative.push(cumulative[i - 1] + distanceKm(coords[i - 1], coords[i]));
+  }
+  return { cumulative, total: cumulative[cumulative.length - 1] };
+}
+
+function interpolateRoute(
+  coords: [number, number][],
+  cumulative: number[],
+  totalDistance: number,
+  progress: number,
+) {
+  const clampedProgress = Math.max(0, Math.min(progress, 1));
+  const targetDistance = clampedProgress * totalDistance;
+  let segmentIndex = 0;
+
+  while (
+    segmentIndex < cumulative.length - 2 &&
+    cumulative[segmentIndex + 1] < targetDistance
+  ) {
+    segmentIndex += 1;
+  }
+
+  const from = coords[segmentIndex];
+  const to = coords[Math.min(segmentIndex + 1, coords.length - 1)];
+  const segmentDistance = cumulative[segmentIndex + 1] - cumulative[segmentIndex] || 1;
+  const segmentProgress = (targetDistance - cumulative[segmentIndex]) / segmentDistance;
+  const marker: [number, number] = [
+    from[0] + (to[0] - from[0]) * segmentProgress,
+    from[1] + (to[1] - from[1]) * segmentProgress,
+  ];
+
+  return {
+    marker,
+    bearing: bearingDegrees(from, to),
+    animatedCoords: [...coords.slice(0, segmentIndex + 1), marker],
+  };
+}
 
 const TECH_ITEMS = [
   'React 18', 'FastAPI', 'PostgreSQL', 'MapLibre GL',
@@ -83,12 +189,9 @@ function FeatureCard({ number, title, desc, delay }: { number: string; title: st
 
 export default function Landing() {
   const navigate = useNavigate();
-  const [animProgress, setAnimProgress] = useState(0);
-  const [isFading, setIsFading] = useState(false);
+  const [routeAnimation, setRouteAnimation] = useState({ progress: 0, fade: 0 });
   const animRef = useRef<number | null>(null);
-  const DRAW_DURATION = 4000;
-  const HOLD_DURATION = 800;
-  const FADE_DURATION = 600;
+  const routeMetrics = useMemo(() => buildRouteMetrics(HERO_ROUTE_COORDINATES), []);
 
   // Animate route on hero map
   useEffect(() => {
@@ -101,24 +204,23 @@ export default function Landing() {
 
       if (phase === 'drawing') {
         const progress = Math.min(elapsed / DRAW_DURATION, 1);
-        setAnimProgress(progress);
-        setIsFading(false);
+        setRouteAnimation({ progress, fade: 0 });
         if (progress >= 1) {
           phase = 'holding';
           phaseStart = timestamp;
         }
       } else if (phase === 'holding') {
+        setRouteAnimation({ progress: 1, fade: 0 });
         if (elapsed >= HOLD_DURATION) {
           phase = 'fading';
           phaseStart = timestamp;
-          setIsFading(true);
         }
       } else if (phase === 'fading') {
+        setRouteAnimation({ progress: 1, fade: Math.min(elapsed / FADE_DURATION, 1) });
         if (elapsed >= FADE_DURATION) {
           phase = 'drawing';
           phaseStart = timestamp;
-          setAnimProgress(0);
-          setIsFading(false);
+          setRouteAnimation({ progress: 0, fade: 0 });
         }
       }
 
@@ -128,36 +230,28 @@ export default function Landing() {
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
   }, []);
 
-  // Build animated route coordinates
-  const totalPoints = HERO_WAYPOINTS.length - 1;
-  const currentSegment = Math.floor(animProgress * totalPoints);
-  const segmentProgress = (animProgress * totalPoints) - currentSegment;
-  const animatedCoords: [number, number][] = [
-    ...HERO_WAYPOINTS.slice(0, currentSegment + 1),
-  ];
-  if (currentSegment < totalPoints) {
-    const from = HERO_WAYPOINTS[currentSegment];
-    const to = HERO_WAYPOINTS[currentSegment + 1];
-    animatedCoords.push([
-      from[0] + (to[0] - from[0]) * segmentProgress,
-      from[1] + (to[1] - from[1]) * segmentProgress,
-    ]);
-  }
+  const routeFrame = interpolateRoute(
+    HERO_ROUTE_COORDINATES,
+    routeMetrics.cumulative,
+    routeMetrics.total,
+    routeAnimation.progress,
+  );
 
-  const lineOpacity = isFading ? 0 : animProgress > 0 ? 0.9 : 0;
-  const glowOpacity = isFading ? 0 : animProgress > 0 ? 0.15 : 0;
+  const fadeOpacity = 1 - routeAnimation.fade;
+  const lineOpacity = routeAnimation.progress > 0 ? 0.95 * fadeOpacity : 0;
+  const glowOpacity = routeAnimation.progress > 0 ? 0.22 * fadeOpacity : 0;
+  const markerOpacity = routeAnimation.progress > 0 ? fadeOpacity : 0;
 
   const routeGeoJSON = {
     type: 'Feature' as const,
     properties: {},
-    geometry: { type: 'LineString' as const, coordinates: animatedCoords.length > 1 ? animatedCoords : [[0,0],[0,0]] },
+    geometry: {
+      type: 'LineString' as const,
+      coordinates: routeFrame.animatedCoords.length > 1
+        ? routeFrame.animatedCoords
+        : [HERO_ROUTE_COORDINATES[0], HERO_ROUTE_COORDINATES[0]],
+    },
   };
-
-  const dotGeoJSON = animatedCoords.length > 1 && !isFading ? {
-    type: 'Feature' as const,
-    properties: {},
-    geometry: { type: 'Point' as const, coordinates: animatedCoords[animatedCoords.length - 1] },
-  } : null;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
@@ -224,7 +318,7 @@ export default function Landing() {
           {/* Right — Live Map View with MapLibre */}
           <div className="relative h-[500px] overflow-hidden">
             <Map
-              initialViewState={{ longitude: 73.0479, latitude: 33.6844, zoom: 11.5 }}
+              initialViewState={{ longitude: MAP_CENTER[0], latitude: MAP_CENTER[1], zoom: 12.15, bearing: -18, pitch: 35 }}
               style={{ width: '100%', height: '100%' }}
               mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
               interactive={false}
@@ -233,10 +327,10 @@ export default function Landing() {
               <Source id="full-route" type="geojson" data={{
                 type: 'Feature',
                 properties: {},
-                geometry: { type: 'LineString', coordinates: HERO_WAYPOINTS },
+                geometry: { type: 'LineString', coordinates: HERO_ROUTE_COORDINATES },
               }}>
                 <Layer id="full-route-line" type="line"
-                  paint={{ 'line-color': '#ffffff', 'line-width': 2, 'line-opacity': 0.15 }}
+                  paint={{ 'line-color': '#7dd3fc', 'line-width': 2, 'line-opacity': 0.16 }}
                   layout={{ 'line-join': 'round', 'line-cap': 'round' }}
                 />
               </Source>
@@ -244,29 +338,32 @@ export default function Landing() {
               {/* Animated route */}
               <Source id="anim-route" type="geojson" data={routeGeoJSON}>
                 <Layer id="anim-route-glow" type="line"
-                  paint={{ 'line-color': '#06b6d4', 'line-width': 10, 'line-opacity': glowOpacity }}
+                  paint={{ 'line-color': '#0ea5e9', 'line-width': 14, 'line-opacity': glowOpacity, 'line-blur': 2 }}
                   layout={{ 'line-join': 'round', 'line-cap': 'round' }}
                 />
                 <Layer id="anim-route-line" type="line"
-                  paint={{ 'line-color': '#06b6d4', 'line-width': 2.5, 'line-opacity': lineOpacity }}
+                  paint={{ 'line-color': '#22d3ee', 'line-width': 3.25, 'line-opacity': lineOpacity }}
                   layout={{ 'line-join': 'round', 'line-cap': 'round' }}
                 />
               </Source>
 
-              {/* Moving dot */}
-              {dotGeoJSON && (
-                <Source id="dot" type="geojson" data={dotGeoJSON}>
-                  <Layer id="dot-layer" type="circle"
-                    paint={{
-                      'circle-radius': 8,
-                      'circle-color': '#06b6d4',
-                      'circle-stroke-width': 3,
-                      'circle-stroke-color': '#ffffff',
-                      'circle-opacity': 1,
-                    }}
-                  />
-                </Source>
-              )}
+              {/* Moving delivery marker */}
+              <Marker
+                longitude={routeFrame.marker[0]}
+                latitude={routeFrame.marker[1]}
+                anchor="center"
+              >
+                <div
+                  className="hero-delivery-marker"
+                  style={{
+                    opacity: markerOpacity,
+                    transform: `rotate(${routeFrame.bearing}deg)`,
+                  }}
+                >
+                  <span className="hero-delivery-marker__pulse" />
+                  <span className="hero-delivery-marker__core" />
+                </div>
+              </Marker>
 
             </Map>
             {/* Subtle edge blending */}
@@ -417,6 +514,47 @@ export default function Landing() {
         @keyframes slide {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
+        }
+        .hero-delivery-marker {
+          position: relative;
+          width: 34px;
+          height: 34px;
+          transition: opacity 160ms linear;
+          will-change: transform, opacity;
+        }
+        .hero-delivery-marker__pulse {
+          position: absolute;
+          inset: 1px;
+          border-radius: 9999px;
+          background: rgba(34, 211, 238, 0.22);
+          box-shadow: 0 0 28px rgba(34, 211, 238, 0.65);
+          animation: deliveryPulse 1.45s ease-out infinite;
+        }
+        .hero-delivery-marker__core {
+          position: absolute;
+          left: 9px;
+          top: 9px;
+          width: 16px;
+          height: 16px;
+          border-radius: 9999px;
+          background: #22d3ee;
+          border: 3px solid #f8fafc;
+          box-shadow: 0 0 18px rgba(34, 211, 238, 0.85), 0 5px 16px rgba(0, 0, 0, 0.45);
+        }
+        .hero-delivery-marker__core::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: -10px;
+          width: 2px;
+          height: 8px;
+          border-radius: 9999px;
+          background: rgba(248, 250, 252, 0.8);
+          transform: translateX(-50%);
+        }
+        @keyframes deliveryPulse {
+          0% { transform: scale(0.62); opacity: 0.8; }
+          100% { transform: scale(1.65); opacity: 0; }
         }
       `}</style>
     </div>
