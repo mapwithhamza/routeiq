@@ -9,39 +9,13 @@ import { toast } from 'sonner';
 import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { authApi } from '../lib/api';
+import { HERO_ROUTE_CENTER, HERO_ROUTE_COORDINATES } from '../lib/heroRoute';
 import { AUTH_KEY } from '../hooks/useAuth';
-
-const STATIC_ROUTE: [number, number][] = [
-  [73.0880, 33.6950],
-  [73.0850, 33.6880],
-  [73.0780, 33.6830],
-  [73.0680, 33.6820],
-  [73.0580, 33.6850],
-  [73.0500, 33.6920],
-  [73.0460, 33.7000],
-  [73.0480, 33.7080],
-  [73.0540, 33.7140],
-  [73.0630, 33.7160],
-  [73.0720, 33.7130],
-  [73.0780, 33.7060],
-  [73.0780, 33.6980],
-  [73.0730, 33.6920],
-  [73.0650, 33.6900],
-  [73.0570, 33.6930],
-  [73.0520, 33.6990],
-  [73.0540, 33.7060],
-  [73.0600, 33.7110],
-  [73.0680, 33.7120],
-  [73.0760, 33.7080],
-  [73.0820, 33.7010],
-  [73.0850, 33.6960],
-  [73.0880, 33.6950],
-];
 
 const routeGeoJSON = {
   type: 'Feature' as const,
   properties: {},
-  geometry: { type: 'LineString' as const, coordinates: STATIC_ROUTE },
+  geometry: { type: 'LineString' as const, coordinates: HERO_ROUTE_COORDINATES },
 };
 
 export default function Login() {
@@ -164,7 +138,7 @@ export default function Login() {
       {/* Right — Static Map */}
       <div className="hidden lg:block flex-1 relative overflow-hidden">
         <Map
-          initialViewState={{ longitude: 73.0670, latitude: 33.6990, zoom: 12 }}
+          initialViewState={{ longitude: HERO_ROUTE_CENTER[0], latitude: HERO_ROUTE_CENTER[1], zoom: 12.05 }}
           style={{ width: '100%', height: '100%' }}
           mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
           interactive={false}

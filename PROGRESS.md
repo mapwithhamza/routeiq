@@ -9,7 +9,7 @@
 ## Current Status
 
 **Active Phase:** Landing Page Polish
-**Last Completed Task:** Landing hero map animation corrected with OSRM-snapped Islamabad road geometry and north-up map orientation.
+**Last Completed Task:** Login page static map synced to the shared OSRM-snapped Islamabad route used by the landing hero.
 **Next Task:** Continue final review, testing, or presentation/report polish as needed.
 
 ---
@@ -194,6 +194,7 @@
 - [x] Premium dark MapLibre visual style preserved
 - [x] Login page map left untouched
 - [x] Route coordinates verified against OSRM-snapped geometry and map orientation reset to north-up flat view
+- [x] Login page static map updated to use the same complete shared OSRM-snapped route
 
 ---
 
@@ -250,6 +251,7 @@
 | 46 | 2026-04-28 | Documentation pass: created `concept.md` explaining algorithms, data structures, concepts, and where they are used in RouteIQ. Updated progress tracker and cleared stale OAuth blocker note. | Concept Docs Done |
 | 47 | 2026-04-28 | Landing hero map animation improved — road-aligned route path, smooth marker interpolation, progressive route animation. Verified `npx.cmd tsc --noEmit` and `npm.cmd run build`. | Landing Hero Animation Done |
 | 48 | 2026-04-28 | Landing hero route verified and corrected — replaced handcrafted geometry with OSRM-snapped Islamabad road coordinates, reset hero map to north-up flat orientation, reran frontend typecheck/build. | Landing Route Verification Done |
+| 49 | 2026-04-28 | Login page static map updated to the latest complete OSRM-snapped route; landing and login now share `frontend/src/lib/heroRoute.ts` to avoid duplicated route coordinates. Verified frontend typecheck/build. | Login Route Sync Done |
 ---
 
 ## Known Issues / Blockers
