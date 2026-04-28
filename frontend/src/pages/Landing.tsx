@@ -334,9 +334,9 @@ export default function Landing() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
           <FeatureCard
-            number="7"
-            title="DSA Algorithms"
-            desc="BFS, DFS, Dijkstra, A*, Greedy-NN, TSP-DP and MergeSort — all running simultaneously on your delivery network."
+            number="6"
+            title="Routing Algorithms"
+            desc="BFS, DFS, Dijkstra, A*, Greedy-NN and TSP-DP running on your delivery network."
             delay={0}
           />
           <FeatureCard

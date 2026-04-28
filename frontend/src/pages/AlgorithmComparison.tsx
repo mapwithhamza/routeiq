@@ -15,8 +15,9 @@ import type { BenchmarkResult } from '../types';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 
-// All 7 algorithms the backend runs
-const ALL_ALGOS = ['BFS', 'DFS', 'Dijkstra', 'A*', 'Greedy-NN', 'TSP-DP', 'MergeSort'] as const;
+const ROUTING_ALGOS = ['BFS', 'DFS', 'Dijkstra', 'A*', 'Greedy-NN', 'TSP-DP'] as const;
+type RoutingAlgo = typeof ROUTING_ALGOS[number];
+type ComplexitySelection = 'all' | RoutingAlgo;
 
 // Colors per algorithm for consistent chart coloring
 const ALGO_COLORS: Record<string, string> = {
@@ -26,7 +27,15 @@ const ALGO_COLORS: Record<string, string> = {
   'A*':        '#10b981',
   'Greedy-NN': '#f59e0b',
   'TSP-DP':    '#ef4444',
-  'MergeSort': '#94a3b8',
+};
+
+const ALGO_COMPLEXITY: Record<RoutingAlgo, string> = {
+  'BFS': 'O(V + E)',
+  'DFS': 'O(V + E)',
+  'Dijkstra': 'O((V + E) log V)',
+  'A*': 'O(E log V)',
+  'Greedy-NN': 'O(n^2)',
+  'TSP-DP': 'O(2^n * n^2)',
 };
 
 type NodeSize = 10 | 50 | 200;
@@ -35,21 +44,7 @@ export default function AlgorithmComparison() {
   const [nodeSize, setNodeSize] = useState<NodeSize>(10);
   const [results, setResults] = useState<BenchmarkResult[] | null>(null);
   const [selectedAlgo, setSelectedAlgo] = useState<string | null>(null);
-
-  const [visibleAlgos, setVisibleAlgos] = useState<Set<string>>(new Set(ALL_ALGOS));
-
-  const toggleVisibleAlgo = (algo: string) => {
-    setVisibleAlgos(prev => {
-      const next = new Set(prev);
-      if (next.has(algo)) {
-        if (next.size === 1) return prev;
-        next.delete(algo);
-      } else {
-        next.add(algo);
-      }
-      return next;
-    });
-  };
+  const [complexitySelection, setComplexitySelection] = useState<ComplexitySelection>('all');
 
   // Big-O theoretical curves — values at n=10, 50, 200
   const BIG_O_N = [10, 50, 200];
@@ -71,14 +66,18 @@ export default function AlgorithmComparison() {
     onSuccess: (data) => {
       setResults(data);
       setSelectedAlgo(null);
-      toast.success(`Benchmark complete — ${data.length} results returned.`);
+      toast.success('Benchmark complete.');
     },
     onError: () => toast.error('Benchmark failed. Is the backend running?'),
   });
 
-  // Filter to the chosen node size, excluding NetworkX validation rows
+  // Filter to routing algorithms only. MergeSort may exist in the backend
+  // benchmark as a standalone sorting demo, but it is not route optimization.
   const filtered: BenchmarkResult[] = (results ?? []).filter(
-    (r) => r.nodes === nodeSize && !r.algorithm.includes('_vs_'),
+    (r) =>
+      r.nodes === nodeSize &&
+      !r.algorithm.includes('_vs_') &&
+      (ROUTING_ALGOS as readonly string[]).includes(r.algorithm),
   );
 
   // Find the best algorithm by shortest distance
@@ -97,7 +96,7 @@ export default function AlgorithmComparison() {
     grid: { top: 12, bottom: 40, left: 55, right: 20 },
     xAxis: {
       type: 'category' as const,
-      data: ALL_ALGOS as unknown as string[],
+      data: ROUTING_ALGOS as unknown as string[],
       axisLabel: { color: '#64748b', rotate: 15, fontSize: 11 },
       axisLine: { lineStyle: { color: '#334155' } },
     },
@@ -112,7 +111,7 @@ export default function AlgorithmComparison() {
       {
         type: 'bar' as const,
         barMaxWidth: 40,
-        data: ALL_ALGOS.map((algo) => {
+        data: ROUTING_ALGOS.map((algo) => {
           const row = filtered.find((r) => r.algorithm === algo);
           return {
             value: row?.distance_km ?? null,
@@ -131,7 +130,7 @@ export default function AlgorithmComparison() {
     grid: { top: 12, bottom: 40, left: 65, right: 20 },
     xAxis: {
       type: 'category' as const,
-      data: ALL_ALGOS as unknown as string[],
+      data: ROUTING_ALGOS as unknown as string[],
       axisLabel: { color: '#64748b', rotate: 15, fontSize: 11 },
       axisLine: { lineStyle: { color: '#334155' } },
     },
@@ -146,7 +145,7 @@ export default function AlgorithmComparison() {
       {
         type: 'bar' as const,
         barMaxWidth: 40,
-        data: ALL_ALGOS.map((algo) => {
+        data: ROUTING_ALGOS.map((algo) => {
           const row = filtered.find((r) => r.algorithm === algo);
           return {
             value: row?.runtime_ms ?? null,
@@ -159,23 +158,38 @@ export default function AlgorithmComparison() {
   };
 
   // Complexity Visualizer chart
+  const visibleComplexityAlgos =
+    complexitySelection === 'all' ? ROUTING_ALGOS : ([complexitySelection] as const);
+
   const complexityChartOptions = {
     backgroundColor: 'transparent',
     tooltip: {
-      trigger: 'axis',
-      formatter: (params: any[]) => {
-        const n = params[0]?.axisValue;
-        let html = `<div style="font-weight:600;margin-bottom:4px">n = ${n} nodes</div>`;
-        params.forEach((p: any) => {
-          if (p.value != null) {
-            html += `<div style="display:flex;align-items:center;gap:6px">
-              <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color}"></span>
-              <span>${p.seriesName}:</span>
-              <span style="font-weight:600">${typeof p.value === 'number' ? p.value.toFixed(4) : p.value} ms</span>
-            </div>`;
-          }
-        });
-        return html;
+      trigger: 'item',
+      formatter: (p: any) => {
+        const value = Array.isArray(p.value) ? p.value[1] : p.value;
+        const runtime = typeof value === 'number' ? value.toFixed(4) : value ?? 'N/A';
+        const nodeCount = Number(p.name);
+        const row = (results ?? []).find(
+          r => r.nodes === nodeCount && r.algorithm === p.seriesName && !r.algorithm.includes('_vs_'),
+        );
+
+        if (row) {
+          return `
+            <div style="font-weight:700;margin-bottom:6px">${row.algorithm}</div>
+            <div>Input size: <b>${row.nodes} nodes</b></div>
+            <div>Runtime: <b>${row.runtime_ms?.toFixed(4) ?? 'N/A'} ms</b></div>
+            <div>Distance: <b>${row.distance_km != null ? `${row.distance_km.toFixed(4)} km` : 'N/A'}</b></div>
+            <div>Nodes explored: <b>${row.nodes_explored ?? 'N/A'}</b></div>
+            <div>Route stops: <b>${row.route_length ?? 'N/A'}</b></div>
+            <div>Complexity: <b>${ALGO_COMPLEXITY[row.algorithm as RoutingAlgo] ?? 'N/A'}</b></div>
+          `;
+        }
+
+        return `
+          <div style="font-weight:700;margin-bottom:6px">${p.seriesName}</div>
+          <div>Input size: <b>${p.name} nodes</b></div>
+          <div>Theoretical value: <b>${runtime} ms</b></div>
+        `;
       },
     },
     legend: {
@@ -212,7 +226,7 @@ export default function AlgorithmComparison() {
         emphasis: { disabled: true },
       })),
       // Actual benchmark data per algorithm
-      ...ALL_ALGOS.filter(algo => visibleAlgos.has(algo)).map(algo => {
+      ...visibleComplexityAlgos.map(algo => {
         const points = [10, 50, 200].map(n => {
           const row = (results ?? []).find(r => r.nodes === n && r.algorithm === algo && !r.algorithm.includes('_vs_'));
           return row?.runtime_ms ?? null;
@@ -227,6 +241,7 @@ export default function AlgorithmComparison() {
           symbol: 'circle',
           symbolSize: 8,
           connectNulls: false,
+          emphasis: { focus: 'series' as const },
         };
       }),
     ],
@@ -244,7 +259,7 @@ export default function AlgorithmComparison() {
             Algorithm Comparison
           </h1>
           <p className="mt-1 text-gray-500 dark:text-[#8B949E] text-sm">
-            Benchmark all 7 DSA algorithms and compare performance metrics.
+            Benchmark route optimization algorithms and compare performance metrics.
           </p>
         </div>
 
@@ -285,7 +300,7 @@ export default function AlgorithmComparison() {
           <div className="text-center">
             <p className="text-gray-900 dark:text-slate-200 font-semibold">Running benchmark suite…</p>
             <p className="text-gray-500 dark:text-slate-400 text-sm mt-1 animate-pulse">
-              Executing all 7 algorithms on 10 / 50 / 200 node graphs
+              Executing routing algorithms on 10 / 50 / 200 node graphs
             </p>
           </div>
         </div>
@@ -355,7 +370,7 @@ export default function AlgorithmComparison() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-[#30363D]">
-                  {ALL_ALGOS.map((algo) => {
+                  {ROUTING_ALGOS.map((algo) => {
                     const row = filtered.find((r) => r.algorithm === algo);
                     const isWinner = algo === winnerAlgo;
                     const isSelected = selectedAlgo === algo;
@@ -501,30 +516,17 @@ export default function AlgorithmComparison() {
                   <span className="ml-1.5 text-gray-500 dark:text-slate-500 font-normal text-xs">theoretical vs actual runtime</span>
                 </h2>
               </div>
-              {/* Algorithm toggles */}
-              <div className="flex flex-wrap gap-1.5">
-                {ALL_ALGOS.map(algo => {
-                  const active = visibleAlgos.has(algo);
-                  return (
-                    <button
-                      key={algo}
-                      onClick={() => toggleVisibleAlgo(algo)}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-150 border"
-                      style={{
-                        backgroundColor: active ? `${ALGO_COLORS[algo]}20` : 'transparent',
-                        borderColor: active ? ALGO_COLORS[algo] : '#334155',
-                        color: active ? ALGO_COLORS[algo] : '#64748b',
-                        opacity: active ? 1 : 0.5,
-                      }}
-                    >
-                      <span
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: active ? ALGO_COLORS[algo] : '#475569' }}
-                      />
-                      {algo}
-                    </button>
-                  );
-                })}
+              <div className="relative">
+                <select
+                  value={complexitySelection}
+                  onChange={(e) => setComplexitySelection(e.target.value as ComplexitySelection)}
+                  className="min-w-[190px] rounded-lg border border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-900/70 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/40"
+                >
+                  <option value="all">All algorithms</option>
+                  {ROUTING_ALGOS.map(algo => (
+                    <option key={algo} value={algo}>{algo}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -549,7 +551,7 @@ export default function AlgorithmComparison() {
             />
 
             <p className="text-xs text-gray-400 dark:text-slate-600 mt-3 text-center">
-              Dashed lines = theoretical Big-O curves · Solid lines = your actual benchmark measurements · Click algorithm buttons to toggle visibility
+              Dashed lines = theoretical Big-O curves | Solid lines = actual routing benchmark measurements | Use the dropdown to view all or one algorithm
             </p>
           </div>
         </>
@@ -565,7 +567,7 @@ export default function AlgorithmComparison() {
             <p className="text-lg font-semibold text-gray-500 dark:text-slate-300">No benchmark data yet</p>
             <p className="text-sm text-gray-400 dark:text-slate-500 mt-1 max-w-xs">
               Select a node count above and click{' '}
-              <span className="text-cyan-600 dark:text-cyan-400 font-medium">Run Benchmark</span> to compare all 7 algorithms.
+              <span className="text-cyan-600 dark:text-cyan-400 font-medium">Run Benchmark</span> to compare routing algorithms.
             </p>
           </div>
           <Button

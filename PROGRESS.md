@@ -9,7 +9,7 @@
 ## Current Status
 
 **Active Phase:** Landing Page Polish
-**Last Completed Task:** Login page static map synced to the shared OSRM-snapped Islamabad route used by the landing hero.
+**Last Completed Task:** Algorithm Comparison cleaned up — MergeSort removed from routing comparison UI, complexity chart dropdown added, item hover details improved.
 **Next Task:** Continue final review, testing, or presentation/report polish as needed.
 
 ---
@@ -196,6 +196,14 @@
 - [x] Route coordinates verified against OSRM-snapped geometry and map orientation reset to north-up flat view
 - [x] Login page static map updated to use the same complete shared OSRM-snapped route
 
+### Phase 16 — Algorithm Comparison UX Cleanup
+
+- [x] Removed MergeSort from route algorithm comparison table/charts
+- [x] Clarified UI copy to describe routing algorithms instead of all DSA demos
+- [x] Replaced complexity chart algorithm buttons with dropdown selector for all/specific algorithms
+- [x] Updated complexity chart hover tooltip to show details for the hovered algorithm line
+- [x] Kept backend Merge Sort implementation available as a standalone DSA module/test
+
 ---
 
 ## Session Log
@@ -252,6 +260,7 @@
 | 47 | 2026-04-28 | Landing hero map animation improved — road-aligned route path, smooth marker interpolation, progressive route animation. Verified `npx.cmd tsc --noEmit` and `npm.cmd run build`. | Landing Hero Animation Done |
 | 48 | 2026-04-28 | Landing hero route verified and corrected — replaced handcrafted geometry with OSRM-snapped Islamabad road coordinates, reset hero map to north-up flat orientation, reran frontend typecheck/build. | Landing Route Verification Done |
 | 49 | 2026-04-28 | Login page static map updated to the latest complete OSRM-snapped route; landing and login now share `frontend/src/lib/heroRoute.ts` to avoid duplicated route coordinates. Verified frontend typecheck/build. | Login Route Sync Done |
+| 50 | 2026-04-28 | Algorithm Comparison UX cleanup — excluded MergeSort from routing comparison UI, added all/specific algorithm dropdown for complexity chart, and improved hover tooltip details. Verified frontend typecheck/build. | Algorithm UX Cleanup Done |
 ---
 
 ## Known Issues / Blockers
