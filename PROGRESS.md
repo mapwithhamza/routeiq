@@ -9,7 +9,7 @@
 ## Current Status
 
 **Active Phase:** Landing Page Polish
-**Last Completed Task:** Landing hero map animation improved — road-aligned route path, smooth marker interpolation, progressive route animation.
+**Last Completed Task:** Landing hero map animation corrected with OSRM-snapped Islamabad road geometry and north-up map orientation.
 **Next Task:** Continue final review, testing, or presentation/report polish as needed.
 
 ---
@@ -193,6 +193,7 @@
 - [x] Progressive route draw/glow preserved with clean fade-and-loop behavior
 - [x] Premium dark MapLibre visual style preserved
 - [x] Login page map left untouched
+- [x] Route coordinates verified against OSRM-snapped geometry and map orientation reset to north-up flat view
 
 ---
 
@@ -248,6 +249,7 @@
 | 45 | 2026-04-03 | Landing smooth figure-8 route restored, Login page static route display (no animation) | Animation v3 Done |
 | 46 | 2026-04-28 | Documentation pass: created `concept.md` explaining algorithms, data structures, concepts, and where they are used in RouteIQ. Updated progress tracker and cleared stale OAuth blocker note. | Concept Docs Done |
 | 47 | 2026-04-28 | Landing hero map animation improved — road-aligned route path, smooth marker interpolation, progressive route animation. Verified `npx.cmd tsc --noEmit` and `npm.cmd run build`. | Landing Hero Animation Done |
+| 48 | 2026-04-28 | Landing hero route verified and corrected — replaced handcrafted geometry with OSRM-snapped Islamabad road coordinates, reset hero map to north-up flat orientation, reran frontend typecheck/build. | Landing Route Verification Done |
 ---
 
 ## Known Issues / Blockers
