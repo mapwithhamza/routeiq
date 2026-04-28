@@ -38,6 +38,15 @@ const ALGO_COMPLEXITY: Record<RoutingAlgo, string> = {
   'TSP-DP': 'O(2^n * n^2)',
 };
 
+const ALGO_BIG_O_CURVE: Record<RoutingAlgo, string> = {
+  'BFS': 'O(n)',
+  'DFS': 'O(n)',
+  'Dijkstra': 'O(n log n)',
+  'A*': 'O(n log n)',
+  'Greedy-NN': 'O(n^2)',
+  'TSP-DP': 'O(2^n)',
+};
+
 type NodeSize = 10 | 50 | 200;
 
 export default function AlgorithmComparison() {
@@ -160,36 +169,60 @@ export default function AlgorithmComparison() {
   // Complexity Visualizer chart
   const visibleComplexityAlgos =
     complexitySelection === 'all' ? ROUTING_ALGOS : ([complexitySelection] as const);
+  const visibleBigOCurves =
+    complexitySelection === 'all'
+      ? Object.entries(bigOCurves)
+      : Object.entries(bigOCurves).filter(([name]) => name === ALGO_BIG_O_CURVE[complexitySelection]);
 
   const complexityChartOptions = {
     backgroundColor: 'transparent',
     tooltip: {
-      trigger: 'item',
-      formatter: (p: any) => {
-        const value = Array.isArray(p.value) ? p.value[1] : p.value;
-        const runtime = typeof value === 'number' ? value.toFixed(4) : value ?? 'N/A';
-        const nodeCount = Number(p.name);
-        const row = (results ?? []).find(
-          r => r.nodes === nodeCount && r.algorithm === p.seriesName && !r.algorithm.includes('_vs_'),
-        );
+      trigger: 'axis',
+      confine: true,
+      appendToBody: true,
+      axisPointer: { type: 'line' },
+      backgroundColor: 'rgba(15, 23, 42, 0.96)',
+      borderColor: 'rgba(34, 211, 238, 0.35)',
+      textStyle: { color: '#e2e8f0' },
+      extraCssText: 'box-shadow: 0 18px 48px rgba(0,0,0,0.35); border-radius: 10px;',
+      formatter: (params: any[]) => {
+        const rows = Array.isArray(params) ? params : [params];
+        const nodeCount = Number(rows[0]?.axisValue ?? rows[0]?.name);
+        const actualRows = rows
+          .map(p => (results ?? []).find(
+            r => r.nodes === nodeCount && r.algorithm === p.seriesName && !r.algorithm.includes('_vs_'),
+          ))
+          .filter(Boolean) as BenchmarkResult[];
+        const theoryRows = rows.filter(p => p.value != null && !(ROUTING_ALGOS as readonly string[]).includes(p.seriesName));
 
-        if (row) {
-          return `
-            <div style="font-weight:700;margin-bottom:6px">${row.algorithm}</div>
-            <div>Input size: <b>${row.nodes} nodes</b></div>
-            <div>Runtime: <b>${row.runtime_ms?.toFixed(4) ?? 'N/A'} ms</b></div>
-            <div>Distance: <b>${row.distance_km != null ? `${row.distance_km.toFixed(4)} km` : 'N/A'}</b></div>
-            <div>Nodes explored: <b>${row.nodes_explored ?? 'N/A'}</b></div>
-            <div>Route stops: <b>${row.route_length ?? 'N/A'}</b></div>
-            <div>Complexity: <b>${ALGO_COMPLEXITY[row.algorithm as RoutingAlgo] ?? 'N/A'}</b></div>
+        let html = `<div style="font-weight:700;margin-bottom:8px">n = ${nodeCount} nodes</div>`;
+
+        actualRows.forEach(row => {
+          const color = ALGO_COLORS[row.algorithm] ?? '#6366f1';
+          html += `
+            <div style="border-top:1px solid rgba(148,163,184,0.22);padding-top:7px;margin-top:7px">
+              <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:${color}">
+                <span style="width:9px;height:9px;border-radius:50%;background:${color};display:inline-block"></span>
+                ${row.algorithm}
+              </div>
+              <div>Runtime: <b>${row.runtime_ms?.toFixed(4) ?? 'N/A'} ms</b></div>
+              <div>Distance: <b>${row.distance_km != null ? `${row.distance_km.toFixed(4)} km` : 'N/A'}</b></div>
+              <div>Nodes explored: <b>${row.nodes_explored ?? 'N/A'}</b></div>
+              <div>Route stops: <b>${row.route_length ?? 'N/A'}</b></div>
+              <div>Complexity: <b>${ALGO_COMPLEXITY[row.algorithm as RoutingAlgo] ?? 'N/A'}</b></div>
+            </div>
           `;
+        });
+
+        if (theoryRows.length > 0) {
+          html += '<div style="border-top:1px solid rgba(148,163,184,0.22);padding-top:7px;margin-top:7px;color:#94a3b8">Theory curves</div>';
+          theoryRows.forEach(p => {
+            const value = typeof p.value === 'number' ? p.value.toFixed(4) : p.value;
+            html += `<div>${p.marker ?? ''}${p.seriesName}: <b>${value} ms</b></div>`;
+          });
         }
 
-        return `
-          <div style="font-weight:700;margin-bottom:6px">${p.seriesName}</div>
-          <div>Input size: <b>${p.name} nodes</b></div>
-          <div>Theoretical value: <b>${runtime} ms</b></div>
-        `;
+        return html;
       },
     },
     legend: {
@@ -215,9 +248,10 @@ export default function AlgorithmComparison() {
     },
     series: [
       // Theoretical Big-O lines
-      ...Object.entries(bigOCurves).map(([name, values]) => ({
+      ...visibleBigOCurves.map(([name, values]) => ({
         name,
         type: 'line' as const,
+        id: `theory-${name}`,
         data: values,
         smooth: true,
         lineStyle: { color: BIG_O_COLORS[name], width: 1.5, type: 'dashed' as const },
@@ -233,6 +267,7 @@ export default function AlgorithmComparison() {
         });
         return {
           name: algo,
+          id: `actual-${algo}`,
           type: 'line' as const,
           data: points,
           smooth: false,
@@ -545,9 +580,12 @@ export default function AlgorithmComparison() {
             </div>
 
             <ReactECharts
+              key={`complexity-${complexitySelection}-${results?.length ?? 0}`}
               option={complexityChartOptions}
               style={{ height: 300 }}
               theme={document.documentElement.classList.contains('dark') ? 'dark' : undefined}
+              notMerge
+              lazyUpdate
             />
 
             <p className="text-xs text-gray-400 dark:text-slate-600 mt-3 text-center">

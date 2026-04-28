@@ -9,7 +9,7 @@
 ## Current Status
 
 **Active Phase:** Landing Page Polish
-**Last Completed Task:** Algorithm Comparison cleaned up — MergeSort removed from routing comparison UI, complexity chart dropdown added, item hover details improved.
+**Last Completed Task:** Complexity chart dropdown/tooltip fixed — selected algorithm now replaces stale chart series and hover uses axis tooltip details.
 **Next Task:** Continue final review, testing, or presentation/report polish as needed.
 
 ---
@@ -203,6 +203,8 @@
 - [x] Replaced complexity chart algorithm buttons with dropdown selector for all/specific algorithms
 - [x] Updated complexity chart hover tooltip to show details for the hovered algorithm line
 - [x] Kept backend Merge Sort implementation available as a standalone DSA module/test
+- [x] Fixed ECharts stale series merge by forcing option replacement when dropdown selection changes
+- [x] Changed complexity tooltip from item hover to axis hover so details appear reliably
 
 ---
 
@@ -261,6 +263,7 @@
 | 48 | 2026-04-28 | Landing hero route verified and corrected — replaced handcrafted geometry with OSRM-snapped Islamabad road coordinates, reset hero map to north-up flat orientation, reran frontend typecheck/build. | Landing Route Verification Done |
 | 49 | 2026-04-28 | Login page static map updated to the latest complete OSRM-snapped route; landing and login now share `frontend/src/lib/heroRoute.ts` to avoid duplicated route coordinates. Verified frontend typecheck/build. | Login Route Sync Done |
 | 50 | 2026-04-28 | Algorithm Comparison UX cleanup — excluded MergeSort from routing comparison UI, added all/specific algorithm dropdown for complexity chart, and improved hover tooltip details. Verified frontend typecheck/build. | Algorithm UX Cleanup Done |
+| 51 | 2026-04-28 | Complexity chart dropdown/hover fix — forced ECharts option replacement on selected algorithm changes, limited specific view to one actual line plus its matching Big-O curve, and switched tooltip to axis hover for reliable details. Verified frontend typecheck/build. | Complexity Chart Fix Done |
 ---
 
 ## Known Issues / Blockers
